@@ -1,0 +1,52 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Add in the MahApps resource so these are based on those -->
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <Color x:Key="BorderLineColor">#FFD0D0D0</Color>
+
+    <SolidColorBrush x:Key="ControlTextColor" Color="#FF878787" />
+    <SolidColorBrush x:Key="TrimColor" Color="#FF878787" />
+    <SolidColorBrush x:Key="BorderColor" Color="{StaticResource BorderLineColor}" />
+    <SolidColorBrush x:Key="BorderTextColor" Color="#FFA0A0A0"/>
+    <SolidColorBrush x:Key="PopupBackground" Color="#FFB0B0B0"/>
+    <!-- "DefaultForegroundBrush" is used by the FadeTrimming behavior -->
+    <SolidColorBrush x:Key="DefaultForegroundBrush" Color="{DynamicResource MahApps.Colors.IdealForeground}"/>
+
+    <Style x:Key="GeneralTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForeground}"/>
+    </Style>
+
+    <Style x:Key="ControlTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource GeneralTitleStyle}">
+        <Setter Property="Foreground" Value="{StaticResource BorderTextColor}"/>
+    </Style>
+
+    <Style x:Key="GeneralButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Padding" Value="5,3"/>
+    </Style>
+
+    <Style x:Key="ListViewTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14"></Setter>
+    </Style>
+
+    <Style x:Key="ListViewSubTextStyle" TargetType="TextBlock" BasedOn="{StaticResource ListViewTextStyle}">
+        <Setter Property="FontSize" Value="13"></Setter>
+    </Style>
+
+    <Style x:Key="ListViewItemStretch" TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MahApps.Styles.ListViewItem}">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    </Style>
+
+    <Style x:Key="EmptyListTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="Foreground" Value="{StaticResource BorderTextColor}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+
+
+</ResourceDictionary>
