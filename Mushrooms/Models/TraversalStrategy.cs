@@ -34,7 +34,7 @@ namespace Mushrooms.Models {
 
             return twoSteps < duration.TotalMilliseconds ?
                 twoSteps :
-                ( duration.TotalMilliseconds ) * 2.0 - twoSteps;
+                ( duration.TotalMilliseconds * 2.0 ) - twoSteps;
         }
 
         public bool CouldTransition( DateTime startTime, TimeSpan duration ) {

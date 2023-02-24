@@ -4,13 +4,13 @@ using Mushrooms.Models;
 
 namespace Mushrooms.ColorAnimation {
     public class ColorAnimationSequence {
-        private readonly ColorAnimationPattern mAnimationPattern;
-        private readonly ITraversalStrategy mTraversalStrategy;
-        private readonly IEasingStrategy mEasingStrategy;
-        private DateTime mStartTime;
+        private readonly ColorAnimationPattern  mAnimationPattern;
+        private readonly ITraversalStrategy     mTraversalStrategy;
+        private readonly IEasingStrategy        mEasingStrategy;
+        private DateTime                        mStartTime;
 
-        public IList<string> Bulbs { get; }
-        public bool CouldTransition { get; private set; }
+        public IList<string>                    Bulbs { get; }
+        public bool                             CouldTransition { get; private set; }
 
         public ColorAnimationSequence( IEnumerable<string> forBulbs, ColorAnimationPattern animationPattern,
                                        ITraversalStrategy traversalStrategy, IEasingStrategy easingStrategy ) {
@@ -26,11 +26,11 @@ namespace Mushrooms.ColorAnimation {
             }
 
             var duration = mAnimationPattern.Duration * parameters.RateMultiplier;
-            var step = mTraversalStrategy.GetNextStep(mStartTime, duration);
+            var step = mTraversalStrategy.GetNextStep( mStartTime, duration );
             var scaledStep = 1.0D / duration.TotalMilliseconds * step;
-            var eased = mEasingStrategy.GetEasedValue(scaledStep);
+            var eased = mEasingStrategy.GetEasedValue( scaledStep );
 
-            var color = mAnimationPattern.Gradient.ColorAt(eased);
+            var color = mAnimationPattern.Gradient.ColorAt( eased );
 
             CouldTransition = mTraversalStrategy.CouldTransition( mStartTime, duration );
 

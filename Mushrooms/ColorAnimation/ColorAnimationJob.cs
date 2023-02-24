@@ -9,10 +9,10 @@ namespace Mushrooms.ColorAnimation
     public class ColorAnimationJob {
         private readonly LimitedRepeatingRandom mRandom;
 
-        public string JobId { get; }
-        public List<string> BulbGroup { get; }
-        public List<ColorAnimationPattern> ColorPalette { get; }
-        public ColorAnimationParameters Parameters { get; private set; }
+        public string                       JobId { get; }
+        public List<string>                 BulbGroup { get; }
+        public List<ColorAnimationPattern>  ColorPalette { get; }
+        public ColorAnimationParameters     Parameters { get; private set; }
 
         public ColorAnimationJob( IEnumerable<string> bulbGroup, IEnumerable<ColorAnimationPattern> colorPalette,
                                   ColorAnimationParameters parameters ) {

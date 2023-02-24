@@ -2,9 +2,9 @@
 
 namespace Mushrooms.ColorAnimation {
     public class ColorAnimationParameters {
-        public bool SynchronizedBulbs { get; }
-        public double RateMultiplier { get; }
-        public double Brightness { get; }
+        public bool     SynchronizedBulbs { get; }
+        public double   RateMultiplier { get; }
+        public double   Brightness { get; }
 
         public ColorAnimationParameters( bool synchronizedBulbs ) {
             SynchronizedBulbs = synchronizedBulbs;
@@ -20,13 +20,13 @@ namespace Mushrooms.ColorAnimation {
             RateMultiplier = rateMultiplier;
             Brightness = brightness;
 
-            if( RateMultiplier < 0.1D ||
-               RateMultiplier > 100.0D ) {
+            if(( RateMultiplier < 0.1D ) ||
+               ( RateMultiplier > 100.0D )) {
                 throw new ApplicationException( "Invalid RateMultiplier value." );
             }
 
-            if( Brightness < 0.0D ||
-               Brightness > 1.0D ) {
+            if(( Brightness < 0.0D ) ||
+               ( Brightness > 1.0D )) {
                 throw new ApplicationException( "Invalid Brightness value." );
             }
         }
