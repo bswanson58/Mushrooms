@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance local:PatternDisplayViewModel, IsDesignTimeCreatable=False}"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="350" d:DesignWidth="800">
 
     <UserControl.Resources>
         <DataTemplate x:Key="BulbTemplate" DataType="{x:Type local:TestBulb}">
@@ -20,14 +20,14 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid Margin="15">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <ItemsControl Grid.Row="0" BorderThickness="1" BorderBrush="{StaticResource TrimColor}" 
-                      Height="60" Padding="5" Margin="5,15"
+                      Height="60" Padding="5" Margin="15,0,15,10"
                       ItemsSource="{Binding Bulbs}" ItemTemplate="{StaticResource BulbTemplate}"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ItemsControl.ItemsPanel>
@@ -41,6 +41,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="10"/>
@@ -55,7 +56,7 @@
 
             <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
                    Content="Rate Multiplier:"/>
-            <Slider Grid.Row="1" Grid.Column="1" Minimum="0.1" Maximum="50.0" 
+            <Slider Grid.Row="1" Grid.Column="1" Minimum="0.1" Maximum="10.0" 
                     Value="{Binding RateMultiplier}"/>
 
             <Label Grid.Row="3" Grid.Column="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
@@ -70,6 +71,8 @@
 
             <CheckBox Grid.Row="7" Grid.Column="1"
                       IsChecked="{Binding SynchronizeBulbs}" Content="Synchronize Bulbs"/>
+
+            <local:ParameterDisplay Grid.Column="2" Grid.Row="0" Grid.RowSpan="8" HorizontalAlignment="Right"/>
         </Grid>
     </Grid>
 </UserControl>

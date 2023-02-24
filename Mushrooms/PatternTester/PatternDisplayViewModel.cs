@@ -30,6 +30,7 @@ namespace Mushrooms.PatternTester {
         private readonly IState<PatternTestState>   mState;
         private readonly IAnimationProcessor        mAnimationProcessor;
         private readonly LimitedRepeatingRandom     mRandom;
+        private readonly IPatternTest               mTestFacade;
         private IDisposable ?                       mAnimationSubscription;
         private Double                              mRateMultiplier;
         private Double                              mBrightness;
@@ -39,15 +40,17 @@ namespace Mushrooms.PatternTester {
 
         public  ObservableCollection<TestBulb>      Bulbs { get; }
 
-        public PatternDisplayViewModel( IState<PatternTestState> state, IAnimationProcessor animationProcessor ) {
+        public PatternDisplayViewModel( IState<PatternTestState> state, IAnimationProcessor animationProcessor, 
+                                        IPatternTest testFacade ) {
             mState = state;
             mAnimationProcessor = animationProcessor;
+            mTestFacade = testFacade;
 
             mRandom = new LimitedRepeatingRandom();
-            mRateMultiplier = 1.0D;
+            mRateMultiplier = mState.Value.DisplayParameters.RateMultiplier;
             mBrightness = 1.0D;
             mSynchronizeBulbs = false;
-            mBulbCount = 3;
+            mBulbCount = mState.Value.DisplayParameters.BulbCount;
 
             Bulbs = new ObservableCollection<TestBulb>();
             BindingOperations.EnableCollectionSynchronization( Bulbs, new object());
@@ -74,12 +77,10 @@ namespace Mushrooms.PatternTester {
         public double RateMultiplier {
             get => mRateMultiplier;
             set {
-                if(( value > 0.1D ) &&
-                   ( value < 100.0D )) {
-                    mRateMultiplier = value;
+                mRateMultiplier = Math.Min( 10.0, Math.Max( 0.1, value ));
 
-                    UpdateJobParameters();
-                }
+                UpdateJobParameters();
+                UpdateDisplayParameters();
             }
         }
 
@@ -98,7 +99,15 @@ namespace Mushrooms.PatternTester {
                 mBulbCount = Math.Min( 20, Math.Max( 1, value ));
 
                 UpdateAnimation();
+                UpdateDisplayParameters();
             }
+        }
+
+        private void UpdateDisplayParameters() {
+            mTestFacade.SetDisplayParameters( new DisplayParameters {
+                BulbCount = mBulbCount,
+                RateMultiplier = mRateMultiplier
+            });
         }
 
         private void UpdateJobParameters() =>

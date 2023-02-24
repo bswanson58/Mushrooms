@@ -9,7 +9,7 @@
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance patternParameters:ParameterEditorViewModel, IsDesignTimeCreatable=False}"
              Width="320"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="250" d:DesignWidth="400">
 
     <Grid>
         <Grid.ColumnDefinitions>

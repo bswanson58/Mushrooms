@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="Mushrooms.PatternTester.ParameterDisplay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mushrooms.PatternTester"
+             xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
+             mc:Ignorable="d" 
+             viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
+             d:DataContext="{d:DesignInstance local:ParameterDisplayViewModel, IsDesignTimeCreatable=False}"
+             d:DesignHeight="200" d:DesignWidth="400">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="120"/>
+            <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center" 
+               Style="{StaticResource LabelStyle}" Content="Swatch Count:"/>
+        <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding SwatchCount}"/>
+
+        <Label Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" 
+               Style="{StaticResource LabelStyle}" Content="Pattern Count:"/>
+        <TextBlock Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Text="{Binding PatternCount}"/>
+
+        <Label Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" 
+               Style="{StaticResource LabelStyle}" Content="Bulb Count:"/>
+        <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding BulbCount}"/>
+
+        <Label Grid.Column="0" Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center"
+               Style="{StaticResource LabelStyle}" Content="Duration:"/>
+        <TextBlock Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" Text="{Binding BaseDuration}"/>
+
+        <Label Grid.Column="0" Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center" 
+               Style="{StaticResource LabelStyle}"  Content="Duration Jitter:"/>
+        <TextBlock Grid.Column="1" Grid.Row="4" VerticalAlignment="Center" Text="{Binding DurationJitter}"/>
+
+        <Label Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center" 
+               Style="{StaticResource LabelStyle}"  Content="Rate Multiplier:"/>
+        <TextBlock Grid.Column="1" Grid.Row="5" VerticalAlignment="Center" Text="{Binding RateMultiplier}"/>
+    </Grid>
+</UserControl>
