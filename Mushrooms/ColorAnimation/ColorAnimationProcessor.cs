@@ -16,6 +16,7 @@ namespace Mushrooms.ColorAnimation
         void StopAnimationProcessor();
 
         void AddJob( ColorAnimationJob job );
+        void RemoveJob( ColorAnimationJob job );
         void UpdateJobParameters( string jobId, ColorAnimationParameters parameters );
     }
 
@@ -60,7 +61,15 @@ namespace Mushrooms.ColorAnimation
         }
 
         public void AddJob( ColorAnimationJob job ) {
-            mJobs.Add( new ColorAnimationJobItem( job ) );
+            mJobs.Add( new ColorAnimationJobItem( job ));
+        }
+
+        public void RemoveJob( ColorAnimationJob job ) {
+            var item = mJobs.FirstOrDefault( j => j.Job.JobId.Equals( job.JobId ));
+
+            if( item != null ) {
+                mJobs.Remove( item );
+            }
         }
 
         public void UpdateJobParameters( string jobId, ColorAnimationParameters parameters ) {

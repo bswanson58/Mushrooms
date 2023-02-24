@@ -7,6 +7,8 @@
         xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
         xmlns:mushrooms="clr-namespace:Mushrooms"
         xmlns:paletteBuilder="clr-namespace:Mushrooms.PaletteBuilder"
+        xmlns:patternParameters="clr-namespace:Mushrooms.PatternParameters"
+        xmlns:patternTester="clr-namespace:Mushrooms.PatternTester"
         mc:Ignorable="d"
         Title="Mushrooms"
         ResizeMode="CanResizeWithGrip"
@@ -14,84 +16,20 @@
         WindowStartupLocation="CenterScreen"
         viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
         d:DataContext="{d:DesignInstance mushrooms:MainWindowViewModel, IsDesignTimeCreatable=False}"
-        Height="500" Width="900">
+        Height="600" Width="1200">
 
     <Grid Margin="15">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <paletteBuilder:PaletteBuilder Grid.Row="0" Grid.Column="0"/>
+        <paletteBuilder:PaletteBuilder Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
+        <patternParameters:ParameterEditor Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left"/>
+        <patternTester:PatternDisplay Grid.Row="1" Grid.Column="1"/>
     </Grid>
-    <!--
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="100"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="1*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="100"/>
-            <ColumnDefinition Width="100"/>
-            <ColumnDefinition Width="100"/>
-            <ColumnDefinition Width="100"/>
-            <ColumnDefinition Width="100"/>
-            <ColumnDefinition Width="100"/>
-            <ColumnDefinition Width="100"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
-
-        <Rectangle Grid.Column="1" Grid.Row="1" Margin="3" Opacity="{Binding ColorBrightness}">
-            <Rectangle.Fill>
-                <SolidColorBrush Color="{Binding ColorSwatch1}"/>
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Grid.Column="2" Grid.Row="1" Margin="3" Opacity="{Binding ColorBrightness}">
-            <Rectangle.Fill>
-                <SolidColorBrush Color="{Binding ColorSwatch2}"/>
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Grid.Column="3" Grid.Row="1" Margin="3" Opacity="{Binding ColorBrightness}">
-            <Rectangle.Fill>
-                <SolidColorBrush Color="{Binding ColorSwatch3}"/>
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Grid.Column="4" Grid.Row="1" Margin="3" Opacity="{Binding ColorBrightness}">
-            <Rectangle.Fill>
-                <SolidColorBrush Color="{Binding ColorSwatch4}"/>
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Grid.Column="5" Grid.Row="1" Margin="3" Opacity="{Binding ColorBrightness}">
-            <Rectangle.Fill>
-                <SolidColorBrush Color="{Binding ColorSwatch5}"/>
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Grid.Column="6" Grid.Row="1" Margin="3" Opacity="{Binding ColorBrightness}">
-            <Rectangle.Fill>
-                <SolidColorBrush Color="{Binding ColorSwatch6}"/>
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Grid.Column="7" Grid.Row="1" Margin="3" Opacity="{Binding ColorBrightness}">
-            <Rectangle.Fill>
-                <SolidColorBrush Color="{Binding ColorSwatch7}"/>
-            </Rectangle.Fill>
-        </Rectangle>
-
-        <Slider Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="3" Margin="0,15" Minimum="0.1" Maximum="50.0" 
-                Value="{Binding RateMultiplier}"/>
-
-        <Slider Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="3" Margin="0,15" Minimum="0.0" Maximum="1.0" 
-                Value="{Binding Brightness}"/>
-
-        <CheckBox Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="3" Margin="0,15"
-                  IsChecked="{Binding SynchronizeBulbs}" Content="Synchronize Bulbs"/>
-    </Grid>
--->
 </mah:MetroWindow>

@@ -22,7 +22,7 @@ namespace Mushrooms.ColorAnimation
 
             mRandom = new LimitedRepeatingRandom( 0.6 );
 
-            if( !ColorPalette.Any() ) {
+            if(!ColorPalette.Any()) {
                 throw new ApplicationException( "A list of ColorAnimationPattern instances must be provided" );
             }
 

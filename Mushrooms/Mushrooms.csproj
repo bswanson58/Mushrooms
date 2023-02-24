@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="ColorThief.ImageSharp" Version="1.0.0" />
+    <PackageReference Include="Fluxor" Version="5.7.0" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="NCuid.NetCore" Version="1.0.1" />
@@ -21,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="PatternTester\" />
     <Folder Include="Resources\" />
   </ItemGroup>
 

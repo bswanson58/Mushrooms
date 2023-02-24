@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
+using Fluxor;
 using Microsoft.Extensions.DependencyInjection;
 using Mushrooms.ColorAnimation;
+using Mushrooms.PatternTester.Store;
 using ReusableBits.Wpf.ViewModelLocator;
 
-namespace Mushrooms
-{
+namespace Mushrooms {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
@@ -13,7 +15,7 @@ namespace Mushrooms
         private IServiceProvider ?  mServiceProvider;
 
         private void OnStartup( object sender, StartupEventArgs e ) {
-            ConfigureApp();
+            mServiceProvider = ConfigureApp().Result;
 
             if( mServiceProvider != null ) {
                 var mainWindow = mServiceProvider.GetService<MainWindow>();
@@ -22,19 +24,32 @@ namespace Mushrooms
             }
         }
 
-        private void ConfigureApp() {
+        private static async Task<IServiceProvider> ConfigureApp() {
             var serviceCollection = new ServiceCollection();
 
             ConfigureServices( serviceCollection );
 
-            mServiceProvider = serviceCollection.BuildServiceProvider();
-            ViewModelLocationProvider.SetDefaultViewModelFactory( type => mServiceProvider.GetService( type ));
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            ViewModelLocationProvider.SetDefaultViewModelFactory( type => serviceProvider.GetService( type ));
+
+            var store = serviceProvider.GetService<IStore>();
+
+            if( store != null ) {
+                await store.InitializeAsync();
+            }
+
+            return serviceProvider;
         }
     
-        private void ConfigureServices( IServiceCollection services ) {
+        private static void ConfigureServices( IServiceCollection services ) {
 
             services.AddScoped<ISequenceFactory, ColorAnimationSequenceFactory>();
             services.AddSingleton<IAnimationProcessor, ColorAnimationProcessor>();
+
+            services.AddScoped<IPatternTest, PatternTestFacade>();
+
+            services.AddFluxor( options => options.ScanAssemblies( typeof( App ).Assembly ));
 
             services.Scan( scan => 
                 scan.FromAssemblyOf<App>()
