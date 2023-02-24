@@ -13,12 +13,16 @@ using Color = System.Windows.Media.Color;
 
 namespace Mushrooms.PaletteBuilder {
     internal class ColorSwatch : PropertyChangeBase {
+        private readonly Action<ColorSwatch>    mOnBulbSelectionChanged;
+
         public  Color               SwatchColor { get; }
         public  bool                IsSelected { get; set; }
 
         public  DelegateCommand     SelectSwatch { get; }
 
-        public ColorSwatch( Color color ) {
+        public ColorSwatch( Color color, Action<ColorSwatch> onSelectionChanged ) {
+            mOnBulbSelectionChanged = onSelectionChanged;
+
             SwatchColor = color;
             IsSelected = true;
 
@@ -29,6 +33,7 @@ namespace Mushrooms.PaletteBuilder {
             IsSelected = !IsSelected;
 
             RaisePropertyChanged( () => IsSelected );
+            mOnBulbSelectionChanged.Invoke( this );
         }
     }
 
@@ -62,6 +67,9 @@ namespace Mushrooms.PaletteBuilder {
 
         }
 
+        private void OnSwatchSelectionChanged( ColorSwatch _ ) => 
+            UpdatePaletteState();
+
         private void UpdatePaletteState() =>
             mPatternTestFacade.SetPatternPalette( from swatch in Palette where swatch.IsSelected select swatch.SwatchColor );
 
@@ -73,7 +81,8 @@ namespace Mushrooms.PaletteBuilder {
                 var palette = colorThief.GetPalette( image, 25, 5 );
 
                 foreach( var color in palette.OrderByDescending( c => c.Population )) {
-                    Palette.Add( new ColorSwatch( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B )));
+                    Palette.Add( new ColorSwatch( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ),
+                                 OnSwatchSelectionChanged ));
                 }
             }
         }
