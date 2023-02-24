@@ -21,9 +21,9 @@ namespace Mushrooms.ColorAnimation
     }
 
     internal class ColorAnimationJobItem {
-        public ColorAnimationJob Job { get; }
+        public ColorAnimationJob            Job { get; }
         public List<ColorAnimationSequence> Sequences { get; }
-        public List<ColorAnimationResult> LastResults { get; }
+        public List<ColorAnimationResult>   LastResults { get; }
 
         public ColorAnimationJobItem( ColorAnimationJob job ) {
             Job = job;
@@ -33,11 +33,11 @@ namespace Mushrooms.ColorAnimation
     }
 
     public class ColorAnimationProcessor : IAnimationProcessor {
-        private readonly ISequenceFactory mSequenceFactory;
-        private readonly List<ColorAnimationJobItem> mJobs;
-        private readonly CancellationTokenSource mTokenSource;
-        private Task mAnimationTask;
-        private readonly Subject<List<ColorAnimationResult>> mResultSubject;
+        private readonly ISequenceFactory                       mSequenceFactory;
+        private readonly List<ColorAnimationJobItem>            mJobs;
+        private readonly CancellationTokenSource                mTokenSource;
+        private Task                                            mAnimationTask;
+        private readonly Subject<List<ColorAnimationResult>>    mResultSubject;
 
         public IObservable<List<ColorAnimationResult>> OnResultsPublished => mResultSubject.AsObservable();
 
@@ -61,41 +61,49 @@ namespace Mushrooms.ColorAnimation
         }
 
         public void AddJob( ColorAnimationJob job ) {
-            mJobs.Add( new ColorAnimationJobItem( job ));
+            lock( mJobs ) {
+                mJobs.Add( new ColorAnimationJobItem( job ));
+            }
         }
 
         public void RemoveJob( ColorAnimationJob job ) {
-            var item = mJobs.FirstOrDefault( j => j.Job.JobId.Equals( job.JobId ));
+            lock( mJobs ) {
+                var item = mJobs.FirstOrDefault( j => j.Job.JobId.Equals( job.JobId ));
 
-            if( item != null ) {
-                mJobs.Remove( item );
+                if( item != null ) {
+                    mJobs.Remove( item );
+                }
             }
         }
 
         public void UpdateJobParameters( string jobId, ColorAnimationParameters parameters ) {
-            var job = mJobs.FirstOrDefault(j => j.Job.JobId.Equals(jobId));
+            lock( mJobs ) {
+                var job = mJobs.FirstOrDefault( j => j.Job.JobId.Equals( jobId ));
 
-            if( job != null ) {
-                job.Job.UpdateParameters( parameters );
+                if( job != null ) {
+                    job.Job.UpdateParameters( parameters );
+                }
             }
         }
 
         private void AnimationTask() {
-            foreach( var job in mJobs ) {
-                UpdateSequences( job );
+            lock( mJobs ) {
+                foreach( var job in mJobs ) {
+                    UpdateSequences( job );
 
-                job.LastResults.Clear();
+                    job.LastResults.Clear();
 
-                foreach( var sequence in job.Sequences ) {
-                    job.LastResults.Add( sequence.RunAnimationStep( job.Job.Parameters ));
+                    foreach( var sequence in job.Sequences ) {
+                        job.LastResults.Add( sequence.RunAnimationStep( job.Job.Parameters ));
+                    }
+
+                    mResultSubject.OnNext( job.LastResults );
                 }
-
-                mResultSubject.OnNext( job.LastResults );
             }
         }
 
         private void UpdateSequences( ColorAnimationJobItem job ) {
-            var completedList = job.Sequences.Where(s => s.CouldTransition).ToList();
+            var completedList = job.Sequences.Where( s => s.CouldTransition ).ToList();
 
             foreach( var sequence in completedList ) {
                 job.Sequences.Remove( sequence );
