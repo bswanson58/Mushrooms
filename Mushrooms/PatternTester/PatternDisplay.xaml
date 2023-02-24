@@ -49,6 +49,8 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="10"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
@@ -61,7 +63,12 @@
             <Slider Grid.Row="3" Grid.Column="1" Minimum="0.0" Maximum="1.0" 
                     Value="{Binding Brightness}"/>
 
-            <CheckBox Grid.Row="5" Grid.Column="1"
+            <Label Grid.Row="5" Grid.Column="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                   Content="Bulb Count:"/>
+            <Slider Grid.Row="5" Grid.Column="1" Minimum="1" Maximum="20" 
+                    Value="{Binding BulbCount}"/>
+
+            <CheckBox Grid.Row="7" Grid.Column="1"
                       IsChecked="{Binding SynchronizeBulbs}" Content="Synchronize Bulbs"/>
         </Grid>
     </Grid>

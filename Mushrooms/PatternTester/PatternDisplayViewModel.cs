@@ -34,6 +34,7 @@ namespace Mushrooms.PatternTester {
         private Double                              mRateMultiplier;
         private Double                              mBrightness;
         private bool                                mSynchronizeBulbs;
+        private int                                 mBulbCount;
         private ColorAnimationJob ?                 mJob;
 
         public  ObservableCollection<TestBulb>      Bulbs { get; }
@@ -46,6 +47,7 @@ namespace Mushrooms.PatternTester {
             mRateMultiplier = 1.0D;
             mBrightness = 1.0D;
             mSynchronizeBulbs = false;
+            mBulbCount = 3;
 
             Bulbs = new ObservableCollection<TestBulb>();
             BindingOperations.EnableCollectionSynchronization( Bulbs, new object());
@@ -90,6 +92,15 @@ namespace Mushrooms.PatternTester {
             }
         }
 
+        public int BulbCount {
+            get => mBulbCount;
+            set {
+                mBulbCount = Math.Min( 20, Math.Max( 1, value ));
+
+                UpdateAnimation();
+            }
+        }
+
         private void UpdateJobParameters() =>
             mJob?.UpdateParameters( CreateParameters());
 
@@ -126,7 +137,7 @@ namespace Mushrooms.PatternTester {
             mState.Value.Parameters.PatternCount > 2;
 
         private ColorAnimationJob CreateAnimationJob() {
-            var bulbGroup = new List<string>{ "bulb1", "bulb2", "bulb3", "bulb4", "bulb5", "bulb6", "bulb7" };
+            var bulbGroup = CreateBulbGroup();
             var palette = new List<ColorAnimationPattern>();
 
             for( var index = 1; index <= mState.Value.Parameters.PatternCount; index++ ) {
@@ -137,6 +148,9 @@ namespace Mushrooms.PatternTester {
 
             return new ColorAnimationJob( bulbGroup, palette, animationParameters );
         }
+
+        private IList<string> CreateBulbGroup() =>
+            Enumerable.Range( 1, mBulbCount ).Select( i => $"Bulb {i}" ).ToList();
 
         private ColorAnimationPattern BuildPattern( IReadOnlyList<Color> fromColors, PatternParameters parameters ) {
             var gradient = new MultiGradient( CreateGradients( fromColors.ToList()));
