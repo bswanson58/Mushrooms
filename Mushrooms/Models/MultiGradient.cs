@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Mushrooms.Support;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media;
 
@@ -63,19 +63,54 @@ namespace Mushrooms.Models {
                 left = stop;
             }
             */
-            var left = stops.Last( s => s.Offset <= offset ); 
-            var right = stops.First( s => s.Offset > offset );
+            var left = stops.LastOrDefault( s => s.Offset <= offset, stops.First()); 
+            var right = stops.FirstOrDefault( s => s.Offset > offset, stops.Last());
+            var colorOffset = Math.Round(( offset - left.Offset ) / ( right.Offset - left.Offset ), 2 );
 
-            Debug.Assert( right != null );
-
-            offset = Math.Round( ( offset - left.Offset ) / ( right.Offset - left.Offset ), 2 );
-
-            byte a = (byte)(( right.Color.A - left.Color.A ) * offset + left.Color.A );
-            byte r = (byte)(( right.Color.R - left.Color.R ) * offset + left.Color.R );
-            byte g = (byte)(( right.Color.G - left.Color.G ) * offset + left.Color.G );
-            byte b = (byte)(( right.Color.B - left.Color.B ) * offset + left.Color.B );
+            byte a = (byte)(( right.Color.A - left.Color.A ) * colorOffset + left.Color.A );
+            byte r = (byte)(( right.Color.R - left.Color.R ) * colorOffset + left.Color.R );
+            byte g = (byte)(( right.Color.G - left.Color.G ) * colorOffset + left.Color.G );
+            byte b = (byte)(( right.Color.B - left.Color.B ) * colorOffset + left.Color.B );
 
             return Color.FromArgb( a, r, g, b );
+        }
+
+        public static MultiGradient Create( IList<Color> fromColors ) =>
+            new( CreateGradients( fromColors ));
+
+        private static IList<GradientColor> CreateGradients( IList<Color> fromColors ) {
+            var retValue = new List<GradientColor>();
+            var gradientStop = 0.0D;
+            var offset = 1.0D;
+
+            if( fromColors.Count == 3 ) {
+                offset = 0.5D;
+            }
+            else if( fromColors.Count > 3 ) {
+                offset = CalculateOffset( fromColors.Count ) / 2.0D;
+            }
+
+            foreach( var color in fromColors.Randomize()) {
+                retValue.Add( new GradientColor( color, gradientStop ));
+
+                gradientStop = Math.Min( 1.0D, gradientStop + offset );
+                offset = CalculateOffset( fromColors.Count );
+            }
+
+            return retValue;
+        }
+
+        private static double CalculateOffset( int totalStops ) {
+            var offset = 1.0D;
+
+            if( totalStops == 3 ) {
+                offset = 0.5D;
+            }
+            else if( totalStops > 3 ) {
+                offset = ( 1.0D / ( totalStops - 2 ));
+            }
+
+            return offset;
         }
     }
 }

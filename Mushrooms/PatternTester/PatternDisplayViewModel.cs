@@ -162,32 +162,10 @@ namespace Mushrooms.PatternTester {
             Enumerable.Range( 1, mBulbCount ).Select( i => $"Bulb {i}" ).ToList();
 
         private ColorAnimationPattern BuildPattern( IReadOnlyList<Color> fromColors, PatternParameters parameters ) {
-            var gradient = new MultiGradient( CreateGradients( fromColors.ToList()));
+            var gradient = MultiGradient.Create( fromColors.ToList());
             var duration = parameters.Duration + TimeSpan.FromSeconds( mRandom.Next( 0, (int)parameters.DurationJitter.TotalSeconds ));
 
             return new ColorAnimationPattern( gradient, duration, parameters.TraversalStyle, parameters.EasingStyle );
-        }
-
-        private IList<GradientColor> CreateGradients( IList<Color> fromColors ) {
-            var retValue = new List<GradientColor>();
-            var gradientStop = 0.0D;
-            var offset = 1.0D;
-
-            if( fromColors.Count == 3 ) {
-                offset = 0.5D;
-            }
-            else if( fromColors.Count > 3 ) {
-                offset = ( 1.0D / ( fromColors.Count - 2 )) / 2.0D;
-            }
-
-            foreach( var color in fromColors.Randomize()) {
-                retValue.Add( new GradientColor( color, gradientStop ));
-
-                gradientStop = Math.Min( 1.0D, gradientStop + offset );
-                offset += Math.Min( 1.0D, ( 1.0D / ( fromColors.Count - 2 )));
-            }
-
-            return retValue;
         }
 
         public void Dispose() {
