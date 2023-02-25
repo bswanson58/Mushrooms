@@ -53,7 +53,7 @@ namespace Mushrooms.PatternTester {
             mBulbCount = mState.Value.DisplayParameters.BulbCount;
 
             Bulbs = new ObservableCollection<TestBulb>();
-            BindingOperations.EnableCollectionSynchronization( Bulbs, new object());
+            BindingOperations.EnableCollectionSynchronization( Bulbs, Bulbs );
 
             mState.StateChanged += OnStateChanged;
             mAnimationSubscription = mAnimationProcessor.OnResultsPublished.Subscribe( OnAnimationResults );
@@ -117,11 +117,13 @@ namespace Mushrooms.PatternTester {
             new( mSynchronizeBulbs, mRateMultiplier, mBrightness );
 
         private void OnAnimationResults( List<ColorAnimationResult> animationResults ) {
-            Bulbs.Clear();
+            lock( Bulbs ) {
+                Bulbs.Clear();
 
-            foreach( var result in animationResults ) {
-                foreach( var bulb in result.Bulbs ) {
-                    Bulbs.Add( new TestBulb( bulb, result.Color, result.Brightness ));
+                foreach( var result in animationResults ) {
+                    foreach( var bulb in result.Bulbs ) {
+                        Bulbs.Add( new TestBulb( bulb, result.Color, result.Brightness ));
+                    }
                 }
             }
         }
