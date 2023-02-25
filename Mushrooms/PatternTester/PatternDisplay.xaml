@@ -66,7 +66,7 @@
 
             <Label Grid.Row="5" Grid.Column="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
                    Content="Bulb Count:"/>
-            <Slider Grid.Row="5" Grid.Column="1" Minimum="1" Maximum="20" 
+            <Slider Grid.Row="5" Grid.Column="1" Minimum="1" Maximum="32" 
                     Value="{Binding BulbCount}"/>
 
             <CheckBox Grid.Row="7" Grid.Column="1"

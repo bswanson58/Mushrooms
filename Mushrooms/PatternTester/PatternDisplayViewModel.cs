@@ -96,7 +96,7 @@ namespace Mushrooms.PatternTester {
         public int BulbCount {
             get => mBulbCount;
             set {
-                mBulbCount = Math.Min( 20, Math.Max( 1, value ));
+                mBulbCount = Math.Min( 32, Math.Max( 1, value ));
 
                 UpdateAnimation();
                 UpdateDisplayParameters();

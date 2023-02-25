@@ -80,7 +80,7 @@ namespace Mushrooms.PatternParameters {
         public int PatternCount {
             get => mPatternCount;
             set {
-                mPatternCount = Math.Min( 25, Math.Max( 3, value ));
+                mPatternCount = Math.Min( 40, Math.Max( 3, value ));
 
                 UpdateTestState();
             }
