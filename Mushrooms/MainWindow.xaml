@@ -7,8 +7,6 @@
         xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
         xmlns:mushrooms="clr-namespace:Mushrooms"
         xmlns:paletteBuilder="clr-namespace:Mushrooms.PaletteBuilder"
-        xmlns:patternParameters="clr-namespace:Mushrooms.PatternParameters"
-        xmlns:patternTester="clr-namespace:Mushrooms.PatternTester"
         mc:Ignorable="d"
         Title="Mushrooms"
         ResizeMode="CanResizeWithGrip"
@@ -29,7 +27,5 @@
         </Grid.ColumnDefinitions>
 
         <paletteBuilder:PaletteBuilder Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
-        <patternParameters:ParameterEditor Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left"/>
-        <patternTester:PatternDisplay Grid.Row="1" Grid.Column="1"/>
     </Grid>
 </mah:MetroWindow>

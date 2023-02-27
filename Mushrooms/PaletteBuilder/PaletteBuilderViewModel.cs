@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
-using Mushrooms.PatternTester.Store;
 using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.ViewModelSupport;
 using SixLabors.ImageSharp;
@@ -39,15 +38,13 @@ namespace Mushrooms.PaletteBuilder {
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class PaletteBuilderViewModel : PropertyChangeBase {
-        private readonly IPatternTest   mPatternTestFacade;
 
         public  ObservableCollection<ColorSwatch>   Palette { get; }
 
         public  DelegateCommand         SelectImage { get; }
         public  ImageSource ?           PatternImage { get; private set; }
 
-        public PaletteBuilderViewModel( IPatternTest patternTestFacade ) {
-            mPatternTestFacade = patternTestFacade;
+        public PaletteBuilderViewModel() {
             Palette = new ObservableCollection<ColorSwatch>();
 
             SelectImage = new DelegateCommand( OnSelectFile );
@@ -70,8 +67,8 @@ namespace Mushrooms.PaletteBuilder {
         private void OnSwatchSelectionChanged( ColorSwatch _ ) => 
             UpdatePaletteState();
 
-        private void UpdatePaletteState() =>
-            mPatternTestFacade.SetPatternPalette( from swatch in Palette where swatch.IsSelected select swatch.SwatchColor );
+        private void UpdatePaletteState() {}
+//            mPatternTestFacade.SetPatternPalette( from swatch in Palette where swatch.IsSelected select swatch.SwatchColor );
 
         private void SelectImageColors( string fileName ) {
             Palette.Clear();

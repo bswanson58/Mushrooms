@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using Fluxor;
 using Microsoft.Extensions.DependencyInjection;
-using Mushrooms.ColorAnimation;
-using Mushrooms.PatternTester.Store;
 using ReusableBits.Wpf.ViewModelLocator;
 
 namespace Mushrooms {
@@ -43,11 +41,6 @@ namespace Mushrooms {
         }
     
         private static void ConfigureServices( IServiceCollection services ) {
-
-            services.AddScoped<ISequenceFactory, ColorAnimationSequenceFactory>();
-            services.AddSingleton<IAnimationProcessor, ColorAnimationProcessor>();
-
-            services.AddScoped<IPatternTest, PatternTestFacade>();
 
             services.AddFluxor( options => options.ScanAssemblies( typeof( App ).Assembly ));
 
