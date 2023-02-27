@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ReusableBits.Platform\ReusableBits.Platform.csproj" />
+    <ProjectReference Include="..\ReusableBits.Wpf\ReusableBits.Wpf.csproj" />
   </ItemGroup>
 
 </Project>

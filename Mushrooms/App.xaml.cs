@@ -2,12 +2,14 @@
 using System.Threading.Tasks;
 using System.Windows;
 using Fluxor;
+using HueLighting.Hub;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mushrooms.Platform;
 using Mushrooms.SceneBuilder.Store;
 using ReusableBits.Platform.Interfaces;
 using ReusableBits.Platform.Preferences;
+using ReusableBits.Wpf.DialogService;
 using ReusableBits.Wpf.ViewModelLocator;
 
 namespace Mushrooms {
@@ -59,7 +61,11 @@ namespace Mushrooms {
             services.AddScoped<IFileWriter, JsonObjectWriter>();
             services.AddScoped<IPreferences, PreferencesManager>();
 
+            services.AddScoped<IDialogService, DialogService>();
+
             services.AddScoped<ISceneFacade, SceneFacade>();
+
+            services.AddScoped<IHubManager, HubManager>();
 
             services.AddFluxor( options => options.ScanAssemblies( typeof( App ).Assembly ));
 
