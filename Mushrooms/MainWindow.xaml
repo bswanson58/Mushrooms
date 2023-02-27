@@ -7,6 +7,7 @@
         xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
         xmlns:mushrooms="clr-namespace:Mushrooms"
         xmlns:paletteBuilder="clr-namespace:Mushrooms.PaletteBuilder"
+        xmlns:sceneParametersEditor="clr-namespace:Mushrooms.SceneParametersEditor"
         mc:Ignorable="d"
         Title="Mushrooms"
         ResizeMode="CanResizeWithGrip"
@@ -27,5 +28,6 @@
         </Grid.ColumnDefinitions>
 
         <paletteBuilder:PaletteBuilder Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
+        <sceneParametersEditor:SceneParametersEditor Grid.Row="1" Grid.Column="0"/>
     </Grid>
 </mah:MetroWindow>

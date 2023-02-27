@@ -1,7 +1,6 @@
-﻿using System.IO;
-using System;
+﻿using ReusableBits.Platform.Interfaces;
 
-namespace ReusableBits.Wpf.Platform {
+namespace ReusableBits.Platform.Preferences {
     public interface IEnvironment {
         string		ApplicationName();
         string      EnvironmentName();
@@ -11,7 +10,7 @@ namespace ReusableBits.Wpf.Platform {
         string		PreferencesDirectory();
     }
 
-    class OperatingEnvironment : IEnvironment {
+    public class OperatingEnvironment : IEnvironment {
         private readonly IApplicationConstants  mApplicationConstants;
 
         public OperatingEnvironment( IApplicationConstants applicationConstants ) {

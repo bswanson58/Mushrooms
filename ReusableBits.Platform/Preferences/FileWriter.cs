@@ -1,7 +1,6 @@
-﻿using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 
-namespace ReusableBits.Wpf.Platform {
+namespace ReusableBits.Platform.Preferences {
     public interface IFileWriter {
         void	Write<T>( string path, T item );
         T ?		Read<T>( string path );

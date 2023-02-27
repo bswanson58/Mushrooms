@@ -1,7 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using ReusableBits.Platform.Interfaces;
 
-namespace ReusableBits.Wpf.Platform {
+namespace ReusableBits.Platform.Preferences {
     public interface IPreferences {
         T		Load<T>() where T : new();
         T		Load<T>( string path ) where T : new();

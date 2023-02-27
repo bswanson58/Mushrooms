@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ColorMinePortable" Version="2.0.1" />
+    <PackageReference Include="Q42.HueApi" Version="3.21.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ReusableBits.Platform\ReusableBits.Platform.csproj" />
+  </ItemGroup>
+
+</Project>

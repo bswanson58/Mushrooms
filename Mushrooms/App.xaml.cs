@@ -3,6 +3,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using Fluxor;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Mushrooms.Platform;
+using Mushrooms.SceneBuilder.Store;
+using ReusableBits.Platform.Interfaces;
+using ReusableBits.Platform.Preferences;
 using ReusableBits.Wpf.ViewModelLocator;
 
 namespace Mushrooms {
@@ -41,6 +46,20 @@ namespace Mushrooms {
         }
     
         private static void ConfigureServices( IServiceCollection services ) {
+            using var loggerFactory = LoggerFactory.Create(builder => {
+                builder
+                    .AddFilter( "Microsoft", LogLevel.Warning )
+                    .AddFilter( "System", LogLevel.Warning )
+                    .AddFilter( nameof( App ), LogLevel.Debug );
+            });
+            services.AddScoped<IBasicLog, BasicLog>();
+
+            services.AddScoped<IApplicationConstants, ApplicationConstants>();
+            services.AddScoped<IEnvironment, OperatingEnvironment>();
+            services.AddScoped<IFileWriter, JsonObjectWriter>();
+            services.AddScoped<IPreferences, PreferencesManager>();
+
+            services.AddScoped<ISceneFacade, SceneFacade>();
 
             services.AddFluxor( options => options.ScanAssemblies( typeof( App ).Assembly ));
 
