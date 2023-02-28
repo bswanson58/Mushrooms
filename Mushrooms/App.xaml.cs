@@ -4,7 +4,7 @@ using System.Windows;
 using Fluxor;
 using HueLighting.Hub;
 using Microsoft.Extensions.DependencyInjection;
-using Mushrooms.Garden;
+using Microsoft.Extensions.Hosting;
 using Mushrooms.Platform;
 using Mushrooms.SceneBuilder.Store;
 using ReusableBits.Platform.Interfaces;
@@ -17,39 +17,48 @@ namespace Mushrooms {
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App {
-        private IServiceProvider ?  mServiceProvider;
+        // designated startup method in App.xaml
+        private async void OnStartup( object sender, StartupEventArgs e ) {
+            var builder = Host.CreateDefaultBuilder()
+                .ConfigureServices( ( _, services ) => {
+                    ConfigureServices( services );
+                })
+                .Build();
 
-        private void OnStartup( object sender, StartupEventArgs e ) {
-            mServiceProvider = ConfigureApp().Result;
+            await InitializeApp( builder.Services );
+            StartApp( builder.Services );
 
-            if( mServiceProvider != null ) {
-                var mainWindow = mServiceProvider.GetService<MainWindow>();
+            await builder.RunAsync();
+        }
 
-                mainWindow?.Show();
+        private void StartApp( IServiceProvider serviceProvider ) {
+            var mainWindow = serviceProvider.GetService<MainWindow>();
+            var lifetime = serviceProvider.GetService<IHostApplicationLifetime>();
+
+            if( mainWindow != null ) {
+                mainWindow.Closing += ( _, _ ) => lifetime?.StopApplication();
+
+                mainWindow.Show();
             }
         }
 
-        private static async Task<IServiceProvider> ConfigureApp() {
-            var serviceCollection = new ServiceCollection();
-
-            ConfigureServices( serviceCollection );
-
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-
-            ViewModelLocationProvider.SetDefaultViewModelFactory( type => serviceProvider.GetService( type ));
+        private async Task InitializeApp( IServiceProvider serviceProvider ) {
+            ViewModelLocationProvider.SetDefaultViewModelFactory( serviceProvider.GetService );
 
             var store = serviceProvider.GetService<IStore>();
 
             if( store != null ) {
                 await store.InitializeAsync();
             }
-
-            return serviceProvider;
         }
     
         private static void ConfigureServices( IServiceCollection services ) {
             services.AddLogging();
             services.AddScoped<IBasicLog, BasicLog>();
+
+            services.AddSingleton<MushroomGarden>();
+            services.AddSingleton<IMushroomGarden>( p => p.GetRequiredService<MushroomGarden>());
+            services.AddHostedService( p => p.GetRequiredService<MushroomGarden>());
 
             services.AddScoped<IApplicationConstants, ApplicationConstants>();
             services.AddScoped<IEnvironment, OperatingEnvironment>();
@@ -62,13 +71,12 @@ namespace Mushrooms {
 
             services.AddScoped<ISceneFacade, SceneFacade>();
 
-            services.AddSingleton<IMushroomGarden, MushroomGarden>();
             services.AddSingleton<IHubManager, HubManager>();
 
             services.AddFluxor( options => options.ScanAssemblies( typeof( App ).Assembly ));
 
             services.Scan( scan => 
-                scan.FromAssembliesOf( typeof(App ), typeof( HubManager ))
+                scan.FromAssembliesOf( typeof( App ), typeof( HubManager ))
                     .AddClasses( c => c.Where( classType => classType.FullName?.EndsWith( "View" ) == true ||
                                                             classType.FullName?.EndsWith( "ViewModel" ) == true ||
                                                             classType.FullName?.EndsWith( "Window" ) == true ||

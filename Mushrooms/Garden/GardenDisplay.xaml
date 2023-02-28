@@ -5,9 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
              xmlns:garden="clr-namespace:Mushrooms.Garden"
-             xmlns:behaviours="clr-namespace:ReusableBits.Wpf.Behaviours;assembly=ReusableBits.Wpf"
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
-             behaviours:ViewLoadedNotifier.NotifyCommand="{Binding ViewLoaded}"
              d:DataContext="{d:DesignInstance garden:GardenDisplayViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">

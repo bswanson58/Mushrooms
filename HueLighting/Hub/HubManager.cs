@@ -84,7 +84,8 @@ namespace HueLighting.Hub {
         public async Task<IEnumerable<HubInformation>> LocateHubs() { 
             var retValue = new List<HubInformation>();
             var installationInfo = mPreferences.Load<HueConfiguration>();
-            var bridges = await HueBridgeDiscovery.FastDiscoveryWithNetworkScanFallbackAsync( TimeSpan.FromSeconds( 5 ), TimeSpan.FromSeconds( 30 ));
+            var bridges = await HueBridgeDiscovery
+                .FastDiscoveryWithNetworkScanFallbackAsync( TimeSpan.FromSeconds( 5 ), TimeSpan.FromSeconds( 30 ));
 
             foreach( var bridge in bridges ) {
                 try {
