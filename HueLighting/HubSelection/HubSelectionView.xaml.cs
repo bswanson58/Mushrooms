@@ -2,8 +2,8 @@
     /// <summary>
     /// Interaction logic for HubSelection.xaml
     /// </summary>
-    public partial class HubSelection {
-        public HubSelection() {
+    public partial class HubSelectionView {
+        public HubSelectionView() {
             InitializeComponent();
         }
     }

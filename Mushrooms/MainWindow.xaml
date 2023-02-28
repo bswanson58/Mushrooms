@@ -8,6 +8,7 @@
         xmlns:mushrooms="clr-namespace:Mushrooms"
         xmlns:paletteBuilder="clr-namespace:Mushrooms.PaletteBuilder"
         xmlns:sceneParametersEditor="clr-namespace:Mushrooms.SceneParametersEditor"
+        xmlns:garden="clr-namespace:Mushrooms.Garden"
         mc:Ignorable="d"
         Title="Mushrooms"
         ResizeMode="CanResizeWithGrip"
@@ -29,5 +30,7 @@
 
         <paletteBuilder:PaletteBuilder Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
         <sceneParametersEditor:SceneParametersEditor Grid.Row="1" Grid.Column="0"/>
+
+        <garden:GardenDisplay Grid.Row="1" Grid.Column="1"/>
     </Grid>
 </mah:MetroWindow>

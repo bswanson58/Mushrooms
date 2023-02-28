@@ -9,11 +9,11 @@ namespace ReusableBits.Platform.Preferences {
     }
 
     public class PreferencesManager : IPreferences {
-        private readonly IEnvironment	    mEnvironment;
-        private readonly IFileWriter		mWriter;
-        private readonly Lazy<IBasicLog>    mLog;
+        private readonly IEnvironment	mEnvironment;
+        private readonly IFileWriter	mWriter;
+        private readonly IBasicLog      mLog;
 
-        public PreferencesManager( IEnvironment noiseEnvironment, IFileWriter writer, Lazy<IBasicLog> log   ) {
+        public PreferencesManager( IEnvironment noiseEnvironment, IFileWriter writer, IBasicLog log   ) {
             mEnvironment = noiseEnvironment;
             mWriter = writer;
             mLog = log;
@@ -33,7 +33,7 @@ namespace ReusableBits.Platform.Preferences {
                 retValue = mWriter.Read<T>( path );
             }
             catch( Exception ex ) {
-                mLog.Value.LogException( $"Loading Preferences failed for '{typeof( T ).Name}'", ex );
+                mLog.LogException( $"Loading Preferences failed for '{typeof( T ).Name}'", ex );
             }
 
             return retValue ?? CreateDefault<T>();
@@ -49,7 +49,7 @@ namespace ReusableBits.Platform.Preferences {
                     mWriter.Write( path, preferences );
                 }
                 catch( Exception ex ) {
-                    mLog.Value.LogException( $"Saving Preferences failed for '{typeof( T ).Name}'", ex );
+                    mLog.LogException( $"Saving Preferences failed for '{typeof( T ).Name}'", ex );
                 }
             }
         }

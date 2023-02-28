@@ -4,7 +4,7 @@ using System.Windows;
 using Fluxor;
 using HueLighting.Hub;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Mushrooms.Garden;
 using Mushrooms.Platform;
 using Mushrooms.SceneBuilder.Store;
 using ReusableBits.Platform.Interfaces;
@@ -48,12 +48,7 @@ namespace Mushrooms {
         }
     
         private static void ConfigureServices( IServiceCollection services ) {
-            using var loggerFactory = LoggerFactory.Create(builder => {
-                builder
-                    .AddFilter( "Microsoft", LogLevel.Warning )
-                    .AddFilter( "System", LogLevel.Warning )
-                    .AddFilter( nameof( App ), LogLevel.Debug );
-            });
+            services.AddLogging();
             services.AddScoped<IBasicLog, BasicLog>();
 
             services.AddScoped<IApplicationConstants, ApplicationConstants>();
@@ -62,16 +57,20 @@ namespace Mushrooms {
             services.AddScoped<IPreferences, PreferencesManager>();
 
             services.AddScoped<IDialogService, DialogService>();
+            services.AddScoped<IDialogWindow, DialogWindow>();
+            services.AddScoped<IDialogServiceContainer, DialogServiceResolver>();
 
             services.AddScoped<ISceneFacade, SceneFacade>();
 
-            services.AddScoped<IHubManager, HubManager>();
+            services.AddSingleton<IMushroomGarden, MushroomGarden>();
+            services.AddSingleton<IHubManager, HubManager>();
 
             services.AddFluxor( options => options.ScanAssemblies( typeof( App ).Assembly ));
 
             services.Scan( scan => 
-                scan.FromAssemblyOf<App>()
-                    .AddClasses( c => c.Where( classType => classType.FullName?.EndsWith( "ViewModel" ) == true ||
+                scan.FromAssembliesOf( typeof(App ), typeof( HubManager ))
+                    .AddClasses( c => c.Where( classType => classType.FullName?.EndsWith( "View" ) == true ||
+                                                            classType.FullName?.EndsWith( "ViewModel" ) == true ||
                                                             classType.FullName?.EndsWith( "Window" ) == true ||
                                                             classType.FullName?.EndsWith( "Dialog" ) == true ))
                     .AsSelf()
