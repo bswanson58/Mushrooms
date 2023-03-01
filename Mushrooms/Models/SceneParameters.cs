@@ -16,7 +16,7 @@ namespace Mushrooms.Models {
         }
 
         public static SceneParameters Default =>
-            new( TimeSpan.FromSeconds( 10 ), TimeSpan.FromSeconds( 5 ), 
-                 TimeSpan.FromSeconds( 10 ), TimeSpan.FromSeconds( 5 ));
+            new( TimeSpan.FromSeconds( 10 ), TimeSpan.FromSeconds( 3 ), 
+                 TimeSpan.FromSeconds( 10 ), TimeSpan.FromSeconds( 3 ));
     }
 }
