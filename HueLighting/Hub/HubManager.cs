@@ -8,6 +8,8 @@ using HueLighting.Models;
 using Q42.HueApi;
 using Q42.HueApi.Interfaces;
 using Q42.HueApi.Models.Groups;
+using Q42.HueApi.ColorConverters;
+using Q42.HueApi.ColorConverters.HSB;
 using ReusableBits.Platform.Interfaces;
 using ReusableBits.Platform.Preferences;
 
@@ -28,10 +30,12 @@ namespace HueLighting.Hub {
         Task<bool>                          SetBulbState( Bulb bulb, bool state );
         Task<bool>                          SetBulbState( Bulb bulb, int brightness );
         Task<bool>                          SetBulbState( Bulb bulb, Color color, TimeSpan? transitionTime = null );
+        Task<bool>                          SetBulbState( Bulb bulb, Color color, double brightness, TimeSpan transitionTime );
 
         Task<bool>                          SetBulbState( IEnumerable<Bulb> bulbList, bool state );
         Task<bool>                          SetBulbState( IEnumerable<Bulb> bulbList, int brightness );
         Task<bool>                          SetBulbState( IEnumerable<Bulb> bulbList, Color color, TimeSpan? transitionTime = null );
+        Task<bool>                          SetBulbState( IEnumerable<Bulb> bulbList, Color color, double brightness, TimeSpan transitionTime );
     }
 
     public class HubManager : IHubManager {
@@ -266,11 +270,38 @@ namespace HueLighting.Hub {
             }
 
             var command = new LightCommand();
+//            var hsbColor = new Rgb { R = color.R, G = color.G, B = color.B }.To<Hsb>();
+
+            command.SetColor( new RGBColor( color.R, color.G, color.B ));
+//            command.Hue = Math.Max( Math.Min( 65535, (int)(( hsbColor.H / 360.0 ) * 65535 )), 0 );
+//            command.Saturation = Math.Max( Math.Min( 254, (int)( hsbColor.S * 254 )), 0 );
+//            command.Brightness = Math.Max( Math.Min( (byte)254, (byte)( hsbColor.B * 254 )), (byte)1 );
+            command.TransitionTime = transitionTime;
+
+            var result = await mClient.SendCommandAsync( command, bulbList );
+
+            return !result.HasErrors();
+        }
+
+        public async Task<bool> SetBulbState( IEnumerable<Bulb> bulbList, Color color, double brightness, TimeSpan transitionTime ) =>
+            await SetBulbState( bulbList.Select( b => b.Id ), color, brightness, transitionTime );
+
+        public async Task<bool> SetBulbState( Bulb bulb, Color color, double brightness, TimeSpan transitionTime ) =>
+            await SetBulbState( new []{ bulb.Id }, color, brightness, transitionTime );
+
+        private async Task<bool> SetBulbState( IEnumerable<string> bulbList, Color color, double brightness, TimeSpan transitionTime ) {
+            if(( mClient == null ) ||
+               ( mEmulating )) {
+                return true;
+            }
+
+            var command = new LightCommand();
             var hsbColor = new Rgb { R = color.R, G = color.G, B = color.B }.To<Hsb>();
+            var brightnessFactor = Math.Max( Math.Min( brightness, 1.0D ), 0 );
 
             command.Hue = Math.Max( Math.Min( 65535, (int)(( hsbColor.H / 360.0 ) * 65535 )), 0 );
             command.Saturation = Math.Max( Math.Min( 254, (int)( hsbColor.S * 254 )), 0 );
-            command.Brightness = Math.Max( Math.Min( (byte)254, (byte)( hsbColor.B * 254 )), (byte)1 );
+            command.Brightness = (byte)( Math.Max( Math.Min( (byte)254, (byte)( hsbColor.B * 254 )), (byte)1 ) * brightnessFactor );
             command.TransitionTime = transitionTime;
 
             var result = await mClient.SendCommandAsync( command, bulbList );

@@ -124,7 +124,7 @@ namespace Mushrooms {
             var displayTime = inScene.Plan.Parameters.BaseDisplayTime + displayJitter;
             var nextUpdateTime = DateTime.Now + transitionTime + displayTime;
 
-            mHubManager.SetBulbState( bulb, color, transitionTime );
+            mHubManager.SetBulbState( bulb, color, inScene.Control.Brightness, transitionTime );
 
             return new ActiveBulb( bulb, nextUpdateTime );
         }
