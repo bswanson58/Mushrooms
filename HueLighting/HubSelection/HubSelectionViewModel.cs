@@ -70,7 +70,7 @@ namespace HueLighting.HubSelection {
 
         private async void OnRegisterHub() {
             if( SelectedHub != null ) {
-                await mHubManager.RegisterApp( SelectedHub );
+                await mHubManager.RegisterApp( SelectedHub, true );
 
                 await ScanForHubs();
             }
