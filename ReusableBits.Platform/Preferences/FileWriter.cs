@@ -11,6 +11,11 @@ namespace ReusableBits.Platform.Preferences {
             if(!Equals( item, default( T ))) {
                 var	json = JsonSerializer.Serialize( item );
 
+                if(( String.IsNullOrWhiteSpace( json )) ||
+                   ( json.Length < 5 )) {
+                    throw new ApplicationException( "FileWrite appears to be saving an empty object." );
+                }
+
                 using( var file = File.CreateText( path )) {
                     file.Write( json );
                     file.Close();

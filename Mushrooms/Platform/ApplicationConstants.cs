@@ -5,12 +5,14 @@ namespace Mushrooms.Platform {
         public string ApplicationName { get; }
         public string CompanyName { get; }
         public string ConfigurationDirectory { get; }
+        public string DatabaseDirectory { get; }
         public string LogFileDirectory { get; }
 
         public ApplicationConstants() {
             ApplicationName = "Mushrooms";
-            CompanyName = "Secret Squirrel Software, Inc.";
+            CompanyName = "Secret Squirrel Software";
             ConfigurationDirectory = "Configuration";
+            DatabaseDirectory = "Database";
             LogFileDirectory = "Logs";
         }
     }

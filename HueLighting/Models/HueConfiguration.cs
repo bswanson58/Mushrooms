@@ -2,10 +2,10 @@
 
 namespace HueLighting.Models {
     public class HueConfiguration {
-        public  String  BridgeIp;
-        public  String  BridgeId;
-        public  String  BridgeAppKey;
-        public  String  BridgeStreamingKey;
+        public  String  BridgeIp { get; set; }
+        public  String  BridgeId { get; set; }
+        public  String  BridgeAppKey { get; set; }
+        public  String  BridgeStreamingKey { get; set; }
 
         public HueConfiguration() {
             BridgeIp = String.Empty;

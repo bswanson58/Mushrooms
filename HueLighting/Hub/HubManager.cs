@@ -197,7 +197,7 @@ namespace HueLighting.Hub {
             return retValue;
         }
 
-        private IEnumerable<Bulb> BuildEmulationBulbSet() {
+        private static IEnumerable<Bulb> BuildEmulationBulbSet() {
             var retValue = new List<Bulb> {
                 new ( "1", "Illuminate 1", true ),
                 new ( "2", "Illuminate 2", true ),

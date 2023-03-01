@@ -6,6 +6,7 @@ namespace ReusableBits.Platform.Preferences {
         string      EnvironmentName();
 
         string		ApplicationDirectory();
+        string      DatabaseDirectory();
         string		LogFileDirectory();
         string		PreferencesDirectory();
     }
@@ -29,6 +30,16 @@ namespace ReusableBits.Platform.Preferences {
             var retValue = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.CommonApplicationData ),
                 mApplicationConstants.CompanyName,
                 mApplicationConstants.ApplicationName );
+
+            if(!Directory.Exists( retValue )) {
+                Directory.CreateDirectory( retValue );
+            }
+
+            return( retValue );
+        }
+
+        public string DatabaseDirectory() {
+            var retValue = Path.Combine( ApplicationDirectory(), mApplicationConstants.DatabaseDirectory );
 
             if(!Directory.Exists( retValue )) {
                 Directory.CreateDirectory( retValue );

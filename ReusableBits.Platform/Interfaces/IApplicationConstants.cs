@@ -4,6 +4,7 @@
         String  CompanyName { get; }
 
         String  ConfigurationDirectory { get; }
+        String  DatabaseDirectory { get; }
         String  LogFileDirectory { get; }
 
     }
