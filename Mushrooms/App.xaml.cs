@@ -5,6 +5,7 @@ using Fluxor;
 using HueLighting.Hub;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Mushrooms.Database;
 using Mushrooms.Platform;
 using Mushrooms.SceneBuilder.Store;
 using ReusableBits.Platform.Interfaces;
@@ -55,6 +56,8 @@ namespace Mushrooms {
         private static void ConfigureServices( IServiceCollection services ) {
             services.AddLogging();
             services.AddScoped<IBasicLog, BasicLog>();
+
+            services.AddScoped<IPlanProvider, PlanProvider>();
 
             services.AddSingleton<MushroomGarden>();
             services.AddSingleton<IMushroomGarden>( p => p.GetRequiredService<MushroomGarden>());

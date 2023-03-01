@@ -7,6 +7,7 @@ namespace ReusableBits.Platform.Preferences {
 
         string		ApplicationDirectory();
         string      DatabaseDirectory();
+        string      DatabaseName();
         string		LogFileDirectory();
         string		PreferencesDirectory();
     }
@@ -18,13 +19,11 @@ namespace ReusableBits.Platform.Preferences {
             mApplicationConstants = applicationConstants;
         }
 
-        public string ApplicationName() {
-            return mApplicationConstants.ApplicationName;
-        }
+        public string ApplicationName() => mApplicationConstants.ApplicationName;
 
-        public string EnvironmentName() {
-            return Environment.MachineName;
-        }
+        public string EnvironmentName() => Environment.MachineName;
+
+        public string DatabaseName() => "Mushroom.Db";
 
         public string ApplicationDirectory() {
             var retValue = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.CommonApplicationData ),

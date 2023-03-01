@@ -1,25 +1,37 @@
 ﻿using System;
 using Fluxor;
+using Mushrooms.Database;
 using Mushrooms.Models;
 using Mushrooms.SceneBuilder.Store;
+using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.ViewModelSupport;
 
 namespace Mushrooms.SceneParametersEditor {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class SceneParametersEditorViewModel : PropertyChangeBase {
         private readonly ISceneFacade           mSceneFacade;
+        private readonly IState<SceneState>     mSceneState;
+        private readonly IPlanProvider          mPlanProvider;
         private TimeSpan                        mTransitionDuration;
         private TimeSpan                        mTransitionJitter;
         private TimeSpan                        mDisplayDuration;
         private TimeSpan                        mDisplayJitter;
+        private string                          mPlanName;
 
-        public SceneParametersEditorViewModel( IState<SceneState> sceneState, ISceneFacade sceneFacade  ) {
+        public  DelegateCommand                 SavePlan { get; }
+
+        public SceneParametersEditorViewModel( IState<SceneState> sceneState, ISceneFacade sceneFacade, 
+                                               IPlanProvider planProvider  ) {
             mSceneFacade = sceneFacade;
+            mSceneState = sceneState;
+            mPlanProvider = planProvider;
 
-            mTransitionDuration = sceneState.Value.Parameters.BaseDisplayTime;
-            mTransitionJitter = sceneState.Value.Parameters.DisplayTimeJitter;
-            mDisplayDuration = sceneState.Value.Parameters.BaseDisplayTime;
-            mDisplayJitter = sceneState.Value.Parameters.DisplayTimeJitter;
+            mTransitionDuration = mSceneState.Value.Parameters.BaseDisplayTime;
+            mTransitionJitter = mSceneState.Value.Parameters.DisplayTimeJitter;
+            mDisplayDuration = mSceneState.Value.Parameters.BaseDisplayTime;
+            mDisplayJitter = mSceneState.Value.Parameters.DisplayTimeJitter;
+
+            SavePlan = new DelegateCommand( OnSavePlan, CanSavePlan );
 
             RaiseAllPropertiesChanged();
         }
@@ -59,6 +71,28 @@ namespace Mushrooms.SceneParametersEditor {
                 UpdateSceneState();
             }
         }
+
+        public string PlanName {
+            get => mPlanName;
+            set {
+                mPlanName = value;
+
+                SavePlan.RaiseCanExecuteChanged();
+            }
+        }
+
+        private void OnSavePlan() {
+            var plan = new ScenePlan {
+                Parameters = mSceneState.Value.Parameters,
+                Palette = mSceneState.Value.Palette,
+                PlanName = mPlanName
+            };
+
+            mPlanProvider.Insert( plan );
+        }
+
+        private bool CanSavePlan() =>
+            !String.IsNullOrWhiteSpace( mPlanName );
 
         private void UpdateSceneState() =>
             mSceneFacade.SetSceneParameters( 

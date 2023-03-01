@@ -2,10 +2,10 @@
 
 namespace Mushrooms.Models {
     internal record SceneParameters {
-        public  TimeSpan        BaseTransitionTime { get; }
-        public  TimeSpan        TransitionJitter { get; }
-        public  TimeSpan        BaseDisplayTime { get; }
-        public  TimeSpan        DisplayTimeJitter { get; }
+        public  TimeSpan        BaseTransitionTime { get; init; }
+        public  TimeSpan        TransitionJitter { get; init; }
+        public  TimeSpan        BaseDisplayTime { get; init; }
+        public  TimeSpan        DisplayTimeJitter { get; init; }
 
         public SceneParameters( TimeSpan transitionTime, TimeSpan transitionJitter,
                                 TimeSpan displayTime, TimeSpan displayTimeJitter ) {

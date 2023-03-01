@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using LiteDB;
 using ReusableBits.Platform.Preferences;
 
@@ -28,7 +29,8 @@ namespace Mushrooms.Database {
 
         private ILiteCollection<TEntity> Collection() {
             if( mCollection == null ) {
-                var connection = $"filename={mEnvironment.DatabaseDirectory()};journal=false";
+                var fileName = Path.Combine( mEnvironment.DatabaseDirectory(), mEnvironment.DatabaseName());
+                var connection = $"Filename={fileName};";
 
                 mDatabase = new LiteDatabase( connection );
 

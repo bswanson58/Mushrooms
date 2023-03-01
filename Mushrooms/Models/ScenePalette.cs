@@ -4,7 +4,10 @@ using System.Windows.Media;
 
 namespace Mushrooms.Models {
     internal record ScenePalette {
-        public  IReadOnlyList<Color>    Palette { get; }
+        public  IReadOnlyList<Color>    Palette { get; init; }
+
+        public ScenePalette() :
+            this( Enumerable.Empty<Color>()) { }
 
         public ScenePalette( IEnumerable<Color> colors ) =>
             Palette = new List<Color>( colors );
