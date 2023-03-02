@@ -134,7 +134,7 @@ namespace Mushrooms.SceneBuilder {
                     .Select( g => g.First())
                     .ToList();
 
-                var scene = new Scene( SceneName, SelectedPalette, SceneParameters.Default, new SceneControl(), bulbList );
+                var scene = new Scene( SceneName, SelectedPalette, SceneParameters.Default, SceneControl.Default, bulbList );
 
                 mSceneProvider.Insert( scene );
             }

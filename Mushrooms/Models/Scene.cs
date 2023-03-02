@@ -5,6 +5,7 @@ using Mushrooms.Database;
 
 namespace Mushrooms.Models {
     internal class Scene : EntityBase {
+        // protected sets are for LiteDB.
         public  string          SceneName { get; protected set; }
         public  ScenePalette    Palette { get; protected  set; }
         public  SceneParameters Parameters { get; protected  set; }

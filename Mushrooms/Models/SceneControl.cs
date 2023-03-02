@@ -3,7 +3,7 @@
         public  double  Brightness { get; protected set; }
         public  double  RateMultiplier { get; protected set; }
 
-        public SceneControl() {
+        private SceneControl() {
             Brightness = 0.7D;
             RateMultiplier = 1.0D;
         }

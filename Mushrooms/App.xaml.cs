@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mushrooms.Database;
 using Mushrooms.Platform;
-using Mushrooms.SceneBuilder.Store;
 using ReusableBits.Platform.Interfaces;
 using ReusableBits.Platform.Preferences;
 using ReusableBits.Wpf.DialogService;
@@ -72,8 +71,6 @@ namespace Mushrooms {
             services.AddScoped<IDialogService, DialogService>();
             services.AddScoped<IDialogWindow, DialogWindow>();
             services.AddScoped<IDialogServiceContainer, DialogServiceResolver>();
-
-            services.AddScoped<ISceneFacade, SceneFacade>();
 
             services.AddSingleton<IHubManager, HubManager>();
 
