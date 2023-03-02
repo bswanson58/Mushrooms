@@ -7,8 +7,8 @@
         xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
         xmlns:mushrooms="clr-namespace:Mushrooms"
         xmlns:paletteBuilder="clr-namespace:Mushrooms.PaletteBuilder"
-        xmlns:sceneParametersEditor="clr-namespace:Mushrooms.SceneParametersEditor"
         xmlns:garden="clr-namespace:Mushrooms.Garden"
+        xmlns:sceneBuilder="clr-namespace:Mushrooms.SceneBuilder"
         mc:Ignorable="d"
         Title="Mushrooms"
         ResizeMode="CanResizeWithGrip"
@@ -18,19 +18,19 @@
         d:DataContext="{d:DesignInstance mushrooms:MainWindowViewModel, IsDesignTimeCreatable=False}"
         Height="600" Width="1200">
 
-    <Grid Margin="15">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="1*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <TabControl Margin="15,0" Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
+        <TabItem Header="palettes">
+            <paletteBuilder:PaletteBuilder/>
+        </TabItem>
+        <TabItem Header="spaces">
 
-        <paletteBuilder:PaletteBuilder Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
-        <sceneParametersEditor:SceneParametersEditor Grid.Row="1" Grid.Column="0"/>
+        </TabItem>
+        <TabItem Header="scenes">
+            <sceneBuilder:SceneEditor/>
+        </TabItem>
+        <TabItem Header="garden">
+            <garden:GardenDisplay/>
+        </TabItem>
+    </TabControl>
 
-        <garden:GardenDisplay Grid.Row="1" Grid.Column="1"/>
-    </Grid>
 </mah:MetroWindow>
