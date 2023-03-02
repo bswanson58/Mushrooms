@@ -1,6 +1,18 @@
 ﻿namespace Mushrooms.Models {
-    internal record SceneControl {
-        public  double  Brightness { get; init; }       = 0.7D;
-        public  double  RateMultiplier { get; init; }   = 1.0D;
+    internal class SceneControl {
+        public  double  Brightness { get; protected set; }
+        public  double  RateMultiplier { get; protected set; }
+
+        public SceneControl() {
+            Brightness = 0.7D;
+            RateMultiplier = 1.0D;
+        }
+
+        public SceneControl( double brightness, double rateMultiplier ) {
+            Brightness = brightness;
+            RateMultiplier = rateMultiplier;
+        }
+
+        public static SceneControl Default => new ();
     }
 }

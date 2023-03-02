@@ -28,10 +28,7 @@ namespace Mushrooms {
 
         public ActiveScene( Scene scene ) {
             Scene = scene;
-            Control = new SceneControl {
-                Brightness = Scene.Control.Brightness,
-                RateMultiplier = Scene.Control.RateMultiplier
-            };
+            Control = new SceneControl( Scene.Control.Brightness, Scene.Control.RateMultiplier );
             IsActive = false;
         }
 

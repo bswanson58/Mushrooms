@@ -12,6 +12,10 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <DataTemplate x:Key="SceneTemplate" DataType="{x:Type models:Scene}">
+            <TextBlock Text="{Binding SceneName}"/>
+        </DataTemplate>
+
         <DataTemplate x:Key="PaletteTemplate" DataType="{x:Type models:ScenePalette}">
             <TextBlock Text="{Binding Name}"/>
         </DataTemplate>
@@ -21,26 +25,76 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Margin="15">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="15"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="15"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
 
-        <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical">
-            <Label Style="{StaticResource LabelStyle}" Content="Plans:"/>
-            <ListView ItemsSource="{Binding Palettes}" ItemTemplate="{StaticResource PaletteTemplate}"
-                      SelectedItem="{Binding SelectedPalette}"/>
+        <StackPanel Grid.Column="0" Orientation="Vertical">
+            <Label Style="{StaticResource LabelStyle}" Content="Available Scenes:"></Label>
+            <ListBox ItemsSource="{Binding Scenes}" ItemTemplate="{StaticResource SceneTemplate}"/>
         </StackPanel>
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Palettes:"/>
+            <ListView Grid.Row="1" ItemsSource="{Binding Palettes}" ItemTemplate="{StaticResource PaletteTemplate}"
+                      SelectedItem="{Binding SelectedPalette}"/>
+
+            <Label Grid.Row="2" Style="{StaticResource LabelStyle}" Content="Parameters:"/>
+
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+               Content="Base Transition Duration:"/>
+                <Slider Grid.Column="1" Grid.Row="0" Minimum="1" Maximum="60" Value="{Binding TransitionDurationSeconds}"/>
+
+                <Label Grid.Column="0" Grid.Row="2" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+               Content="Transition Duration Jitter:"/>
+                <Slider Grid.Column="1" Grid.Row="2" Minimum="0" Maximum="60" Value="{Binding TransitionDurationJitterSeconds}"/>
+
+                <Label Grid.Column="0" Grid.Row="4" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+               Content="Base Display Duration:"/>
+                <Slider Grid.Column="1" Grid.Row="4" Minimum="1" Maximum="600" Value="{Binding DisplayDurationSeconds}"/>
+
+                <Label Grid.Column="0" Grid.Row="6" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+               Content="Display Duration Jitter:"/>
+                <Slider Grid.Column="1" Grid.Row="6" Minimum="0" Maximum="600" Value="{Binding DisplayDurationJitterSeconds}"/>
+            </Grid>
+        </Grid>
         
-        <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Vertical">
-            <Label Style="{StaticResource LabelStyle}" Content="Lighting:"/>
-            <ListView ItemsSource="{Binding LightingList}" ItemTemplate="{StaticResource LightingTemplate}"
+        <Grid Grid.Column="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Lighting:"/>
+            <ListView Grid.Row="1" ItemsSource="{Binding LightingList}" ItemTemplate="{StaticResource LightingTemplate}"
                       SelectionMode="Multiple">
                 <ListView.Resources>
                     <Style TargetType="{x:Type ListViewItem}">
@@ -48,20 +102,21 @@
                     </Style>
                 </ListView.Resources>
             </ListView>
-        </StackPanel>
 
-        <Grid Grid.Column="0" Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="15,0,0,0"
-                   Content="Scene Name:"/>
-            <TextBox Grid.Column="1" Text="{Binding SceneName, UpdateSourceTrigger=PropertyChanged}"/>
+                <Label Grid.Column="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="15,0,0,0"
+                       Content="Scene Name:"/>
+                <TextBox Grid.Column="1" Text="{Binding SceneName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Button Grid.Column="2" Margin="15,0,0,0" HorizontalAlignment="Right" Command="{Binding CreateScene}"
+                        Content="Create Scene"/>
+            </Grid>
         </Grid>
-
-        <Button Grid.Column="2" Grid.Row="1" HorizontalAlignment="Right" Command="{Binding CreateScene}"
-                Content="Create Scene"/>
     </Grid>
 </UserControl>

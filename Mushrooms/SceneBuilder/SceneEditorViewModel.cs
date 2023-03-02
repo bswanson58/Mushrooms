@@ -36,7 +36,12 @@ namespace Mushrooms.SceneBuilder {
         private readonly ISceneProvider         mSceneProvider;
         private string                          mSceneName;
         private ScenePalette ?                  mSelectedPalette;
+        private TimeSpan                        mTransitionDuration;
+        private TimeSpan                        mTransitionJitter;
+        private TimeSpan                        mDisplayDuration;
+        private TimeSpan                        mDisplayJitter;
 
+        public  RangeCollection<Scene>          Scenes { get; }
         public  RangeCollection<ScenePalette>   Palettes { get; }
         public  RangeCollection<LightingItem>   LightingList { get; }
 
@@ -49,6 +54,14 @@ namespace Mushrooms.SceneBuilder {
 
             mSceneName = String.Empty;
 
+            var defaultParameters = SceneParameters.Default;
+
+            mDisplayDuration = defaultParameters.BaseDisplayTime;
+            mDisplayJitter = defaultParameters.DisplayTimeJitter;
+            mTransitionDuration = defaultParameters.BaseTransitionTime;
+            mTransitionJitter = defaultParameters.TransitionJitter;
+
+            Scenes = new RangeCollection<Scene>();
             Palettes = new RangeCollection<ScenePalette>();
             LightingList = new RangeCollection<LightingItem>();
 
@@ -56,6 +69,26 @@ namespace Mushrooms.SceneBuilder {
 
             LoadAssets();
             LoadBulbs();
+        }
+
+        public int TransitionDurationSeconds {
+            get => (int)mTransitionDuration.TotalSeconds;
+            set => mTransitionDuration = TimeSpan.FromSeconds( value );
+        }
+
+        public int TransitionDurationJitterSeconds {
+            get => (int)mTransitionJitter.TotalSeconds;
+            set => mTransitionJitter = TimeSpan.FromSeconds( value );
+        }
+
+        public int DisplayDurationSeconds {
+            get => (int)mDisplayDuration.TotalSeconds;
+            set => mDisplayDuration = TimeSpan.FromSeconds( value );
+        }
+
+        public int DisplayDurationJitterSeconds {
+            get => (int)mDisplayJitter.TotalSeconds;
+            set => mDisplayJitter = TimeSpan.FromSeconds( value );
         }
 
         public string SceneName {
@@ -78,6 +111,7 @@ namespace Mushrooms.SceneBuilder {
 
         private void LoadAssets() {
             Palettes.AddRange( mPaletteProvider.GetAll());
+            Scenes.AddRange( mSceneProvider.GetAll());
         }
 
         private async void LoadBulbs() {
