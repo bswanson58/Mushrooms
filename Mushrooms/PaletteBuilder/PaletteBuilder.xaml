@@ -6,6 +6,7 @@
              xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
              xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
              xmlns:paletteBuilder="clr-namespace:Mushrooms.PaletteBuilder"
+             xmlns:models="clr-namespace:Mushrooms.Models"
              mc:Ignorable="d" 
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance paletteBuilder:PaletteBuilderViewModel, IsDesignTimeCreatable=False}"
@@ -13,6 +14,10 @@
 
     <UserControl.Resources>
         <valueConverters:BooleanColorConverter x:Key="DisplayBorder" TrueColor="DimGray"/>
+
+        <DataTemplate x:Key="PaletteTemplate" DataType="{x:Type models:ScenePalette}">
+            <TextBlock Text="{Binding Name}"/>
+        </DataTemplate>
 
         <DataTemplate x:Key="PaletteItemTemplate" DataType="{x:Type paletteBuilder:ColorSwatch}">
             <Border Height="35" Width="35" Padding="3" Margin="5" BorderThickness="1">
@@ -33,26 +38,60 @@
 
     <Grid Margin="15">
         <Grid.RowDefinitions>
-            <RowDefinition Height="200"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
 
-        <Button Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" Content="Select Image..."
-                Command="{Binding SelectImage}"/>
-        <Image Grid.Row="0" Grid.Column="1" Source="{Binding PatternImage}"/>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
 
-        <ItemsControl Grid.Row="0" Grid.Column="2" BorderThickness="1" BorderBrush="{StaticResource TrimColor}" Padding="5"
-                  ItemsSource="{Binding Palette}" ItemTemplate="{StaticResource PaletteItemTemplate}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
+            <StackPanel Grid.Column="0" Orientation="Vertical">
+                <Label Style="{StaticResource LabelStyle}" Content="Available Palettes:"/>
+                <ListBox ItemsSource="{Binding PaletteList}" ItemTemplate="{StaticResource PaletteTemplate}"/>
+            </StackPanel>
+
+            <Image Grid.Column="1" Margin="5" VerticalAlignment="Top" Source="{Binding PatternImage}"/>
+
+            <ItemsControl Grid.Column="2" BorderThickness="1" BorderBrush="{StaticResource TrimColor}" 
+                          Padding="5" Margin="15,0,15,35" VerticalAlignment="Top"
+                          ItemsSource="{Binding SwatchList}" ItemTemplate="{StaticResource PaletteItemTemplate}"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
                         <WrapPanel Orientation="Horizontal"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-        </ItemsControl>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Margin="5,0,25,0" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                    Content="Select Image..." Command="{Binding SelectImage}"/>
+
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Palette Name:"/>
+                <TextBox Grid.Column="1" Text="{Binding PaletteName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Button Grid.Column="2" Margin="25,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+                        Content="Save Palette" Command="{Binding SavePalette}"/>
+            </Grid>
+        </Grid>
+
     </Grid>
 </UserControl>

@@ -12,13 +12,13 @@ using ReusableBits.Wpf.ViewModelSupport;
 
 namespace Mushrooms.SceneBuilder {
     internal class LightingItem {
-        public  string      Name { get; }
-        public  GroupType   GroupType { get; }
-        public  IList<Bulb> Bulbs { get; }
+        public  string          Name { get; }
+        public  GroupType       GroupType { get; }
+        public  IList<Bulb>     Bulbs { get; }
 
-        public  bool        IsSelected { get; set; }
+        public  bool            IsSelected { get; set; }
 
-        public  string      DisplayName => $"{Name} ({GroupType})";
+        public  string          DisplayName => $"{Name} ({GroupType})";
 
         public LightingItem( string name, GroupType groupType, IList<Bulb> bulbs ) {
             Name = name;
@@ -32,24 +32,24 @@ namespace Mushrooms.SceneBuilder {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class SceneEditorViewModel : PropertyChangeBase {
         private readonly IHubManager            mHubManager;
-        private readonly IPlanProvider          mPlanProvider;
+        private readonly IPaletteProvider       mPaletteProvider;
         private readonly ISceneProvider         mSceneProvider;
         private string                          mSceneName;
-        private ScenePlan ?                     mSelectedPlan;
+        private ScenePalette ?                  mSelectedPalette;
 
-        public  RangeCollection<ScenePlan>      Plans { get; }
+        public  RangeCollection<ScenePalette>   Palettes { get; }
         public  RangeCollection<LightingItem>   LightingList { get; }
 
         public  DelegateCommand                 CreateScene { get; }
 
-        public SceneEditorViewModel( IHubManager hubManager, IPlanProvider planProvider, ISceneProvider sceneProvider ) {
+        public SceneEditorViewModel( IHubManager hubManager, IPaletteProvider paletteProvider, ISceneProvider sceneProvider ) {
             mHubManager = hubManager;
-            mPlanProvider = planProvider;
+            mPaletteProvider = paletteProvider;
             mSceneProvider = sceneProvider;
 
             mSceneName = String.Empty;
 
-            Plans = new RangeCollection<ScenePlan>();
+            Palettes = new RangeCollection<ScenePalette>();
             LightingList = new RangeCollection<LightingItem>();
 
             CreateScene = new DelegateCommand( OnCreateScene, CanCreateScene );
@@ -67,17 +67,17 @@ namespace Mushrooms.SceneBuilder {
              }
         }
 
-        public ScenePlan ? SelectedScene {
-            get => mSelectedPlan;
+        public ScenePalette ? SelectedPalette {
+            get => mSelectedPalette;
             set {
-                mSelectedPlan = value;
+                mSelectedPalette = value;
 
                 CreateScene.RaiseCanExecuteChanged();
             }
         }
 
         private void LoadAssets() {
-            Plans.AddRange( mPlanProvider.GetAll());
+            Palettes.AddRange( mPaletteProvider.GetAll());
         }
 
         private async void LoadBulbs() {
@@ -91,7 +91,7 @@ namespace Mushrooms.SceneBuilder {
         }
 
         private void OnCreateScene() {
-            if(( SelectedScene != null ) &&
+            if(( SelectedPalette != null ) &&
                ( LightingList.Any( l => l.IsSelected ))) {
                 var bulbList = LightingList
                     .Where( b => b.IsSelected )
@@ -100,12 +100,7 @@ namespace Mushrooms.SceneBuilder {
                     .Select( g => g.First())
                     .ToList();
 
-                var scene = new Scene {
-                    Bulbs = bulbList,
-                    Control = new SceneControl(),
-                    Plan = SelectedScene,
-                    SceneName = mSceneName
-                };
+                var scene = new Scene( SceneName, SelectedPalette, SceneParameters.Default, new SceneControl(), bulbList );
 
                 mSceneProvider.Insert( scene );
             }
@@ -114,6 +109,6 @@ namespace Mushrooms.SceneBuilder {
         private bool CanCreateScene() =>
             !String.IsNullOrWhiteSpace( mSceneName ) &&
             LightingList.Any( b => b.IsSelected ) &&
-            SelectedScene != null;
+            SelectedPalette != null;
     }
 }

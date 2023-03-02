@@ -1,6 +1,14 @@
 ﻿namespace Mushrooms.Database {
-    public record EntityBase {
-        public  string  Id { get; init; } = NCuid.Cuid.Generate();
+    public class EntityBase {
+        public  string  Id { get; protected set; }
+            
+        protected EntityBase( string id ) {
+            Id = id;
+        }
+
+        protected EntityBase() {
+            Id = NCuid.Cuid.Generate();
+        }
     }
 
 }

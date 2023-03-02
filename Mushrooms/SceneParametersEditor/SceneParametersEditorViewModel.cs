@@ -1,6 +1,5 @@
 ﻿using System;
 using Fluxor;
-using Mushrooms.Database;
 using Mushrooms.Models;
 using Mushrooms.SceneBuilder.Store;
 using ReusableBits.Wpf.Commands;
@@ -11,7 +10,6 @@ namespace Mushrooms.SceneParametersEditor {
     internal class SceneParametersEditorViewModel : PropertyChangeBase {
         private readonly ISceneFacade           mSceneFacade;
         private readonly IState<SceneState>     mSceneState;
-        private readonly IPlanProvider          mPlanProvider;
         private TimeSpan                        mTransitionDuration;
         private TimeSpan                        mTransitionJitter;
         private TimeSpan                        mDisplayDuration;
@@ -20,11 +18,9 @@ namespace Mushrooms.SceneParametersEditor {
 
         public  DelegateCommand                 SavePlan { get; }
 
-        public SceneParametersEditorViewModel( IState<SceneState> sceneState, ISceneFacade sceneFacade, 
-                                               IPlanProvider planProvider  ) {
+        public SceneParametersEditorViewModel( IState<SceneState> sceneState, ISceneFacade sceneFacade ) {
             mSceneFacade = sceneFacade;
             mSceneState = sceneState;
-            mPlanProvider = planProvider;
 
             mPlanName = String.Empty;
 
@@ -84,6 +80,7 @@ namespace Mushrooms.SceneParametersEditor {
         }
 
         private void OnSavePlan() {
+            /*
             var plan = new ScenePlan {
                 Parameters = mSceneState.Value.Parameters,
                 Palette = mSceneState.Value.Palette,
@@ -91,6 +88,7 @@ namespace Mushrooms.SceneParametersEditor {
             };
 
             mPlanProvider.Insert( plan );
+            */
         }
 
         private bool CanSavePlan() =>

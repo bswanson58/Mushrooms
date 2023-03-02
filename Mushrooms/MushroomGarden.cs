@@ -156,11 +156,11 @@ namespace Mushrooms {
         }
 
         private ActiveBulb UpdateBulb( Bulb bulb, Scene inScene ) {
-            var color = inScene.Plan.Palette.Palette[ mLimitedRandom.Next( inScene.Plan.Palette.Palette.Count )];
-            var transitionJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Plan.Parameters.DisplayTimeJitter.TotalSeconds ));
-            var transitionTime = inScene.Plan.Parameters.BaseTransitionTime + transitionJitter;
-            var displayJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Plan.Parameters.DisplayTimeJitter.TotalSeconds ));
-            var displayTime = inScene.Plan.Parameters.BaseDisplayTime + displayJitter;
+            var color = inScene.Palette.Palette[ mLimitedRandom.Next( inScene.Palette.Palette.Count )];
+            var transitionJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Parameters.DisplayTimeJitter.TotalSeconds ));
+            var transitionTime = inScene.Parameters.BaseTransitionTime + transitionJitter;
+            var displayJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Parameters.DisplayTimeJitter.TotalSeconds ));
+            var displayTime = inScene.Parameters.BaseDisplayTime + displayJitter;
             var nextUpdateTime = DateTime.Now + transitionTime + displayTime;
 
             mHubManager.SetBulbState( bulb, color, 0.05D, transitionTime );

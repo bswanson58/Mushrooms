@@ -3,9 +3,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using DynamicData;
 using Microsoft.Win32;
+using Mushrooms.Database;
 using Mushrooms.Models;
-using Mushrooms.SceneBuilder.Store;
 using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.ViewModelSupport;
 using SixLabors.ImageSharp;
@@ -40,18 +41,34 @@ namespace Mushrooms.PaletteBuilder {
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class PaletteBuilderViewModel : PropertyChangeBase {
-        private readonly ISceneFacade               mSceneFacade;
+        private readonly IPaletteProvider           mPaletteProvider;
 
-        public  ObservableCollection<ColorSwatch>   Palette { get; }
+        private string                              mPaletteName;
 
-        public  DelegateCommand         SelectImage { get; }
-        public  ImageSource ?           PatternImage { get; private set; }
+        public  ObservableCollection<ScenePalette>  PaletteList { get; }
+        public  ObservableCollection<ColorSwatch>   SwatchList { get; }
 
-        public PaletteBuilderViewModel( ISceneFacade sceneFacade ) {
-            mSceneFacade = sceneFacade;
-            Palette = new ObservableCollection<ColorSwatch>();
+        public  DelegateCommand                     SavePalette { get; }
+        public  DelegateCommand                     SelectImage { get; }
+        public  ImageSource ?                       PatternImage { get; private set; }
 
+        public PaletteBuilderViewModel( IPaletteProvider paletteProvider ) {
+            mPaletteProvider = paletteProvider;
+            mPaletteName = String.Empty;
+
+            PaletteList = new ObservableCollection<ScenePalette>();
+            SwatchList = new ObservableCollection<ColorSwatch>();
+
+            SavePalette = new DelegateCommand( OnSavePalette );
             SelectImage = new DelegateCommand( OnSelectFile );
+
+            var p = mPaletteProvider.GetAll().ToList();
+            PaletteList.AddRange( mPaletteProvider.GetAll());
+        }
+
+        public string PaletteName {
+            get => mPaletteName;
+            set => mPaletteName = value;
         }
 
         private void OnSelectFile() {
@@ -65,27 +82,37 @@ namespace Mushrooms.PaletteBuilder {
 
                 RaisePropertyChanged( () => PatternImage );
             }
-
         }
 
         private void OnSwatchSelectionChanged( ColorSwatch _ ) => 
             UpdatePaletteState();
 
-        private void UpdatePaletteState() =>
-            mSceneFacade.SetScenePalette( 
-                new ScenePalette( from swatch in Palette where swatch.IsSelected select swatch.SwatchColor ));
+        private void UpdatePaletteState() {}
+//            mSceneFacade.SetScenePalette(
+//                new ScenePalette( from swatch in Palette where swatch.IsSelected select swatch.SwatchColor ));
 
         private void SelectImageColors( string fileName ) {
-            Palette.Clear();
+            SwatchList.Clear();
 
             using( var image = Image.Load<Rgba32>( fileName )) {
                 var colorThief = new ColorThief.ImageSharp.ColorThief();
                 var palette = colorThief.GetPalette( image, 25, 5 );
 
                 foreach( var color in palette.OrderByDescending( c => c.Population )) {
-                    Palette.Add( new ColorSwatch( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ),
-                                 OnSwatchSelectionChanged ));
+                    SwatchList.Add( 
+                        new ColorSwatch( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ), OnSwatchSelectionChanged ));
                 }
+            }
+        }
+
+        private void OnSavePalette() {
+            if((!String.IsNullOrWhiteSpace( mPaletteName )) &&
+               ( SwatchList.Any( p => p.IsSelected ))) {
+                var palette = new ScenePalette( 
+                    from swatch in SwatchList where swatch.IsSelected select swatch.SwatchColor,
+                    mPaletteName );
+
+                mPaletteProvider.Insert( palette );
             }
         }
     }
