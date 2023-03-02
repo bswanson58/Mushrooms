@@ -270,12 +270,8 @@ namespace HueLighting.Hub {
             }
 
             var command = new LightCommand();
-//            var hsbColor = new Rgb { R = color.R, G = color.G, B = color.B }.To<Hsb>();
 
             command.SetColor( new RGBColor( color.R, color.G, color.B ));
-//            command.Hue = Math.Max( Math.Min( 65535, (int)(( hsbColor.H / 360.0 ) * 65535 )), 0 );
-//            command.Saturation = Math.Max( Math.Min( 254, (int)( hsbColor.S * 254 )), 0 );
-//            command.Brightness = Math.Max( Math.Min( (byte)254, (byte)( hsbColor.B * 254 )), (byte)1 );
             command.TransitionTime = transitionTime;
 
             var result = await mClient.SendCommandAsync( command, bulbList );

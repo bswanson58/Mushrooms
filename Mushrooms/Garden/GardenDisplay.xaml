@@ -9,7 +9,28 @@
              d:DataContext="{d:DesignInstance garden:GardenDisplayViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="SceneTemplate" DataType="{x:Type garden:SceneViewModel}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="{Binding SceneName}"/>
+                <Button Grid.Column="2" Command="{Binding ActivateScene}" Content="Activate"/>
+                <Button Grid.Column="3" Command="{Binding DeactivateScene}" Content="Deactivate"/>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
     <Grid>
-            
+        <Grid.ColumnDefinitions></Grid.ColumnDefinitions>
+        <Grid.RowDefinitions></Grid.RowDefinitions>
+
+        <ListView ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource SceneTemplate}"/>
     </Grid>
 </UserControl>

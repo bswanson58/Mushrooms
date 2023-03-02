@@ -26,6 +26,8 @@ namespace Mushrooms.SceneParametersEditor {
             mSceneState = sceneState;
             mPlanProvider = planProvider;
 
+            mPlanName = String.Empty;
+
             mTransitionDuration = mSceneState.Value.Parameters.BaseDisplayTime;
             mTransitionJitter = mSceneState.Value.Parameters.DisplayTimeJitter;
             mDisplayDuration = mSceneState.Value.Parameters.BaseDisplayTime;

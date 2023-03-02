@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="ColorThief.ImageSharp" Version="1.0.0" />
+    <PackageReference Include="DynamicData" Version="7.13.1" />
     <PackageReference Include="Fluxor" Version="5.7.0" />
     <PackageReference Include="LiteDB" Version="5.0.15" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />

@@ -30,7 +30,7 @@ namespace Mushrooms.Database {
         private ILiteCollection<TEntity> Collection() {
             if( mCollection == null ) {
                 var fileName = Path.Combine( mEnvironment.DatabaseDirectory(), mEnvironment.DatabaseName());
-                var connection = $"Filename={fileName};";
+                var connection = $"Filename={fileName};Connection=shared";
 
                 mDatabase = new LiteDatabase( connection );
 
