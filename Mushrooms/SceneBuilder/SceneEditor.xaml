@@ -5,21 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
              xmlns:sceneBuilder="clr-namespace:Mushrooms.SceneBuilder"
-             xmlns:models="clr-namespace:Mushrooms.Models"
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance sceneBuilder:SceneEditorViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="SceneTemplate" DataType="{x:Type models:Scene}">
-            <TextBlock Text="{Binding SceneName}"/>
-        </DataTemplate>
-
-        <DataTemplate x:Key="PaletteTemplate" DataType="{x:Type models:ScenePalette}">
-            <TextBlock Text="{Binding Name}"/>
-        </DataTemplate>
-
         <DataTemplate x:Key="LightingTemplate" DataType="{x:Type sceneBuilder:LightingItem}">
             <TextBlock Text="{Binding DisplayName}"/>
         </DataTemplate>

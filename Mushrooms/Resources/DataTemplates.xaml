@@ -1,0 +1,38 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:models="clr-namespace:Mushrooms.Models">
+
+    <DataTemplate x:Key="ColorTemplate" DataType="{x:Type Color}">
+        <Rectangle Margin="2" Height="15" Width="15">
+            <Rectangle.Fill>
+                <SolidColorBrush Color="{Binding}"/>
+            </Rectangle.Fill>
+        </Rectangle>
+    </DataTemplate>
+
+    <DataTemplate x:Key="PaletteTemplate" DataType="{x:Type models:PaletteViewModel}">
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="{Binding Name}"/>
+            <ItemsControl Margin="15,3" ItemsSource="{Binding ExampleColors}" ItemTemplate="{StaticResource ColorTemplate}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate x:Key="SceneTemplate" DataType="{x:Type models:SceneViewModel}">
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="{Binding Name}"/>
+            <ItemsControl Margin="15,3" ItemsSource="{Binding ExampleColors}" ItemTemplate="{StaticResource ColorTemplate}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </StackPanel>
+    </DataTemplate>
+</ResourceDictionary>

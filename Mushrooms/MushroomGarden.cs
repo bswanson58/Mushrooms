@@ -9,7 +9,7 @@ using HueLighting.HubSelection;
 using HueLighting.Models;
 using Microsoft.Extensions.Hosting;
 using Mushrooms.Database;
-using Mushrooms.Models;
+using Mushrooms.Entities;
 using Mushrooms.Support;
 using ReusableBits.Wpf.DialogService;
 

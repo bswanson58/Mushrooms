@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mushrooms.Models {
+namespace Mushrooms.Entities {
     internal record SceneParameters {
         public  TimeSpan        BaseTransitionTime { get; init; }
         public  TimeSpan        TransitionJitter { get; init; }

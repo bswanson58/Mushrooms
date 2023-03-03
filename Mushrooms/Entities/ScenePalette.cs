@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows.Media;
 using Mushrooms.Database;
 
-namespace Mushrooms.Models {
+namespace Mushrooms.Entities {
     internal class ScenePalette :EntityBase {
         // protected sets are for LiteDB.
         public  IList<Color>    Palette { get; protected set; }

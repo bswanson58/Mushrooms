@@ -15,11 +15,7 @@
     <UserControl.Resources>
         <valueConverters:BooleanColorConverter x:Key="DisplayBorder" TrueColor="DimGray"/>
 
-        <DataTemplate x:Key="PaletteTemplate" DataType="{x:Type models:ScenePalette}">
-            <TextBlock Text="{Binding Name}"/>
-        </DataTemplate>
-
-        <DataTemplate x:Key="PaletteItemTemplate" DataType="{x:Type paletteBuilder:ColorSwatch}">
+        <DataTemplate x:Key="PaletteItemTemplate" DataType="{x:Type models:ColorViewModel}">
             <Border Height="35" Width="35" Padding="3" Margin="5" BorderThickness="1">
                 <Border.BorderBrush>
                     <SolidColorBrush Color="{Binding IsSelected, Converter={StaticResource DisplayBorder}}"/>
@@ -36,7 +32,7 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid Margin="15">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -44,14 +40,14 @@
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="4*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Orientation="Vertical">
                 <Label Style="{StaticResource LabelStyle}" Content="Available Palettes:"/>
-                <ListBox ItemsSource="{Binding PaletteList}" ItemTemplate="{StaticResource PaletteTemplate}"/>
+                <ListBox Margin="3,0" ItemsSource="{Binding PaletteList}" ItemTemplate="{StaticResource PaletteTemplate}"/>
             </StackPanel>
 
             <Image Grid.Column="1" Margin="5" VerticalAlignment="Top" Source="{Binding PatternImage}"/>

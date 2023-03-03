@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using DynamicData;
 using Microsoft.Win32;
 using Mushrooms.Database;
+using Mushrooms.Entities;
 using Mushrooms.Models;
 using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.ViewModelSupport;
@@ -14,56 +15,30 @@ using SixLabors.ImageSharp.PixelFormats;
 using Color = System.Windows.Media.Color;
 
 namespace Mushrooms.PaletteBuilder {
-    internal class ColorSwatch : PropertyChangeBase {
-        private readonly Action<ColorSwatch>    mOnBulbSelectionChanged;
-
-        public  Color               SwatchColor { get; }
-        public  bool                IsSelected { get; set; }
-
-        public  DelegateCommand     SelectSwatch { get; }
-
-        public ColorSwatch( Color color, Action<ColorSwatch> onSelectionChanged ) {
-            mOnBulbSelectionChanged = onSelectionChanged;
-
-            SwatchColor = color;
-            IsSelected = true;
-
-            SelectSwatch = new DelegateCommand( OnSelectSwatch );
-        }
-
-        private void OnSelectSwatch() {
-            IsSelected = !IsSelected;
-
-            RaisePropertyChanged( () => IsSelected );
-            mOnBulbSelectionChanged.Invoke( this );
-        }
-    }
-
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class PaletteBuilderViewModel : PropertyChangeBase {
-        private readonly IPaletteProvider           mPaletteProvider;
+        private readonly IPaletteProvider               mPaletteProvider;
 
-        private string                              mPaletteName;
+        private string                                  mPaletteName;
 
-        public  ObservableCollection<ScenePalette>  PaletteList { get; }
-        public  ObservableCollection<ColorSwatch>   SwatchList { get; }
+        public  ObservableCollection<PaletteViewModel>  PaletteList { get; }
+        public  ObservableCollection<ColorViewModel>    SwatchList { get; }
 
-        public  DelegateCommand                     SavePalette { get; }
-        public  DelegateCommand                     SelectImage { get; }
-        public  ImageSource ?                       PatternImage { get; private set; }
+        public  DelegateCommand                         SavePalette { get; }
+        public  DelegateCommand                         SelectImage { get; }
+        public  ImageSource ?                           PatternImage { get; private set; }
 
         public PaletteBuilderViewModel( IPaletteProvider paletteProvider ) {
             mPaletteProvider = paletteProvider;
             mPaletteName = String.Empty;
 
-            PaletteList = new ObservableCollection<ScenePalette>();
-            SwatchList = new ObservableCollection<ColorSwatch>();
+            PaletteList = new ObservableCollection<PaletteViewModel>();
+            SwatchList = new ObservableCollection<ColorViewModel>();
 
             SavePalette = new DelegateCommand( OnSavePalette );
             SelectImage = new DelegateCommand( OnSelectFile );
 
-            var p = mPaletteProvider.GetAll().ToList();
-            PaletteList.AddRange( mPaletteProvider.GetAll());
+            PaletteList.AddRange( mPaletteProvider.GetAll().Select( p => new PaletteViewModel( p )));
         }
 
         public string PaletteName {
@@ -84,7 +59,7 @@ namespace Mushrooms.PaletteBuilder {
             }
         }
 
-        private void OnSwatchSelectionChanged( ColorSwatch _ ) => 
+        private void OnSwatchSelectionChanged( ColorViewModel _ ) => 
             UpdatePaletteState();
 
         private void UpdatePaletteState() {}
@@ -100,7 +75,7 @@ namespace Mushrooms.PaletteBuilder {
 
                 foreach( var color in palette.OrderByDescending( c => c.Population )) {
                     SwatchList.Add( 
-                        new ColorSwatch( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ), OnSwatchSelectionChanged ));
+                        new ColorViewModel( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ), OnSwatchSelectionChanged ));
                 }
             }
         }

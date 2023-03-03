@@ -5,13 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
              xmlns:garden="clr-namespace:Mushrooms.Garden"
+             xmlns:models="clr-namespace:Mushrooms.Models"
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance garden:GardenDisplayViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="SceneTemplate" DataType="{x:Type garden:SceneViewModel}">
+        <DataTemplate x:Key="SceneTemplate" DataType="{x:Type models:GardenSceneViewModel}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -20,17 +21,14 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="{Binding SceneName}"/>
-                <Button Grid.Column="2" Command="{Binding ActivateScene}" Content="Activate"/>
-                <Button Grid.Column="3" Command="{Binding DeactivateScene}" Content="Deactivate"/>
+                <ContentPresenter DataContext="{Binding Scene}" ContentTemplate="{StaticResource SceneTemplate}"/>
+                <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding ActivateScene}" Content="Activate"/>
+                <Button Grid.Column="3" VerticalAlignment="Center" Command="{Binding DeactivateScene}" Content="Deactivate"/>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid>
-        <Grid.ColumnDefinitions></Grid.ColumnDefinitions>
-        <Grid.RowDefinitions></Grid.RowDefinitions>
-
+    <Grid Margin="15">
         <ListView ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource SceneTemplate}"/>
     </Grid>
 </UserControl>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using HueLighting.Models;
 using Mushrooms.Database;
 
-namespace Mushrooms.Models {
+namespace Mushrooms.Entities {
     internal class Scene : EntityBase {
         // protected sets are for LiteDB.
         public  string          SceneName { get; protected set; }

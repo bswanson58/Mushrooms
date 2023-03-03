@@ -1,4 +1,4 @@
-﻿namespace Mushrooms.Models {
+﻿namespace Mushrooms.Entities {
     internal class SceneControl {
         public  double  Brightness { get; protected set; }
         public  double  RateMultiplier { get; protected set; }

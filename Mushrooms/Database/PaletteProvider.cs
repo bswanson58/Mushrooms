@@ -1,5 +1,5 @@
 ﻿using LiteDB;
-using Mushrooms.Models;
+using Mushrooms.Entities;
 using ReusableBits.Platform.Preferences;
 
 namespace Mushrooms.Database {

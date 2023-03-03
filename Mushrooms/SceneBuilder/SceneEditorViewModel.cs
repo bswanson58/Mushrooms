@@ -4,6 +4,7 @@ using System.Linq;
 using HueLighting.Hub;
 using HueLighting.Models;
 using Mushrooms.Database;
+using Mushrooms.Entities;
 using Mushrooms.Models;
 using Q42.HueApi.Models.Groups;
 using ReusableBits.Wpf.Commands;
@@ -31,21 +32,21 @@ namespace Mushrooms.SceneBuilder {
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class SceneEditorViewModel : PropertyChangeBase {
-        private readonly IHubManager            mHubManager;
-        private readonly IPaletteProvider       mPaletteProvider;
-        private readonly ISceneProvider         mSceneProvider;
-        private string                          mSceneName;
-        private ScenePalette ?                  mSelectedPalette;
-        private TimeSpan                        mTransitionDuration;
-        private TimeSpan                        mTransitionJitter;
-        private TimeSpan                        mDisplayDuration;
-        private TimeSpan                        mDisplayJitter;
+        private readonly IHubManager                mHubManager;
+        private readonly IPaletteProvider           mPaletteProvider;
+        private readonly ISceneProvider             mSceneProvider;
+        private string                              mSceneName;
+        private ScenePalette ?                      mSelectedPalette;
+        private TimeSpan                            mTransitionDuration;
+        private TimeSpan                            mTransitionJitter;
+        private TimeSpan                            mDisplayDuration;
+        private TimeSpan                            mDisplayJitter;
 
-        public  RangeCollection<Scene>          Scenes { get; }
-        public  RangeCollection<ScenePalette>   Palettes { get; }
-        public  RangeCollection<LightingItem>   LightingList { get; }
+        public  RangeCollection<SceneViewModel>     Scenes { get; }
+        public  RangeCollection<PaletteViewModel>   Palettes { get; }
+        public  RangeCollection<LightingItem>       LightingList { get; }
 
-        public  DelegateCommand                 CreateScene { get; }
+        public  DelegateCommand                     CreateScene { get; }
 
         public SceneEditorViewModel( IHubManager hubManager, IPaletteProvider paletteProvider, ISceneProvider sceneProvider ) {
             mHubManager = hubManager;
@@ -61,8 +62,8 @@ namespace Mushrooms.SceneBuilder {
             mTransitionDuration = defaultParameters.BaseTransitionTime;
             mTransitionJitter = defaultParameters.TransitionJitter;
 
-            Scenes = new RangeCollection<Scene>();
-            Palettes = new RangeCollection<ScenePalette>();
+            Scenes = new RangeCollection<SceneViewModel>();
+            Palettes = new RangeCollection<PaletteViewModel>();
             LightingList = new RangeCollection<LightingItem>();
 
             CreateScene = new DelegateCommand( OnCreateScene, CanCreateScene );
@@ -110,8 +111,8 @@ namespace Mushrooms.SceneBuilder {
         }
 
         private void LoadAssets() {
-            Palettes.AddRange( mPaletteProvider.GetAll());
-            Scenes.AddRange( mSceneProvider.GetAll());
+            Palettes.AddRange( mPaletteProvider.GetAll().Select( p => new PaletteViewModel( p )));
+            Scenes.AddRange( mSceneProvider.GetAll().Select( s => new SceneViewModel( s )));
         }
 
         private async void LoadBulbs() {
