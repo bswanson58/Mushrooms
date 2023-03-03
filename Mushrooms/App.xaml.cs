@@ -69,7 +69,7 @@ namespace Mushrooms {
             services.AddScoped<IPreferences, PreferencesManager>();
 
             services.AddScoped<IDialogService, DialogService>();
-            services.AddScoped<IDialogWindow, DialogWindow>();
+            services.AddTransient<IDialogWindow, DialogWindow>();
             services.AddScoped<IDialogServiceContainer, DialogServiceResolver>();
 
             services.AddSingleton<IHubManager, HubManager>();

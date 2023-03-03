@@ -203,8 +203,6 @@ namespace ReusableBits.Wpf.DialogService {
                     vm.OnDialogClosed();
                 }
 
-                dialogWindow.Result = new DialogResult();
-
                 callback.Invoke( dialogWindow.Result );
 
                 dialogWindow.DataContext = null;
