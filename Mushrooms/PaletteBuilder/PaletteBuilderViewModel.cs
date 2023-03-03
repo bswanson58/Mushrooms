@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DynamicData;
+using DynamicData.Binding;
 using Microsoft.Win32;
 using Mushrooms.Database;
 using Mushrooms.Entities;
@@ -16,12 +17,13 @@ using Color = System.Windows.Media.Color;
 
 namespace Mushrooms.PaletteBuilder {
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class PaletteBuilderViewModel : PropertyChangeBase {
+    internal class PaletteBuilderViewModel : PropertyChangeBase, IDisposable {
         private readonly IPaletteProvider               mPaletteProvider;
 
         private string                                  mPaletteName;
+        private IDisposable ?                           mPaletteSubscription;
 
-        public  ObservableCollection<PaletteViewModel>  PaletteList { get; }
+        public  ObservableCollectionExtended<PaletteViewModel>  Palettes { get; }
         public  ObservableCollection<ColorViewModel>    SwatchList { get; }
 
         public  DelegateCommand                         SavePalette { get; }
@@ -32,13 +34,18 @@ namespace Mushrooms.PaletteBuilder {
             mPaletteProvider = paletteProvider;
             mPaletteName = String.Empty;
 
-            PaletteList = new ObservableCollection<PaletteViewModel>();
+            Palettes = new ObservableCollectionExtended<PaletteViewModel>();
+
+            mPaletteSubscription = mPaletteProvider.Entities
+                .Connect()
+                .Transform( p => new PaletteViewModel( p ))
+                .Bind( Palettes )
+                .Subscribe();
+
             SwatchList = new ObservableCollection<ColorViewModel>();
 
             SavePalette = new DelegateCommand( OnSavePalette );
             SelectImage = new DelegateCommand( OnSelectFile );
-
-            PaletteList.AddRange( mPaletteProvider.GetAll().Select( p => new PaletteViewModel( p )));
         }
 
         public string PaletteName {
@@ -93,6 +100,11 @@ namespace Mushrooms.PaletteBuilder {
 
                 mPaletteProvider.Insert( palette );
             }
+        }
+
+        public void Dispose() {
+            mPaletteSubscription?.Dispose();
+            mPaletteSubscription = null;
         }
     }
 }

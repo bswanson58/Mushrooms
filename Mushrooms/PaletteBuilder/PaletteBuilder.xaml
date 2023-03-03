@@ -56,7 +56,7 @@
 
             <StackPanel Grid.Column="0" Orientation="Vertical">
                 <Label Style="{StaticResource LabelStyle}" Content="Available Palettes:"/>
-                <ListBox Margin="3,0" ItemsSource="{Binding PaletteList}" ItemTemplate="{StaticResource PaletteTemplate}"/>
+                <ListBox Margin="3,0" ItemsSource="{Binding Palettes}" ItemTemplate="{StaticResource PaletteTemplate}"/>
             </StackPanel>
 
             <Image Grid.Column="1" Margin="0,5,0,0" VerticalAlignment="Top" Source="{Binding PatternImage}"/>

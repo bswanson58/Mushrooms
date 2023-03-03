@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DynamicData;
+using DynamicData.Binding;
 using HueLighting.Hub;
 using HueLighting.Models;
 using Mushrooms.Database;
@@ -33,9 +35,8 @@ namespace Mushrooms.SceneBuilder {
     }
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class SceneEditorViewModel : PropertyChangeBase {
+    internal class SceneEditorViewModel : PropertyChangeBase, IDisposable {
         private readonly IHubManager                mHubManager;
-        private readonly IPaletteProvider           mPaletteProvider;
         private readonly ISceneProvider             mSceneProvider;
         private readonly IDialogService             mDialogService;
         private string                              mSceneName;
@@ -45,9 +46,11 @@ namespace Mushrooms.SceneBuilder {
         private TimeSpan                            mTransitionJitter;
         private TimeSpan                            mDisplayDuration;
         private TimeSpan                            mDisplayJitter;
+        private IDisposable ?                       mSceneSubscription;
+        private IDisposable ?                       mPaletteSubscription;
 
-        public  RangeCollection<SceneViewModel>     Scenes { get; }
-        public  RangeCollection<PaletteViewModel>   Palettes { get; }
+        public  ObservableCollectionExtended<SceneViewModel>    Scenes { get; }
+        public  ObservableCollectionExtended<PaletteViewModel>  Palettes { get; }
         public  RangeCollection<LightingItem>       LightingList { get; }
 
         public  string                              DisplayDuration => mDisplayDuration.ToString();
@@ -61,7 +64,6 @@ namespace Mushrooms.SceneBuilder {
         public SceneEditorViewModel( IHubManager hubManager, IPaletteProvider paletteProvider, ISceneProvider sceneProvider,
                                      IDialogService dialogService ) {
             mHubManager = hubManager;
-            mPaletteProvider = paletteProvider;
             mSceneProvider = sceneProvider;
             mDialogService = dialogService;
 
@@ -76,14 +78,27 @@ namespace Mushrooms.SceneBuilder {
 
             mSchedule = SceneSchedule.Default;
 
-            Scenes = new RangeCollection<SceneViewModel>();
-            Palettes = new RangeCollection<PaletteViewModel>();
+            Scenes = new ObservableCollectionExtended<SceneViewModel>();
+
+            mSceneSubscription = mSceneProvider.Entities
+                .Connect()
+                .Transform( s => new SceneViewModel( s ))
+                .Bind( Scenes )
+                .Subscribe();
+
+            Palettes = new ObservableCollectionExtended<PaletteViewModel>();
+
+            mPaletteSubscription = paletteProvider.Entities
+                .Connect()
+                .Transform( p => new PaletteViewModel( p ))
+                .Bind( Palettes )
+                .Subscribe();
+
             LightingList = new RangeCollection<LightingItem>();
 
             EditSchedule = new DelegateCommand( OnEditSchedule );
             CreateScene = new DelegateCommand( OnCreateScene, CanCreateScene );
 
-            LoadAssets();
             LoadBulbs();
         }
 
@@ -141,11 +156,6 @@ namespace Mushrooms.SceneBuilder {
             }
         }
 
-        private void LoadAssets() {
-            Palettes.AddRange( mPaletteProvider.GetAll().Select( p => new PaletteViewModel( p )));
-            Scenes.AddRange( mSceneProvider.GetAll().Select( s => new SceneViewModel( s )));
-        }
-
         private async void LoadBulbs() {
             var groups = await mHubManager.GetBulbGroups();
 
@@ -187,5 +197,13 @@ namespace Mushrooms.SceneBuilder {
             !String.IsNullOrWhiteSpace( mSceneName ) &&
             LightingList.Any( b => b.IsSelected ) &&
             SelectedPalette != null;
+
+        public void Dispose() {
+            mSceneSubscription?.Dispose();
+            mSceneSubscription = null;
+
+            mPaletteSubscription?.Dispose();
+            mPaletteSubscription = null;
+        }
     }
 }

@@ -3,9 +3,9 @@ using Mushrooms.Entities;
 using ReusableBits.Platform.Preferences;
 
 namespace Mushrooms.Database {
-    internal interface ISceneProvider : IEntityProvider<Scene> { }
+    internal interface ISceneDatabaseProvider : IEntityProvider<Scene> { }
 
-    internal class SceneProvider : LiteDatabaseProvider<Scene>, ISceneProvider {
+    internal class SceneProvider : LiteDatabaseProvider<Scene>, ISceneDatabaseProvider {
         public SceneProvider( IEnvironment environment )
             : base( environment ) { }
 

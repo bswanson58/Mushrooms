@@ -56,8 +56,11 @@ namespace Mushrooms {
             services.AddLogging();
             services.AddScoped<IBasicLog, BasicLog>();
 
-            services.AddScoped<IPaletteProvider, PaletteProvider>();
-            services.AddScoped<ISceneProvider, SceneProvider>();
+            services.AddScoped<IPaletteDatabaseProvider, PaletteProvider>();
+            services.AddSingleton<IPaletteProvider, PaletteCache>();
+
+            services.AddScoped<ISceneDatabaseProvider, SceneProvider>();
+            services.AddSingleton<ISceneProvider, SceneCache>();
 
             services.AddSingleton<MushroomGarden>();
             services.AddSingleton<IMushroomGarden>( p => p.GetRequiredService<MushroomGarden>());

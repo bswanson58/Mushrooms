@@ -15,8 +15,7 @@ namespace Mushrooms.Garden {
         public GardenDisplayViewModel( IMushroomGarden garden ) {
             SceneList = new ObservableCollectionExtended<GardenSceneViewModel>();
 
-            mSceneSubscription = garden.Scenes
-                .Connect()
+            mSceneSubscription = garden.ActiveScenes
                 .Transform( s => new GardenSceneViewModel( s.Scene, garden ))
                 .Bind( SceneList )
                 .Subscribe();

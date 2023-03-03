@@ -3,9 +3,9 @@ using Mushrooms.Entities;
 using ReusableBits.Platform.Preferences;
 
 namespace Mushrooms.Database {
-    internal interface IPaletteProvider : IEntityProvider<ScenePalette> { }
+    internal interface IPaletteDatabaseProvider : IEntityProvider<ScenePalette> { }
 
-    internal class PaletteProvider : LiteDatabaseProvider<ScenePalette>, IPaletteProvider {
+    internal class PaletteProvider : LiteDatabaseProvider<ScenePalette>, IPaletteDatabaseProvider {
         public PaletteProvider( IEnvironment environment )
             : base( environment ) { }
 

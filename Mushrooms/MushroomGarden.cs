@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DynamicData;
+using DynamicData.Binding;
 using HueLighting.Hub;
 using HueLighting.HubSelection;
 using HueLighting.Models;
@@ -18,7 +19,7 @@ namespace Mushrooms {
         Task    StartScene( Scene forScene );
         Task    StopScene( Scene forScene );
         	
-        IObservableCache<ActiveScene, String>   Scenes { get; }
+        IObservable<IChangeSet<ActiveScene>>    ActiveScenes { get; }
     }
 
     internal enum SceneState {
@@ -77,25 +78,29 @@ namespace Mushrooms {
     }
 
     internal class MushroomGarden : BackgroundService, IMushroomGarden {
-        private readonly IHubManager                        mHubManager;
-        private readonly ISceneProvider                     mSceneProvider;
-        private readonly IDialogService                     mDialogService;
-        private readonly SourceCache<ActiveScene, string>   mScenes;
-        private readonly IList<ActiveBulb>                  mActiveBulbs;
-        private readonly CancellationTokenSource            mTokenSource;
-        private readonly LimitedRepeatingRandom             mLimitedRandom;
-        private readonly Random                             mRandom;
-        private Task ?                                      mLightingTask;
-        private Task ?                                      mSchedulingTask;
+        private readonly IHubManager                                mHubManager;
+        private readonly ISceneProvider                             mSceneProvider;
+        private readonly IDialogService                             mDialogService;
+        private readonly ObservableCollectionExtended<Scene>        mScenes;
+        private readonly ObservableCollectionExtended<ActiveScene>  mActiveScenes;
+        private readonly IList<ActiveBulb>                          mActiveBulbs;
+        private readonly CancellationTokenSource                    mTokenSource;
+        private readonly LimitedRepeatingRandom                     mLimitedRandom;
+        private readonly Random                                     mRandom;
+        private IDisposable ?                                       mSceneSubscription;
+        private IDisposable ?                                       mActiveSceneSubscription;
+        private Task ?                                              mLightingTask;
+        private Task ?                                              mSchedulingTask;
 
-        public  IObservableCache<ActiveScene, string>       Scenes => mScenes.AsObservableCache();
+        public  IObservable<IChangeSet<ActiveScene>>                ActiveScenes => mActiveScenes.ToObservableChangeSet();
 
         public MushroomGarden( IHubManager hubManager, IDialogService dialogService, ISceneProvider sceneProvider ) {
             mHubManager = hubManager;
             mSceneProvider = sceneProvider;
             mDialogService = dialogService;
 
-            mScenes = new SourceCache<ActiveScene, string>( s => s.Scene.Id );
+            mActiveScenes = new ObservableCollectionExtended<ActiveScene>();
+            mScenes = new ObservableCollectionExtended<Scene>();
             mActiveBulbs = new List<ActiveBulb>();
             mTokenSource = new CancellationTokenSource();
             mLimitedRandom = new LimitedRepeatingRandom();
@@ -103,7 +108,7 @@ namespace Mushrooms {
         }
 
         public async Task StartScene( Scene forScene ) {
-            var scene = mScenes.Items.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
+            var scene = mActiveScenes.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
 
             if( scene != null ) {
                 await ActivateScene( scene.Scene );
@@ -120,7 +125,7 @@ namespace Mushrooms {
         }
 
         public async Task StopScene( Scene forScene ) {
-            var scene = mScenes.Items.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
+            var scene = mActiveScenes.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
 
             if( scene != null ) {
                 await DeactivateScene( scene.Scene );
@@ -144,7 +149,16 @@ namespace Mushrooms {
         }
 
         protected override Task ExecuteAsync( CancellationToken stoppingToken ) {
-            mScenes.AddOrUpdate( mSceneProvider.GetAll().Select( s => new ActiveScene( s )).ToList());
+            mSceneSubscription = mSceneProvider.Entities
+                .Connect()
+                .Bind( mScenes )
+                .Subscribe();
+
+            mActiveSceneSubscription = mSceneProvider.Entities
+                .Connect()
+                .Transform( s => new ActiveScene( s ))
+                .Bind( mActiveScenes )
+                .Subscribe();
 
             mLightingTask = Repeat.Interval( TimeSpan.FromMilliseconds( 200 ), LightingTask, mTokenSource.Token );
             mSchedulingTask = Repeat.Interval( TimeSpan.FromSeconds( 31 ), SchedulingTask, mTokenSource.Token );
@@ -153,7 +167,7 @@ namespace Mushrooms {
         }
 
         private void LightingTask() {
-            foreach( var scene in mScenes.Items.Where( s => s.IsActive )) {
+            foreach( var scene in mActiveScenes.Where( s => s.IsActive )) {
                 var updateList = BuildBulbList( scene.Scene );
 
                 if( updateList.Any()) {
@@ -163,13 +177,13 @@ namespace Mushrooms {
         }
 
         private async void SchedulingTask() {
-            foreach( var scene in mScenes.Items.Where( s => s.Scene.Schedule.Enabled )) {
+            foreach( var scene in mActiveScenes.Where( s => s.Scene.Schedule.Enabled )) {
                 if(!scene.IsActive ) {
                     await ActivateIfScheduleStart( scene );
                 }
             }
 
-            foreach( var scene in mScenes.Items.Where( s => s.SceneState.Equals( SceneState.Scheduled ))) {
+            foreach( var scene in mActiveScenes.Where( s => s.SceneState.Equals( SceneState.Scheduled ))) {
                 await DeactivateIfScheduleEnd( scene );
             }
         }
@@ -243,6 +257,12 @@ namespace Mushrooms {
             if( mSchedulingTask != null ) {
                 Task.WaitAll( new []{ mSchedulingTask }, TimeSpan.FromMilliseconds( 250 ));
             }
+
+            mActiveSceneSubscription?.Dispose();
+            mActiveSceneSubscription = null;
+
+            mSceneSubscription?.Dispose();
+            mSceneSubscription = null;
         }
     }
 }
