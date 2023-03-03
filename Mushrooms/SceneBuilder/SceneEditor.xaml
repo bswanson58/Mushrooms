@@ -48,6 +48,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -60,20 +61,32 @@
                 </Grid.RowDefinitions>
 
                 <Label Grid.Column="0" Grid.Row="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
-               Content="Base Transition Duration:"/>
-                <Slider Grid.Column="1" Grid.Row="0" Minimum="1" Maximum="60" Value="{Binding TransitionDurationSeconds}"/>
+                       Content="Base Transition Duration:"/>
+                <Slider Grid.Column="1" Grid.Row="0" Minimum="1" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
+                        Value="{Binding TransitionDurationSeconds}"/>
+                <Label Grid.Column="2" Grid.Row="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"
+                       Content="{Binding TransitionDuration}"/>
 
                 <Label Grid.Column="0" Grid.Row="2" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
-               Content="Transition Duration Jitter:"/>
-                <Slider Grid.Column="1" Grid.Row="2" Minimum="0" Maximum="60" Value="{Binding TransitionDurationJitterSeconds}"/>
+                       Content="Transition Duration Jitter:"/>
+                <Slider Grid.Column="1" Grid.Row="2" Minimum="0" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
+                        Value="{Binding TransitionDurationJitterSeconds}"/>
+                <Label Grid.Column="2" Grid.Row="2" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"
+                       Content="{Binding TransitionJitter}"/>
 
                 <Label Grid.Column="0" Grid.Row="4" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
                Content="Base Display Duration:"/>
-                <Slider Grid.Column="1" Grid.Row="4" Minimum="1" Maximum="600" Value="{Binding DisplayDurationSeconds}"/>
+                <Slider Grid.Column="1" Grid.Row="4" Minimum="1" Maximum="600" Style="{DynamicResource MahApps.Styles.Slider}"
+                        Value="{Binding DisplayDurationSeconds}"/>
+                <Label Grid.Column="2" Grid.Row="4" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"
+                       Content="{Binding DisplayDuration}"/>
 
                 <Label Grid.Column="0" Grid.Row="6" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
                Content="Display Duration Jitter:"/>
-                <Slider Grid.Column="1" Grid.Row="6" Minimum="0" Maximum="600" Value="{Binding DisplayDurationJitterSeconds}"/>
+                <Slider Grid.Column="1" Grid.Row="6" Minimum="0" Maximum="600" Style="{DynamicResource MahApps.Styles.Slider}"
+                        Value="{Binding DisplayDurationJitterSeconds}"/>
+                <Label Grid.Column="2" Grid.Row="6" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"
+                       Content="{Binding DisplayJitter}"/>
             </Grid>
         </Grid>
         
