@@ -54,5 +54,8 @@
         <Setter Property="HorizontalAlignment" Value="Center"/>
     </Style>
 
+    <Style x:Key="PathButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Padding" Value="5"/>
+    </Style>
 
 </ResourceDictionary>

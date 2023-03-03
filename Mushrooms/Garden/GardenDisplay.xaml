@@ -6,12 +6,16 @@
              xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
              xmlns:garden="clr-namespace:Mushrooms.Garden"
              xmlns:models="clr-namespace:Mushrooms.Models"
+             xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance garden:GardenDisplayViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfActive" IsHidden="False" TriggerValue="True"/>
+        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfInactive" IsHidden="False" TriggerValue="False"/>
+
         <DataTemplate x:Key="SceneTemplate" DataType="{x:Type models:GardenSceneViewModel}">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -22,8 +26,15 @@
                 </Grid.ColumnDefinitions>
 
                 <ContentPresenter DataContext="{Binding Scene}" ContentTemplate="{StaticResource SceneTemplate}"/>
-                <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding ActivateScene}" Content="Activate"/>
-                <Button Grid.Column="3" VerticalAlignment="Center" Command="{Binding DeactivateScene}" Content="Deactivate"/>
+                <Button Grid.Column="2" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                        Style="{StaticResource PathButtonStyle}" 
+                        Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfActive}}"
+                        Command="{Binding ActivateScene}" Content="{StaticResource Path_Power}"/>
+
+                <Button Grid.Column="2" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                        Style="{StaticResource PathButtonStyle}" 
+                        Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfInactive}}"
+                        Command="{Binding DeactivateScene}" Content="{StaticResource Path_Power}"/>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>

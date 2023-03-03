@@ -1,0 +1,14 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--  Button Images  -->
+	<Viewbox x:Key="Path_Power" x:Shared="False">
+        <Canvas Width="403.200" Height="414.964">
+            <Path Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
+                  Data="F1 M 201.602,232.962 C 218.403,232.962 232.403,218.962 232.403,202.161 L 232.403,30.801 C 232.403,14.000 218.403,0.000 201.602,0.000 C 184.801,0.000 170.801,14.000 170.801,30.801 L 170.801,202.161 C 170.801,219.520 184.801,232.962 201.602,232.962 Z"/>
+            <Path Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
+                  Data="F1 M 327.602,56.562 C 314.161,45.921 295.122,48.164 284.481,61.042 C 273.840,74.483 276.083,93.522 288.962,104.163 C 322.001,131.042 341.040,170.804 341.040,213.363 C 341.040,290.644 278.321,353.363 201.040,353.363 C 123.759,353.363 61.040,290.644 61.040,213.363 C 61.040,173.043 78.399,134.402 109.200,107.523 C 122.079,96.324 123.200,76.722 112.559,63.843 C 101.360,50.965 81.758,49.843 68.879,60.484 C 25.762,99.683 0.000,155.125 0.000,213.364 C 0.000,324.244 90.160,414.964 201.600,414.964 C 313.040,414.964 403.200,324.804 403.200,213.364 C 403.200,152.325 375.759,95.204 327.598,56.564 L 327.602,56.562 Z"/>
+        </Canvas>
+	</Viewbox>
+
+</ResourceDictionary>
