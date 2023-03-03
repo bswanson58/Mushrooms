@@ -39,7 +39,7 @@ namespace Mushrooms.SceneBuilder {
         private readonly ISceneProvider             mSceneProvider;
         private readonly IDialogService             mDialogService;
         private string                              mSceneName;
-        private ScenePalette ?                      mSelectedPalette;
+        private PaletteViewModel ?                  mSelectedPalette;
         private SceneSchedule                       mSchedule;
         private TimeSpan                            mTransitionDuration;
         private TimeSpan                            mTransitionJitter;
@@ -132,7 +132,7 @@ namespace Mushrooms.SceneBuilder {
              }
         }
 
-        public ScenePalette ? SelectedPalette {
+        public PaletteViewModel ? SelectedPalette {
             get => mSelectedPalette;
             set {
                 mSelectedPalette = value;
@@ -176,7 +176,7 @@ namespace Mushrooms.SceneBuilder {
                     .Select( g => g.First())
                     .ToList();
 
-                var scene = new Scene( SceneName, SelectedPalette, SceneParameters.Default, 
+                var scene = new Scene( SceneName, SelectedPalette.Palette, SceneParameters.Default, 
                                        SceneControl.Default, bulbList, SceneSchedule.Default );
 
                 mSceneProvider.Insert( scene );
