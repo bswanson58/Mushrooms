@@ -7,6 +7,8 @@
              xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
              xmlns:paletteBuilder="clr-namespace:Mushrooms.PaletteBuilder"
              xmlns:models="clr-namespace:Mushrooms.Models"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviours="clr-namespace:ReusableBits.Wpf.Behaviours;assembly=ReusableBits.Wpf"
              mc:Ignorable="d" 
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance paletteBuilder:PaletteBuilderViewModel, IsDesignTimeCreatable=False}"
@@ -30,6 +32,13 @@
                 </Rectangle>
             </Border>
         </DataTemplate>
+
+        <ControlTemplate x:Key="NoImageTemplate">
+            <Border BorderThickness="1" BorderBrush="{StaticResource TrimColor}">
+                <TextBlock Style="{StaticResource EmptyListTextStyle}" Margin="15" 
+                           Text="'Select Image' to display it's palette!"/>
+            </Border>
+        </ControlTemplate>
     </UserControl.Resources>
 
     <Grid>
@@ -50,10 +59,10 @@
                 <ListBox Margin="3,0" ItemsSource="{Binding PaletteList}" ItemTemplate="{StaticResource PaletteTemplate}"/>
             </StackPanel>
 
-            <Image Grid.Column="1" Margin="5" VerticalAlignment="Top" Source="{Binding PatternImage}"/>
+            <Image Grid.Column="1" Margin="0,5,0,0" VerticalAlignment="Top" Source="{Binding PatternImage}"/>
 
             <ItemsControl Grid.Column="2" BorderThickness="1" BorderBrush="{StaticResource TrimColor}" 
-                          Padding="5" Margin="15,0,15,35" VerticalAlignment="Top"
+                          Padding="5" Margin="15,5,0,35" VerticalAlignment="Top"
                           ItemsSource="{Binding SwatchList}" ItemTemplate="{StaticResource PaletteItemTemplate}"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl.ItemsPanel>
@@ -61,6 +70,9 @@
                         <WrapPanel Orientation="Horizontal"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
+                <b:Interaction.Behaviors>
+                    <behaviours:EmptyListBehavior EmptyTemplate="{StaticResource NoImageTemplate}"/>
+                </b:Interaction.Behaviors>
             </ItemsControl>
         </Grid>
 

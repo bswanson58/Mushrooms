@@ -16,13 +16,13 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid Margin="15">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="15"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="15"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" Orientation="Vertical">
@@ -44,7 +44,7 @@
 
             <Label Grid.Row="2" Style="{StaticResource LabelStyle}" Content="Parameters:"/>
 
-            <Grid Grid.Row="3">
+            <Grid Grid.Row="3" Margin="0,5,10,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="*"/>
@@ -94,7 +94,7 @@
                 </ListView.Resources>
             </ListView>
 
-            <Grid Grid.Row="2">
+            <Grid Grid.Row="2" Margin="0,5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -105,7 +105,7 @@
                        Content="Scene Name:"/>
                 <TextBox Grid.Column="1" Text="{Binding SceneName, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <Button Grid.Column="2" Margin="15,0,0,0" HorizontalAlignment="Right" Command="{Binding CreateScene}"
+                <Button Grid.Column="2" Margin="25,0,5,0" HorizontalAlignment="Right" Command="{Binding CreateScene}"
                         Content="Create Scene"/>
             </Grid>
         </Grid>
