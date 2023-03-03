@@ -12,11 +12,11 @@ namespace Mushrooms.Models {
 
         public  DelegateCommand     SelectSwatch { get; }
 
-        public ColorViewModel( Color color, Action<ColorViewModel> onSelectionChanged ) {
+        public ColorViewModel( Color color, bool isSelected, Action<ColorViewModel> onSelectionChanged ) {
             mOnBulbSelectionChanged = onSelectionChanged;
 
             SwatchColor = color;
-            IsSelected = true;
+            IsSelected = isSelected;
 
             SelectSwatch = new DelegateCommand( OnSelectSwatch );
         }

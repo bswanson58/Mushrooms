@@ -72,10 +72,14 @@ namespace Mushrooms.PaletteBuilder {
             using( var image = Image.Load<Rgba32>( fileName )) {
                 var colorThief = new ColorThief.ImageSharp.ColorThief();
                 var palette = colorThief.GetPalette( image, 25, 5 );
+                var swatchLimit = 10;
 
                 foreach( var color in palette.OrderByDescending( c => c.Population )) {
                     SwatchList.Add( 
-                        new ColorViewModel( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ), OnSwatchSelectionChanged ));
+                        new ColorViewModel( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ), 
+                                            swatchLimit > 0,
+                                            OnSwatchSelectionChanged ));
+                    swatchLimit--;
                 }
             }
         }
