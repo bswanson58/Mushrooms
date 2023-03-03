@@ -21,19 +21,39 @@ namespace Mushrooms {
         IObservableCache<ActiveScene, String>   Scenes { get; }
     }
 
+    internal enum SceneState {
+        Active,
+        Scheduled,
+        Inactive
+    }
+
     internal class ActiveScene {
         public  Scene           Scene { get; }
+        public  SceneState      SceneState { get; private set; }
         public  bool            IsActive { get; private set; }
         public  SceneControl    Control { get; private set; }
 
         public ActiveScene( Scene scene ) {
             Scene = scene;
             Control = new SceneControl( Scene.Control.Brightness, Scene.Control.RateMultiplier );
+            SceneState = SceneState.Inactive;
             IsActive = false;
         }
 
-        public void Activate() => IsActive = true;
-        public void Deactivate() => IsActive = false;
+        public void Activate() {
+            IsActive = true;
+            SceneState = SceneState.Active;
+        }
+
+        public void ActiveBySchedule() {
+            IsActive = true;
+            SceneState = SceneState.Scheduled;
+        }
+
+        public void Deactivate() {
+            IsActive = false;
+            SceneState = SceneState.Inactive;
+        }
 
         public void UpdateControl( SceneControl control ) {
             Control = control;
@@ -66,6 +86,7 @@ namespace Mushrooms {
         private readonly LimitedRepeatingRandom             mLimitedRandom;
         private readonly Random                             mRandom;
         private Task ?                                      mLightingTask;
+        private Task ?                                      mSchedulingTask;
 
         public  IObservableCache<ActiveScene, string>       Scenes => mScenes.AsObservableCache();
 
@@ -126,6 +147,7 @@ namespace Mushrooms {
             mScenes.AddOrUpdate( mSceneProvider.GetAll().Select( s => new ActiveScene( s )).ToList());
 
             mLightingTask = Repeat.Interval( TimeSpan.FromMilliseconds( 200 ), LightingTask, mTokenSource.Token );
+            mSchedulingTask = Repeat.Interval( TimeSpan.FromSeconds( 31 ), SchedulingTask, mTokenSource.Token );
 
             return Task.CompletedTask;
         }
@@ -137,6 +159,40 @@ namespace Mushrooms {
                 if( updateList.Any()) {
                     UpdateActiveBulb( UpdateBulb( updateList.First().Bulb, scene.Scene ));
                 }
+            }
+        }
+
+        private async void SchedulingTask() {
+            foreach( var scene in mScenes.Items.Where( s => s.Scene.Schedule.Enabled )) {
+                if(!scene.IsActive ) {
+                    await ActivateIfScheduleStart( scene );
+                }
+            }
+
+            foreach( var scene in mScenes.Items.Where( s => s.SceneState.Equals( SceneState.Scheduled ))) {
+                await DeactivateIfScheduleEnd( scene );
+            }
+        }
+
+        private async Task ActivateIfScheduleStart( ActiveScene scene ) {
+            var startTime = scene.Scene.Schedule.StartTimeForToday();
+            var now = DateTime.Now;
+
+            if(( now > startTime ) &&
+               ( now < startTime.AddMinutes( 2 ))) {
+                await ActivateScene( scene.Scene );
+
+                scene.ActiveBySchedule();
+            }
+        }
+
+        private async Task DeactivateIfScheduleEnd( ActiveScene scene ) {
+            var stopTime = scene.Scene.Schedule.StopTimeForToday();
+
+            if( DateTime.Now > stopTime ) {
+                await DeactivateScene( scene.Scene );
+
+                scene.Deactivate();
             }
         }
 
@@ -182,6 +238,10 @@ namespace Mushrooms {
 
             if( mLightingTask != null ) {
                 Task.WaitAll( new []{ mLightingTask }, TimeSpan.FromMilliseconds( 250 ));
+            }
+
+            if( mSchedulingTask != null ) {
+                Task.WaitAll( new []{ mSchedulingTask }, TimeSpan.FromMilliseconds( 250 ));
             }
         }
     }

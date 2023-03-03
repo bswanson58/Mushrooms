@@ -177,7 +177,7 @@ namespace Mushrooms.SceneBuilder {
                     .ToList();
 
                 var scene = new Scene( SceneName, SelectedPalette.Palette, SceneParameters.Default, 
-                                       SceneControl.Default, bulbList, SceneSchedule.Default );
+                                       SceneControl.Default, bulbList, mSchedule );
 
                 mSceneProvider.Insert( scene );
             }

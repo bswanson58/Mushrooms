@@ -1,4 +1,5 @@
 ﻿using System;
+using Mushrooms.Support;
 
 namespace Mushrooms.Entities {
     internal enum ScheduleTimeType {
@@ -23,6 +24,7 @@ namespace Mushrooms.Entities {
             OnTime = onTime;
             OffTimeType = offTimeTimeType;
             OffTime = offTime;
+            OnDuration = onDuration;
             Enabled = enabled;
         }
         private SceneSchedule() {
@@ -35,5 +37,68 @@ namespace Mushrooms.Entities {
         }
 
         public static SceneSchedule Default => new ();
+    }
+
+    internal static class SceneScheduleExtensions {
+        public static DateTime StartTimeForToday( this SceneSchedule schedule ) {
+            var retValue = DateTime.MaxValue;
+
+            switch ( schedule.OnTimeType ) {
+                case ScheduleTimeType.SpecificTime:
+                    retValue = DateTime.Today.Add( schedule.OnTime.ToTimeSpan());
+                    break;
+
+                case ScheduleTimeType.Sunrise:
+                    retValue = Sunrise();
+                    break;
+
+                case ScheduleTimeType.Sunset:
+                    retValue = Sunset();
+                    break;
+            }
+
+            return retValue;
+        }
+
+        public static DateTime StopTimeForToday( this SceneSchedule schedule ) {
+            var retValue = DateTime.MaxValue;
+
+            switch ( schedule.OffTimeType ) {
+                case ScheduleTimeType.SpecificTime:
+                    retValue = DateTime.Today.Add( schedule.OffTime.ToTimeSpan());
+                    break;
+
+                case ScheduleTimeType.Sunrise:
+                    retValue = Sunrise();
+                    break;
+
+                case ScheduleTimeType.Sunset:
+                    retValue = Sunset();
+                    break;
+
+                case ScheduleTimeType.Duration:
+                    retValue = DateTime.Today.Add( schedule.OnDuration );
+                    break;
+            }
+
+            return retValue;
+        }
+
+        private const double cLatitude = 41.997D;
+        private const double cLongitude = -88.458D;
+
+        private static DateTime Sunrise() {
+            var calculator = new CelestialCalculator();
+            var data = calculator.CalculateData( cLatitude, cLongitude );
+
+            return data.SunRise;
+        }
+
+        private static DateTime Sunset() {
+            var calculator = new CelestialCalculator();
+            var data = calculator.CalculateData( cLatitude, cLongitude );
+
+            return data.SunSet;
+        }
     }
 }
