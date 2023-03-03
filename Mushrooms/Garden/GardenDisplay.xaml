@@ -25,7 +25,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <ContentPresenter DataContext="{Binding Scene}" ContentTemplate="{StaticResource SceneTemplate}"/>
+                <ContentPresenter Margin="5,0" DataContext="{Binding Scene}" ContentTemplate="{StaticResource SceneTemplate}"/>
                 <Button Grid.Column="2" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
                         Style="{StaticResource PathButtonStyle}" 
                         Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfActive}}"
@@ -39,7 +39,7 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid Margin="15">
+    <Grid Margin="0,15">
         <ListView ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource SceneTemplate}"/>
     </Grid>
 </UserControl>

@@ -11,6 +11,7 @@ namespace Mushrooms.Entities {
         public  SceneParameters Parameters { get; protected  set; }
         public  SceneControl    Control { get; protected set; }
         public  IList<Bulb>     Bulbs { get; protected set; }
+        public  SceneSchedule   Schedule { get; protected set; }
 
         protected Scene() {
             SceneName = String.Empty;
@@ -18,15 +19,17 @@ namespace Mushrooms.Entities {
             Parameters = SceneParameters.Default;
             Control = SceneControl.Default;
             Bulbs = new List<Bulb>();
+            Schedule = SceneSchedule.Default;
         }
 
         public Scene( string sceneName, ScenePalette palette, SceneParameters parameters, SceneControl control,     
-                      IEnumerable<Bulb> bulbs ) {
+                      IEnumerable<Bulb> bulbs, SceneSchedule schedule ) {
             SceneName = sceneName;
             Palette = palette;
             Parameters = parameters;
             Control = control;
             Bulbs = new List<Bulb>( bulbs );
+            Schedule = schedule;
         }
     }
 }

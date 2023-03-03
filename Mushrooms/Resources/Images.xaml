@@ -11,4 +11,21 @@
         </Canvas>
 	</Viewbox>
 
+    <Viewbox x:Key="Path_Clock" x:Shared="False">
+        <Canvas Width="504.240" Height="504.240">
+            <Path Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
+                  Data="F1 M 252.120,453.840 C 140.900,453.840 50.400,363.348 50.400,252.120 C 50.400,140.892 140.896,50.400 252.120,50.400 C 363.344,50.400 453.840,140.896 453.840,252.120 C 453.840,363.344 363.344,453.840 252.120,453.840 L 252.120,453.840 Z M 252.120,0.000 C 113.100,0.000 0.000,113.100 0.000,252.120 C 0.000,391.140 113.100,504.240 252.120,504.240 C 391.140,504.240 504.240,391.140 504.240,252.120 C 504.240,113.100 391.140,-0.000 252.120,0.000 Z"/>
+            <Path Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" 
+                  Data="F1 M 276.920,241.837 C 277.123,240.548 277.318,239.263 277.318,237.915 L 277.318,128.015 C 277.318,114.101 266.033,102.816 252.119,102.816 C 238.205,102.816 226.920,114.101 226.920,128.015 L 226.920,237.925 C 226.920,240.070 226.651,264.464 234.565,271.558 L 312.545,341.464 C 317.354,345.781 323.369,347.898 329.357,347.898 C 336.267,347.898 343.154,345.070 348.134,339.519 C 357.423,329.152 356.556,313.226 346.193,303.937 L 276.920,241.837 Z"/>
+            <Path StrokeThickness="20.0" StrokeMiterLimit="1.0" Stroke="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
+                  Data="F1 M 27.620,252.130 L 102.620,252.607"/>
+            <Path StrokeThickness="20.0" StrokeMiterLimit="1.0" Stroke="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
+                  Data="F1 M 404.120,251.881 L 479.120,252.359"/>
+            <Path StrokeThickness="20.0" StrokeMiterLimit="1.0" Stroke="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
+                  Data="F1 M 251.881,482.617 L 252.359,407.617"/>
+            <Path StrokeThickness="20.0" StrokeMiterLimit="1.0" Stroke="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" 
+                  Data="F1 M 251.961,85.617 L 252.279,35.617"/>
+        </Canvas>
+    </Viewbox>
+
 </ResourceDictionary>

@@ -6,8 +6,10 @@ using HueLighting.Models;
 using Mushrooms.Database;
 using Mushrooms.Entities;
 using Mushrooms.Models;
+using Mushrooms.Scheduler;
 using Q42.HueApi.Models.Groups;
 using ReusableBits.Wpf.Commands;
+using ReusableBits.Wpf.DialogService;
 using ReusableBits.Wpf.Platform;
 using ReusableBits.Wpf.ViewModelSupport;
 
@@ -35,8 +37,10 @@ namespace Mushrooms.SceneBuilder {
         private readonly IHubManager                mHubManager;
         private readonly IPaletteProvider           mPaletteProvider;
         private readonly ISceneProvider             mSceneProvider;
+        private readonly IDialogService             mDialogService;
         private string                              mSceneName;
         private ScenePalette ?                      mSelectedPalette;
+        private SceneSchedule                       mSchedule;
         private TimeSpan                            mTransitionDuration;
         private TimeSpan                            mTransitionJitter;
         private TimeSpan                            mDisplayDuration;
@@ -51,12 +55,15 @@ namespace Mushrooms.SceneBuilder {
         public  string                              TransitionDuration => mTransitionDuration.ToString();
         public  string                              TransitionJitter => mTransitionJitter.ToString();
 
+        public  DelegateCommand                     EditSchedule { get; }
         public  DelegateCommand                     CreateScene { get; }
 
-        public SceneEditorViewModel( IHubManager hubManager, IPaletteProvider paletteProvider, ISceneProvider sceneProvider ) {
+        public SceneEditorViewModel( IHubManager hubManager, IPaletteProvider paletteProvider, ISceneProvider sceneProvider,
+                                     IDialogService dialogService ) {
             mHubManager = hubManager;
             mPaletteProvider = paletteProvider;
             mSceneProvider = sceneProvider;
+            mDialogService = dialogService;
 
             mSceneName = String.Empty;
 
@@ -67,10 +74,13 @@ namespace Mushrooms.SceneBuilder {
             mTransitionDuration = defaultParameters.BaseTransitionTime;
             mTransitionJitter = defaultParameters.TransitionJitter;
 
+            mSchedule = SceneSchedule.Default;
+
             Scenes = new RangeCollection<SceneViewModel>();
             Palettes = new RangeCollection<PaletteViewModel>();
             LightingList = new RangeCollection<LightingItem>();
 
+            EditSchedule = new DelegateCommand( OnEditSchedule );
             CreateScene = new DelegateCommand( OnCreateScene, CanCreateScene );
 
             LoadAssets();
@@ -146,6 +156,16 @@ namespace Mushrooms.SceneBuilder {
             LightingList.AddRange( bulbs.Select( b => new LightingItem( b.Name, GroupType.Free, new List<Bulb>{ b } )));
         }
 
+        private void OnEditSchedule() {
+            var parameters = new DialogParameters{{ ScheduleEditDialogViewModel.cSchedule, mSchedule }};
+
+            mDialogService.ShowDialog<ScheduleEditDialog>( parameters, result => {
+                if( result.Result == ButtonResult.Ok ) {
+                    mSchedule = result.Parameters.GetValue<SceneSchedule>( ScheduleEditDialogViewModel.cSchedule ) ?? SceneSchedule.Default;
+                }
+            });
+        }
+
         private void OnCreateScene() {
             if(( SelectedPalette != null ) &&
                ( LightingList.Any( l => l.IsSelected ))) {
@@ -156,7 +176,8 @@ namespace Mushrooms.SceneBuilder {
                     .Select( g => g.First())
                     .ToList();
 
-                var scene = new Scene( SceneName, SelectedPalette, SceneParameters.Default, SceneControl.Default, bulbList );
+                var scene = new Scene( SceneName, SelectedPalette, SceneParameters.Default, 
+                                       SceneControl.Default, bulbList, SceneSchedule.Default );
 
                 mSceneProvider.Insert( scene );
             }
