@@ -7,6 +7,7 @@ using ReusableBits.Platform.Preferences;
 namespace Mushrooms.Database {
     internal interface IPictureCache {
         void    SavePicture( ScenePalette forPalette, string fileName );
+        void    DeletePicture( ScenePalette forPalette );
         string  GetPalettePictureFile( ScenePalette forPalette );
     }
 
@@ -32,6 +33,19 @@ namespace Mushrooms.Database {
             }
             catch( Exception ex ) {
                 mLog.LogException( $"Saving picture for palette '{forPalette.Name}' from: {fileName}", ex );
+            }
+        }
+
+        public void DeletePicture( ScenePalette forPalette ) {
+            try {
+                var fileName = GetPalettePictureFile( forPalette );
+
+                if( File.Exists( fileName )) {
+                    File.Delete( fileName );
+                }
+            }
+            catch( Exception ex ) {
+                mLog.LogException( $"Deleting picture for palette '{forPalette.Name}', id: {forPalette.Id}", ex );
             }
         }
 

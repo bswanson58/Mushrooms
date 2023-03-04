@@ -127,6 +127,8 @@ namespace Mushrooms.PaletteBuilder {
             mDialogService.ShowDialog<ConfirmationDialog>( parameters, result => {
                 if( result.Result.Equals( ButtonResult.Ok )) {
                     mPaletteProvider.Delete( palette.Palette );
+
+                    mPictureCache.DeletePicture( palette.Palette );
                 }
             });
         }
