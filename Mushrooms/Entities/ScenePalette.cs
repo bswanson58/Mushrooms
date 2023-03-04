@@ -20,6 +20,12 @@ namespace Mushrooms.Entities {
             Palette = new List<Color>( colors );
         }
 
+        public void UpdateFrom( ScenePalette palette ) {
+            SourceColors = new List<Color>( palette.SourceColors );
+            Palette = new List<Color>( palette.Palette );
+            Name = palette.Name;
+        }
+
         public static ScenePalette Default =>
             new ();
     }

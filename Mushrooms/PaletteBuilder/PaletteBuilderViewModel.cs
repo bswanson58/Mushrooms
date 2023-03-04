@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -37,20 +37,23 @@ namespace Mushrooms.PaletteBuilder {
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class PaletteBuilderViewModel : PropertyChangeBase, IDisposable {
-        private readonly IPaletteProvider               mPaletteProvider;
-        private readonly IPictureCache                  mPictureCache;
-        private readonly IDialogService                 mDialogService;
+        private readonly IPaletteProvider       mPaletteProvider;
+        private readonly IPictureCache          mPictureCache;
+        private readonly IDialogService         mDialogService;
+        private readonly List<ColorViewModel>   mSwatchList;
 
-        private string                                  mPaletteName;
-        private string                                  mPictureFile;
-        private IDisposable ?                           mPaletteSubscription;
+        private EditablePaletteViewModel ?      mSelectedPalette;
+        private string                          mPaletteName;
+        private string                          mPictureFile;
+        private bool                            mDisplayOnlySelectedSwatches;
+        private IDisposable ?                   mPaletteSubscription;
 
         public  ObservableCollectionExtended<EditablePaletteViewModel>  Palettes { get; }
-        public  ObservableCollection<ColorViewModel>    SwatchList { get; }
+        public  int                             SelectedSwatchCount => mSwatchList.Count( s => s.IsSelected );
 
-        public  DelegateCommand                         SavePalette { get; }
-        public  DelegateCommand                         SelectImage { get; }
-        public  ImageSource ?                           PatternImage { get; private set; }
+        public  DelegateCommand                 SavePalette { get; }
+        public  DelegateCommand                 SelectImage { get; }
+        public  ImageSource ?                   PatternImage { get; private set; }
 
         public PaletteBuilderViewModel( IPaletteProvider paletteProvider, IPictureCache pictureCache,
                                         IDialogService dialogService ) {
@@ -59,48 +62,103 @@ namespace Mushrooms.PaletteBuilder {
             mDialogService = dialogService;
             mPaletteName = String.Empty;
             mPictureFile = String.Empty;
+            mDisplayOnlySelectedSwatches = false;
+            mSwatchList = new List<ColorViewModel>();
 
             Palettes = new ObservableCollectionExtended<EditablePaletteViewModel>();
 
             mPaletteSubscription = mPaletteProvider.Entities
                 .Connect()
                 .Transform( p => new EditablePaletteViewModel( p, OnDeletePalette ))
+                .Sort( SortExpressionComparer<EditablePaletteViewModel>.Ascending( p => p.Name ))
                 .Bind( Palettes )
                 .Subscribe();
 
-            SwatchList = new ObservableCollection<ColorViewModel>();
-
-            SavePalette = new DelegateCommand( OnSavePalette );
+            SavePalette = new DelegateCommand( OnSavePalette, CanSavePalette );
             SelectImage = new DelegateCommand( OnSelectFile );
         }
 
+        public EditablePaletteViewModel ? SelectedPalette {
+            get => mSelectedPalette;
+            set {
+                mSelectedPalette = value;
+
+                SelectPalette();
+            }
+        }
+
+        private void SelectPalette() {
+            if( mSelectedPalette != null ) {
+                SelectImageFile( mPictureCache.GetPalettePictureFile( mSelectedPalette.Palette ));
+
+                foreach( var swatch in mSwatchList ) {
+                    swatch.IsSelected = mSelectedPalette.Palette.Palette.Contains( swatch.SwatchColor );
+                }
+
+                mPaletteName = mSelectedPalette.Name;
+
+                RaiseAllPropertiesChanged();
+            }
+        }
+
+        public IEnumerable<ColorViewModel> SwatchList =>
+            mDisplayOnlySelectedSwatches ?
+                mSwatchList.Where( s => s.IsSelected ) :
+                mSwatchList;
+
         public string PaletteName {
             get => mPaletteName;
-            set => mPaletteName = value;
+            set {
+                mPaletteName = value;
+
+                SavePalette.RaiseCanExecuteChanged();
+            }
+        }
+
+        public bool DisplayOnlySelected {
+            get => mDisplayOnlySelectedSwatches;
+            set {
+                mDisplayOnlySelectedSwatches = value;
+
+                RaisePropertyChanged( () => SwatchList );
+            }
         }
 
         private void OnSelectFile() {
             var dialog = new OpenFileDialog { Filter = "Images|*.jpg", Title = "Select Image" };
 
             if( dialog.ShowDialog() == true ) {
-                SelectImageColors( dialog.FileName );
-                UpdatePaletteState();
-
-                PatternImage = new BitmapImage( new Uri( dialog.FileName ));
-
-                RaisePropertyChanged( () => PatternImage );
+                SelectImageFile( dialog.FileName );
             }
         }
 
-        private void OnSwatchSelectionChanged( ColorViewModel _ ) => 
-            UpdatePaletteState();
+        private void SelectImageFile( string fileName ) {
+            SelectImageColors( fileName );
 
-        private void UpdatePaletteState() {}
-//            mSceneFacade.SetScenePalette(
-//                new ScenePalette( from swatch in Palette where swatch.IsSelected select swatch.SwatchColor ));
+            PatternImage = new BitmapImage( new Uri( fileName ));
+            PaletteName = String.Empty;
+            mPictureFile = fileName;
+
+            RaisePropertyChanged( () => PaletteName );
+            RaisePropertyChanged( () => PatternImage );
+            RaisePropertyChanged( () => SelectedSwatchCount );
+            RaisePropertyChanged( () => DisplayOnlySelected );
+
+            // force the collection source to change since it is not an observable collection
+            mDisplayOnlySelectedSwatches = true;
+            RaisePropertyChanged( () => SwatchList );
+            mDisplayOnlySelectedSwatches = false;
+            RaisePropertyChanged( () => SwatchList );
+        }
+
+        private void OnSwatchSelectionChanged( ColorViewModel _ ) { 
+            RaisePropertyChanged( () => SwatchList );
+            RaisePropertyChanged( () => SelectedSwatchCount );
+        }
+
 
         private void SelectImageColors( string fileName ) {
-            SwatchList.Clear();
+            mSwatchList.Clear();
 
             using( var image = Image.Load<Rgba32>( fileName )) {
                 var colorThief = new ColorThief.ImageSharp.ColorThief();
@@ -108,14 +166,12 @@ namespace Mushrooms.PaletteBuilder {
                 var swatchLimit = 10;
 
                 foreach( var color in palette.OrderByDescending( c => c.Population )) {
-                    SwatchList.Add( 
+                    mSwatchList.Add( 
                         new ColorViewModel( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ), 
                                             swatchLimit > 0,
                                             OnSwatchSelectionChanged ));
                     swatchLimit--;
                 }
-
-                mPictureFile = fileName;
             }
         }
 
@@ -131,20 +187,50 @@ namespace Mushrooms.PaletteBuilder {
                     mPictureCache.DeletePicture( palette.Palette );
                 }
             });
+
+            if( palette.Equals( mSelectedPalette )) {
+                mSwatchList.Clear();
+                PatternImage = null;
+                mPaletteName = String.Empty;
+                mPictureFile = String.Empty;
+            }
         }
 
         private void OnSavePalette() {
             if((!String.IsNullOrWhiteSpace( mPaletteName )) &&
                ( SwatchList.Any( p => p.IsSelected ))) {
-                var palette = new ScenePalette(
-                    from swatch in SwatchList select swatch.SwatchColor,
-                    from swatch in SwatchList where swatch.IsSelected select swatch.SwatchColor,
-                    mPaletteName );
-
-                mPaletteProvider.Insert( palette );
-                mPictureCache.SavePicture( palette, mPictureFile );
+                if( mSelectedPalette != null ) {
+                    UpdatePalette( mSelectedPalette.Palette );
+                }
+                else {
+                    CreatePalette();
+                }
             }
         }
+
+        private void CreatePalette() {
+            var palette = new ScenePalette(
+                from swatch in mSwatchList select swatch.SwatchColor,
+                from swatch in mSwatchList where swatch.IsSelected select swatch.SwatchColor,
+                mPaletteName );
+
+            mPaletteProvider.Insert( palette );
+            mPictureCache.SavePicture( palette, mPictureFile );
+        }
+
+        private void UpdatePalette( ScenePalette currentPalette ) {
+            currentPalette.UpdateFrom( 
+                new ScenePalette(
+                    from swatch in mSwatchList select swatch.SwatchColor,
+                    from swatch in mSwatchList where swatch.IsSelected select swatch.SwatchColor,
+                    mPaletteName ));
+
+            mPaletteProvider.Update( currentPalette );
+        }
+
+        private bool CanSavePalette() =>
+            !String.IsNullOrWhiteSpace( PaletteName ) &&
+            mSwatchList.Any( s => s.IsSelected );
 
         public void Dispose() {
             mPaletteSubscription?.Dispose();
