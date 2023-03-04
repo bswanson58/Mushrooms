@@ -52,7 +52,7 @@
                     </ItemsControl>
                 </StackPanel>
 
-                <StackPanel x:Name="SceneControls" Grid.Column="3" Orientation="Horizontal" Opacity="0" Visibility="Hidden">
+                <StackPanel x:Name="SceneControls" Grid.Column="3" Orientation="Horizontal" Opacity="0.3" Visibility="Hidden">
                     <Label Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Brightness:"/>
                     <Slider Style="{DynamicResource MahApps.Styles.Slider}" Width="120" Margin="5,0" VerticalAlignment="Center"
                             Minimum="0.0" Maximum="1.0" Value="{Binding Brightness}"/>
