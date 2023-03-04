@@ -38,9 +38,11 @@ namespace Mushrooms.PaletteBuilder {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class PaletteBuilderViewModel : PropertyChangeBase, IDisposable {
         private readonly IPaletteProvider               mPaletteProvider;
+        private readonly IPictureCache                  mPictureCache;
         private readonly IDialogService                 mDialogService;
 
         private string                                  mPaletteName;
+        private string                                  mPictureFile;
         private IDisposable ?                           mPaletteSubscription;
 
         public  ObservableCollectionExtended<EditablePaletteViewModel>  Palettes { get; }
@@ -50,10 +52,13 @@ namespace Mushrooms.PaletteBuilder {
         public  DelegateCommand                         SelectImage { get; }
         public  ImageSource ?                           PatternImage { get; private set; }
 
-        public PaletteBuilderViewModel( IPaletteProvider paletteProvider, IDialogService dialogService ) {
+        public PaletteBuilderViewModel( IPaletteProvider paletteProvider, IPictureCache pictureCache,
+                                        IDialogService dialogService ) {
             mPaletteProvider = paletteProvider;
+            mPictureCache = pictureCache;
             mDialogService = dialogService;
             mPaletteName = String.Empty;
+            mPictureFile = String.Empty;
 
             Palettes = new ObservableCollectionExtended<EditablePaletteViewModel>();
 
@@ -109,6 +114,8 @@ namespace Mushrooms.PaletteBuilder {
                                             OnSwatchSelectionChanged ));
                     swatchLimit--;
                 }
+
+                mPictureFile = fileName;
             }
         }
 
@@ -127,11 +134,13 @@ namespace Mushrooms.PaletteBuilder {
         private void OnSavePalette() {
             if((!String.IsNullOrWhiteSpace( mPaletteName )) &&
                ( SwatchList.Any( p => p.IsSelected ))) {
-                var palette = new ScenePalette( 
+                var palette = new ScenePalette(
+                    from swatch in SwatchList select swatch.SwatchColor,
                     from swatch in SwatchList where swatch.IsSelected select swatch.SwatchColor,
                     mPaletteName );
 
                 mPaletteProvider.Insert( palette );
+                mPictureCache.SavePicture( palette, mPictureFile );
             }
         }
 

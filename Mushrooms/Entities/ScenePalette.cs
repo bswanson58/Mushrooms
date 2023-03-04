@@ -7,14 +7,16 @@ using Mushrooms.Database;
 namespace Mushrooms.Entities {
     internal class ScenePalette :EntityBase {
         // protected sets are for LiteDB.
+        public  IList<Color>    SourceColors { get; protected set; }
         public  IList<Color>    Palette { get; protected set; }
         public  string          Name { get; protected set; }
 
         private ScenePalette() :
-            this( Enumerable.Empty<Color>(), String.Empty ) { }
+            this( Enumerable.Empty<Color>(), Enumerable.Empty<Color>(), String.Empty ) { }
 
-        public ScenePalette( IEnumerable<Color> colors, string name ) {
+        public ScenePalette( IEnumerable<Color> sourceColors, IEnumerable<Color> colors, string name ) {
             Name = name;
+            SourceColors = new List<Color>( sourceColors );
             Palette = new List<Color>( colors );
         }
 

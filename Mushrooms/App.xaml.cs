@@ -56,6 +56,8 @@ namespace Mushrooms {
             services.AddLogging();
             services.AddScoped<IBasicLog, BasicLog>();
 
+            services.AddScoped<IPictureCache, PictureCache>();
+
             services.AddScoped<IPaletteDatabaseProvider, PaletteProvider>();
             services.AddSingleton<IPaletteProvider, PaletteCache>();
 

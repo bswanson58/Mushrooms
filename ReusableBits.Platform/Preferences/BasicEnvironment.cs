@@ -9,6 +9,7 @@ namespace ReusableBits.Platform.Preferences {
         string      DatabaseDirectory();
         string      DatabaseName();
         string		LogFileDirectory();
+        string      PictureDirectory();
         string		PreferencesDirectory();
     }
 
@@ -39,6 +40,16 @@ namespace ReusableBits.Platform.Preferences {
 
         public string DatabaseDirectory() {
             var retValue = Path.Combine( ApplicationDirectory(), mApplicationConstants.DatabaseDirectory );
+
+            if(!Directory.Exists( retValue )) {
+                Directory.CreateDirectory( retValue );
+            }
+
+            return( retValue );
+        }
+
+        public string PictureDirectory() {
+            var retValue = Path.Combine( ApplicationDirectory(), mApplicationConstants.PictureStorageDirectory );
 
             if(!Directory.Exists( retValue )) {
                 Directory.CreateDirectory( retValue );
