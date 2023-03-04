@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using DynamicData;
@@ -29,35 +31,49 @@ namespace Mushrooms {
     }
 
     internal class ActiveScene {
-        public  Scene           Scene { get; }
-        public  SceneState      SceneState { get; private set; }
-        public  bool            IsActive { get; private set; }
-        public  SceneControl    Control { get; private set; }
+        private Subject<ActiveScene>        mChangeSubject;
+
+        public  Scene                       Scene { get; }
+        public  SceneState                  SceneState { get; private set; }
+        public  bool                        IsActive { get; private set; }
+        public  SceneControl                Control { get; private set; }
+
+        public  IObservable<ActiveScene>    OnSceneChanged => mChangeSubject.AsObservable();
 
         public ActiveScene( Scene scene ) {
             Scene = scene;
             Control = new SceneControl( Scene.Control.Brightness, Scene.Control.RateMultiplier );
             SceneState = SceneState.Inactive;
             IsActive = false;
+
+            mChangeSubject = new Subject<ActiveScene>();
         }
 
         public void Activate() {
             IsActive = true;
             SceneState = SceneState.Active;
+
+            mChangeSubject.OnNext( this );
         }
 
         public void ActiveBySchedule() {
             IsActive = true;
             SceneState = SceneState.Scheduled;
+
+            mChangeSubject.OnNext( this );
         }
 
         public void Deactivate() {
             IsActive = false;
             SceneState = SceneState.Inactive;
+
+            mChangeSubject.OnNext( this );
         }
 
         public void UpdateControl( SceneControl control ) {
             Control = control;
+
+            mChangeSubject.OnNext( this );
         }
     }
 

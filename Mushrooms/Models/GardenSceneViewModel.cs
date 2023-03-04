@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.ViewModelSupport;
@@ -7,38 +8,45 @@ using System.Windows.Media;
 using Mushrooms.Entities;
 
 namespace Mushrooms.Models {
-    internal class GardenSceneViewModel : PropertyChangeBase {
+    internal class GardenSceneViewModel : PropertyChangeBase, IDisposable {
         private readonly IMushroomGarden    mGarden;
+        private IDisposable ?               mSceneSubscription;
 
-        public  Scene                       Scene { get; }
+        public  ActiveScene                 ActiveScene { get; }
+        public  Scene                       Scene => ActiveScene.Scene;
 
         public  string                      Name => Scene.SceneName;
         public  IEnumerable<Color>          ExampleColors => Scene.Palette.Palette.Take( 7 );
-        public  bool                        IsSceneActive { get; private set; }
+        public  bool                        IsSceneActive => ActiveScene.IsActive;
 
         public  ICommand                    ActivateScene { get; }
         public  ICommand                    DeactivateScene { get; }
 
-        public GardenSceneViewModel( Scene scene, IMushroomGarden garden ) {
-            Scene = scene;
+        public GardenSceneViewModel( ActiveScene scene, IMushroomGarden garden ) {
+            ActiveScene = scene;
             mGarden = garden;
 
             ActivateScene = new DelegateCommand( OnActivateScene );
             DeactivateScene = new DelegateCommand( OnDeactivateScene );
+
+            mSceneSubscription = ActiveScene.OnSceneChanged.Subscribe( OnSceneChanged );
+        }
+
+        private void OnSceneChanged( ActiveScene scene ) {
+            RaisePropertyChanged( () => IsSceneActive );
         }
 
         private void OnActivateScene() {
             mGarden.StartScene( Scene );
-
-            IsSceneActive = true;
-            RaisePropertyChanged( () => IsSceneActive );
         }
 
         private void OnDeactivateScene() {
             mGarden.StopScene( Scene );
+        }
 
-            IsSceneActive = false;
-            RaisePropertyChanged( () => IsSceneActive );
+        public void Dispose() {
+            mSceneSubscription?.Dispose();
+            mSceneSubscription = null;
         }
     }
 }

@@ -17,25 +17,48 @@
         <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfInactive" IsHidden="False" TriggerValue="False"/>
 
         <DataTemplate x:Key="SceneTemplate" DataType="{x:Type models:GardenSceneViewModel}">
-            <Grid>
+            <Grid x:Name="SceneContainer" Background="Transparent">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <ContentPresenter Margin="5,0" DataContext="{Binding Scene}" ContentTemplate="{StaticResource SceneTemplate}"/>
-                <Button Grid.Column="2" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
-                        Style="{StaticResource PathButtonStyle}" 
-                        Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfActive}}"
-                        Command="{Binding ActivateScene}" Content="{StaticResource Path_Power}"/>
+                <Button x:Name="SceneActive" Grid.Column="0" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                        Style="{StaticResource PathButtonStyle}" Foreground="LawnGreen" BorderThickness="0"
+                        Visibility="Collapsed" Content="{StaticResource Path_Power}"/>
 
-                <Button Grid.Column="2" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
-                        Style="{StaticResource PathButtonStyle}" 
-                        Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfInactive}}"
-                        Command="{Binding DeactivateScene}" Content="{StaticResource Path_Power}"/>
+                <Grid x:Name="PowerControls" Grid.Column="0" Background="Transparent" Opacity="0">
+                    <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                            Style="{StaticResource PathButtonStyle}" 
+                            Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfActive}}"
+                            Command="{Binding ActivateScene}" Content="{StaticResource Path_Power}"/>
+
+                    <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                            Style="{StaticResource PathButtonStyle}" 
+                            Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfInactive}}"
+                            Command="{Binding DeactivateScene}" Content="{StaticResource Path_Power}"/>
+                </Grid>
+
+                <ContentPresenter Grid.Column="1" Margin="5,0" DataContext="{Binding Scene}" ContentTemplate="{StaticResource SceneTemplate}"/>
+
+                <StackPanel x:Name="SceneControls" Grid.Column="3" Orientation="Horizontal" Opacity="0" Visibility="Hidden">
+                    <Label Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Brightness:"/>
+                    <Slider Style="{DynamicResource MahApps.Styles.Slider}" Width="120" Margin="5,0" VerticalAlignment="Center"
+                            Minimum="0" Maximum="1"></Slider>
+                </StackPanel>
             </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsSceneActive}" Value="True">
+                    <Setter TargetName="SceneActive" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="SceneControls" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <Trigger SourceName="SceneContainer" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="PowerControls" Property="Opacity" Value="1.0"/>
+                    <Setter TargetName="SceneControls" Property="Opacity" Value="1.0"/>
+                </Trigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
     </UserControl.Resources>
 
