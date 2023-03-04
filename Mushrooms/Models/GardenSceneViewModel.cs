@@ -32,6 +32,15 @@ namespace Mushrooms.Models {
             mSceneSubscription = ActiveScene.OnSceneChanged.Subscribe( OnSceneChanged );
         }
 
+        public double Brightness {
+            get => ActiveScene.Control.Brightness;
+            set {
+                var brightness = Math.Max( Math.Min( 1.0, value ), 0.0 );
+
+                mGarden.UpdateSceneControl( Scene, new SceneControl( brightness, 1.0 ));
+            }
+        }
+
         private void OnSceneChanged( ActiveScene scene ) {
             RaisePropertyChanged( () => IsSceneActive );
         }

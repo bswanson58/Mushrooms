@@ -29,11 +29,13 @@ namespace HueLighting.Hub {
 
         Task<bool>                          SetBulbState( Bulb bulb, bool state );
         Task<bool>                          SetBulbState( Bulb bulb, int brightness );
+        Task<bool>                          SetBulbState( Bulb bulb, double brightness );
         Task<bool>                          SetBulbState( Bulb bulb, Color color, TimeSpan? transitionTime = null );
         Task<bool>                          SetBulbState( Bulb bulb, Color color, double brightness, TimeSpan transitionTime );
 
         Task<bool>                          SetBulbState( IEnumerable<Bulb> bulbList, bool state );
         Task<bool>                          SetBulbState( IEnumerable<Bulb> bulbList, int brightness );
+        Task<bool>                          SetBulbState( IEnumerable<Bulb> bulbList, double brightness );
         Task<bool>                          SetBulbState( IEnumerable<Bulb> bulbList, Color color, TimeSpan? transitionTime = null );
         Task<bool>                          SetBulbState( IEnumerable<Bulb> bulbList, Color color, double brightness, TimeSpan transitionTime );
     }
@@ -239,6 +241,14 @@ namespace HueLighting.Hub {
 
         public async Task<bool> SetBulbState( IEnumerable<Bulb> bulbList, int brightness ) {
             return await SetBulbState( from b in bulbList select b.Id, brightness );
+        }
+
+        public async Task<bool> SetBulbState( Bulb bulb, double brightness ) {
+            return await SetBulbState( new []{ bulb.Id }, (int)( brightness * 255 ));
+        }
+
+        public async Task<bool> SetBulbState( IEnumerable<Bulb> bulbList, double brightness ) {
+            return await SetBulbState( from b in bulbList select b.Id, (int)( brightness * 255 ));
         }
 
         private async Task<bool> SetBulbState( IEnumerable<string> bulbList, int brightness ) {
