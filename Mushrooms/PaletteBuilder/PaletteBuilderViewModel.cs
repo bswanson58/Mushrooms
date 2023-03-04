@@ -1,44 +1,65 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DynamicData;
 using DynamicData.Binding;
 using Microsoft.Win32;
 using Mushrooms.Database;
+using Mushrooms.Dialogs;
 using Mushrooms.Entities;
 using Mushrooms.Models;
 using ReusableBits.Wpf.Commands;
+using ReusableBits.Wpf.DialogService;
 using ReusableBits.Wpf.ViewModelSupport;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Color = System.Windows.Media.Color;
 
 namespace Mushrooms.PaletteBuilder {
+    internal class EditablePaletteViewModel : PaletteViewModel {
+        private readonly Action<EditablePaletteViewModel> mOnDelete;
+
+        public  ICommand        Delete { get; }
+
+        public EditablePaletteViewModel( ScenePalette palette, Action<EditablePaletteViewModel> onDelete )
+            : base( palette ) {
+            Delete = new DelegateCommand( OnDelete );
+            mOnDelete = onDelete;
+        }
+
+        private void OnDelete() {
+            mOnDelete.Invoke( this );
+        }
+    }
+
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class PaletteBuilderViewModel : PropertyChangeBase, IDisposable {
         private readonly IPaletteProvider               mPaletteProvider;
+        private readonly IDialogService                 mDialogService;
 
         private string                                  mPaletteName;
         private IDisposable ?                           mPaletteSubscription;
 
-        public  ObservableCollectionExtended<PaletteViewModel>  Palettes { get; }
+        public  ObservableCollectionExtended<EditablePaletteViewModel>  Palettes { get; }
         public  ObservableCollection<ColorViewModel>    SwatchList { get; }
 
         public  DelegateCommand                         SavePalette { get; }
         public  DelegateCommand                         SelectImage { get; }
         public  ImageSource ?                           PatternImage { get; private set; }
 
-        public PaletteBuilderViewModel( IPaletteProvider paletteProvider ) {
+        public PaletteBuilderViewModel( IPaletteProvider paletteProvider, IDialogService dialogService ) {
             mPaletteProvider = paletteProvider;
+            mDialogService = dialogService;
             mPaletteName = String.Empty;
 
-            Palettes = new ObservableCollectionExtended<PaletteViewModel>();
+            Palettes = new ObservableCollectionExtended<EditablePaletteViewModel>();
 
             mPaletteSubscription = mPaletteProvider.Entities
                 .Connect()
-                .Transform( p => new PaletteViewModel( p ))
+                .Transform( p => new EditablePaletteViewModel( p, OnDeletePalette ))
                 .Bind( Palettes )
                 .Subscribe();
 
@@ -89,6 +110,18 @@ namespace Mushrooms.PaletteBuilder {
                     swatchLimit--;
                 }
             }
+        }
+
+        private void OnDeletePalette( EditablePaletteViewModel palette ) {
+            var parameters = new DialogParameters{
+                { ConfirmationDialogViewModel.cTitle, "Confirm Deletion" },
+                { ConfirmationDialogViewModel.cMessage, $"Would you like to delete palette named: '{palette.Palette.Name}'?" }};
+
+            mDialogService.ShowDialog<ConfirmationDialog>( parameters, result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    mPaletteProvider.Delete( palette.Palette );
+                }
+            });
         }
 
         private void OnSavePalette() {
