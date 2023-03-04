@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using HueLighting.Hub;
 using HueLighting.Models;
 using Mushrooms.Database;
+using Mushrooms.Dialogs;
 using Mushrooms.Entities;
 using Mushrooms.Models;
 using Mushrooms.Scheduler;
@@ -16,6 +18,22 @@ using ReusableBits.Wpf.Platform;
 using ReusableBits.Wpf.ViewModelSupport;
 
 namespace Mushrooms.SceneBuilder {
+    internal class EditableSceneViewModel : SceneViewModel {
+        private readonly Action<EditableSceneViewModel> mOnDelete;
+
+        public  ICommand        Delete { get; }
+
+        public EditableSceneViewModel( Scene scene, Action<EditableSceneViewModel> onDelete )
+            : base( scene ) {
+            Delete = new DelegateCommand( OnDelete );
+            mOnDelete = onDelete;
+        }
+
+        private void OnDelete() {
+            mOnDelete.Invoke( this );
+        }
+    }
+
     internal class LightingItem {
         public  string          Name { get; }
         public  GroupType       GroupType { get; }
@@ -49,8 +67,8 @@ namespace Mushrooms.SceneBuilder {
         private IDisposable ?                       mSceneSubscription;
         private IDisposable ?                       mPaletteSubscription;
 
-        public  ObservableCollectionExtended<SceneViewModel>    Scenes { get; }
-        public  ObservableCollectionExtended<PaletteViewModel>  Palettes { get; }
+        public  ObservableCollectionExtended<EditableSceneViewModel>    Scenes { get; }
+        public  ObservableCollectionExtended<PaletteViewModel>          Palettes { get; }
         public  RangeCollection<LightingItem>       LightingList { get; }
 
         public  string                              DisplayDuration => mDisplayDuration.ToString();
@@ -78,11 +96,11 @@ namespace Mushrooms.SceneBuilder {
 
             mSchedule = SceneSchedule.Default;
 
-            Scenes = new ObservableCollectionExtended<SceneViewModel>();
+            Scenes = new ObservableCollectionExtended<EditableSceneViewModel>();
 
             mSceneSubscription = mSceneProvider.Entities
                 .Connect()
-                .Transform( s => new SceneViewModel( s ))
+                .Transform( s => new EditableSceneViewModel( s, OnDeleteScene ))
                 .Bind( Scenes )
                 .Subscribe();
 
@@ -175,6 +193,19 @@ namespace Mushrooms.SceneBuilder {
                 }
             });
         }
+
+        private void OnDeleteScene( EditableSceneViewModel scene ) {
+            var parameters = new DialogParameters{
+                { ConfirmationDialogViewModel.cTitle, "Confirm Deletion" },
+                { ConfirmationDialogViewModel.cMessage, $"Would you like to delete scene named: '{scene.Scene.SceneName}'?" }};
+
+            mDialogService.ShowDialog<ConfirmationDialog>( parameters, result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    mSceneProvider.Delete( scene.Scene );
+                }
+            });
+        }
+
 
         private void OnCreateScene() {
             if(( SelectedPalette != null ) &&
