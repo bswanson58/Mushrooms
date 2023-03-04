@@ -18,8 +18,8 @@ namespace Mushrooms.Models {
         public  string                      Name => Scene.SceneName;
         public  bool                        IsSceneActive => ActiveScene.IsActive;
         public  IEnumerable<Color>          SceneColors => IsSceneActive ? 
-                                                                ActiveScene.ActiveBulbs.Select( s => s.ActiveColor ) :
-                                                                Scene.Palette.Palette.Take( 7 );
+                                                ActiveScene.ActiveBulbs.OrderBy( b => b.Bulb.Name ).Select( s => s.ActiveColor ) :
+                                                Scene.Palette.Palette.Take( 7 );
 
         public  ICommand                    ActivateScene { get; }
         public  ICommand                    DeactivateScene { get; }
