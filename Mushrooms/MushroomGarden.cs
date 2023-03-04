@@ -34,25 +34,32 @@ namespace Mushrooms {
     }
 
     internal class ActiveScene {
-        private Subject<ActiveScene>        mChangeSubject;
+        private readonly Subject<ActiveScene>   mChangeSubject;
 
-        public  Scene                       Scene { get; }
-        public  IList<ActiveBulb>           ActiveBulbs { get; }
+        public  Scene                           Scene { get; }
+        public  IList<Bulb>                     SceneBulbs { get; }
+        public  IList<ActiveBulb>               ActiveBulbs { get; }
 
-        public  SceneState                  SceneState { get; private set; }
-        public  bool                        IsActive { get; private set; }
-        public  SceneControl                Control { get; private set; }
+        public  SceneState                      SceneState { get; private set; }
+        public  bool                            IsActive { get; private set; }
+        public  SceneControl                    Control { get; private set; }
 
-        public  IObservable<ActiveScene>    OnSceneChanged => mChangeSubject.AsObservable();
+        public  IObservable<ActiveScene>        OnSceneChanged => mChangeSubject.AsObservable();
 
         public ActiveScene( Scene scene ) {
             Scene = scene;
+            SceneBulbs = new List<Bulb>();
             ActiveBulbs = new List<ActiveBulb>();
             Control = new SceneControl( Scene.Control.Brightness, Scene.Control.RateMultiplier );
             SceneState = SceneState.Inactive;
             IsActive = false;
 
             mChangeSubject = new Subject<ActiveScene>();
+        }
+
+        public void UpdateSceneBulbs( IEnumerable<Bulb> bulbs ) {
+            SceneBulbs.Clear();
+            SceneBulbs.AddRange( bulbs );
         }
 
         public void Activate() {
@@ -146,14 +153,16 @@ namespace Mushrooms {
             var scene = mActiveScenes.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
 
             if( scene != null ) {
-                await ActivateScene( scene.Scene );
+                await ActivateScene( scene );
 
                 scene.Activate();
             }
         }
 
-        private async Task ActivateScene( Scene scene ) {
-            foreach( var bulb in scene.Bulbs ) {
+        private async Task ActivateScene( ActiveScene scene ) {
+            scene.UpdateSceneBulbs( await GetSceneBulbs( scene.Scene ));
+
+            foreach( var bulb in scene.SceneBulbs ) {
                 await mHubManager.SetBulbState( bulb, true );
                 await mHubManager.SetBulbState( bulb, scene.Control.Brightness );
             }
@@ -163,7 +172,7 @@ namespace Mushrooms {
             var scene = mActiveScenes.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
 
             if( scene != null ) {
-                await DeactivateScene( scene.Scene );
+                await DeactivateScene( scene );
 
                 scene.Deactivate();
             }
@@ -180,15 +189,42 @@ namespace Mushrooms {
         }
 
         private async Task UpdateSceneControl( ActiveScene scene ) {
-            foreach ( var bulb in scene.Scene.Bulbs ) {
+            foreach ( var bulb in scene.SceneBulbs ) {
                 await mHubManager.SetBulbState( bulb, scene.Control.Brightness );
             }
         }
 
-        private async Task DeactivateScene( Scene scene ) {
-            foreach( var bulb in scene.Bulbs ) {
+        private async Task DeactivateScene( ActiveScene scene ) {
+            foreach( var bulb in scene.SceneBulbs ) {
                 await mHubManager.SetBulbState( bulb, false );
             }
+        }
+
+        private async Task<IEnumerable<Bulb>> GetSceneBulbs( Scene forScene ) {
+            var retValue = new List<Bulb>();
+            var groups = ( await mHubManager.GetBulbGroups()).ToList();
+            var bulbs = ( await mHubManager.GetBulbs()).ToList();
+
+            foreach( var lightSource in forScene.Lights ) {
+                if( lightSource.SourceType.Equals( LightSourceType.Bulb )) {
+                    var bulb = bulbs.FirstOrDefault( b => b.Name.Equals( lightSource.SourceName ));
+
+                    if( bulb != null ) {
+                        retValue.Add( bulb );
+                    }
+                }
+                else {
+                    var group = groups.FirstOrDefault( g => g.Name.Equals( lightSource.SourceName ));
+
+                    if( group != null ) {
+                        retValue.AddRange( group.Bulbs );
+                    }
+                }
+            }
+
+            return retValue                    
+                .GroupBy( b => b.Id )
+                .Select( g => g.First());
         }
 
         public override async Task StartAsync( CancellationToken cancellationToken ) {
@@ -245,7 +281,7 @@ namespace Mushrooms {
 
             if(( now > startTime ) &&
                ( now < startTime.AddMinutes( 2 ))) {
-                await ActivateScene( scene.Scene );
+                await ActivateScene( scene );
 
                 scene.ActiveBySchedule();
             }
@@ -255,16 +291,16 @@ namespace Mushrooms {
             var stopTime = scene.Scene.Schedule.StopTimeForToday();
 
             if( DateTime.Now > stopTime ) {
-                await DeactivateScene( scene.Scene );
+                await DeactivateScene( scene );
 
                 scene.Deactivate();
             }
         }
 
-        private IList<ActiveBulb> BuildBulbList( ActiveScene forScene ) {
+        private static IList<ActiveBulb> BuildBulbList( ActiveScene forScene ) {
             var activity = new List<ActiveBulb>();
 
-            foreach( var bulb in forScene.Scene.Bulbs ) {
+            foreach( var bulb in forScene.SceneBulbs ) {
                 activity.Add( forScene.ActiveBulbs.FirstOrDefault( b => b.Bulb.Id.Equals( bulb.Id ), new ActiveBulb( bulb )));
             }
 

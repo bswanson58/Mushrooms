@@ -11,6 +11,7 @@ namespace Mushrooms.Database {
 
         protected override void InitializeDatabase( LiteDatabase db ) {
             BsonMapper.Global.Entity<Scene>().Id( e => e.Id );
+            BsonMapper.Global.EnumAsInteger = true;
         }
     }
 }

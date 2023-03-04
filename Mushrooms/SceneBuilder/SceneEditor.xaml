@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
              xmlns:sceneBuilder="clr-namespace:Mushrooms.SceneBuilder"
+             xmlns:models="clr-namespace:Mushrooms.Models"
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance sceneBuilder:SceneEditorViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
@@ -33,7 +34,7 @@
         </DataTemplate>
 
 
-        <DataTemplate x:Key="LightingTemplate" DataType="{x:Type sceneBuilder:LightingItem}">
+        <DataTemplate x:Key="LightingTemplate" DataType="{x:Type models:LightSourceViewModel}">
             <TextBlock Text="{Binding DisplayName}"/>
         </DataTemplate>
     </UserControl.Resources>

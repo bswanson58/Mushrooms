@@ -141,14 +141,14 @@ namespace Mushrooms.PaletteBuilder {
 
             RaisePropertyChanged( () => PaletteName );
             RaisePropertyChanged( () => PatternImage );
-            RaisePropertyChanged( () => SelectedSwatchCount );
-            RaisePropertyChanged( () => DisplayOnlySelected );
 
             // force the collection source to change since it is not an observable collection
             mDisplayOnlySelectedSwatches = true;
             RaisePropertyChanged( () => SwatchList );
             mDisplayOnlySelectedSwatches = false;
             RaisePropertyChanged( () => SwatchList );
+            RaisePropertyChanged( () => SelectedSwatchCount );
+            RaisePropertyChanged( () => DisplayOnlySelected );
         }
 
         private void OnSwatchSelectionChanged( ColorViewModel _ ) { 

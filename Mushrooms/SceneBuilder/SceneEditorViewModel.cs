@@ -34,24 +34,6 @@ namespace Mushrooms.SceneBuilder {
         }
     }
 
-    internal class LightingItem {
-        public  string          Name { get; }
-        public  GroupType       GroupType { get; }
-        public  IList<Bulb>     Bulbs { get; }
-
-        public  bool            IsSelected { get; set; }
-
-        public  string          DisplayName => $"{Name} ({GroupType})";
-
-        public LightingItem( string name, GroupType groupType, IList<Bulb> bulbs ) {
-            Name = name;
-            GroupType = groupType;
-            Bulbs = bulbs;
-
-            IsSelected = false;
-        }
-    }
-
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class SceneEditorViewModel : PropertyChangeBase, IDisposable {
         private readonly IHubManager                mHubManager;
@@ -69,7 +51,7 @@ namespace Mushrooms.SceneBuilder {
 
         public  ObservableCollectionExtended<EditableSceneViewModel>    Scenes { get; }
         public  ObservableCollectionExtended<PaletteViewModel>          Palettes { get; }
-        public  RangeCollection<LightingItem>       LightingList { get; }
+        public  RangeCollection<LightSourceViewModel>                   LightingList { get; }
 
         public  string                              DisplayDuration => mDisplayDuration.ToString();
         public  string                              DisplayJitter => mDisplayJitter.ToString();
@@ -112,7 +94,7 @@ namespace Mushrooms.SceneBuilder {
                 .Bind( Palettes )
                 .Subscribe();
 
-            LightingList = new RangeCollection<LightingItem>();
+            LightingList = new RangeCollection<LightSourceViewModel>();
 
             EditSchedule = new DelegateCommand( OnEditSchedule );
             CreateScene = new DelegateCommand( OnCreateScene, CanCreateScene );
@@ -177,11 +159,13 @@ namespace Mushrooms.SceneBuilder {
         private async void LoadBulbs() {
             var groups = await mHubManager.GetBulbGroups();
 
-            LightingList.AddRange( groups.Select( g => new LightingItem( g.Name, g.GroupType, g.Bulbs )));
+            LightingList.AddRange( groups.Select( 
+                g => new LightSourceViewModel( new LightSource( g.Name, g.GroupType ), g.Bulbs )));
 
             var bulbs = await mHubManager.GetBulbs();
 
-            LightingList.AddRange( bulbs.Select( b => new LightingItem( b.Name, GroupType.Free, new List<Bulb>{ b } )));
+            LightingList.AddRange( bulbs.Select( 
+                b => new LightSourceViewModel( new LightSource( b.Name, GroupType.Free ), new List<Bulb>{ b })));
         }
 
         private void OnEditSchedule() {
@@ -210,18 +194,16 @@ namespace Mushrooms.SceneBuilder {
         private void OnCreateScene() {
             if(( SelectedPalette != null ) &&
                ( LightingList.Any( l => l.IsSelected ))) {
-                var bulbList = LightingList
+                var lightingList = LightingList
                     .Where( b => b.IsSelected )
-                    .SelectMany( b => b.Bulbs )
-                    .GroupBy( b => b.Id )
-                    .Select( g => g.First())
+                    .Select( l => l.LightSource )
                     .ToList();
 
                 var sceneParameters = 
                     new SceneParameters( mTransitionDuration, mTransitionJitter, mDisplayDuration, mDisplayJitter );
 
                 var scene = 
-                    new Scene( SceneName, SelectedPalette.Palette, sceneParameters, SceneControl.Default, bulbList, mSchedule );
+                    new Scene( SceneName, SelectedPalette.Palette, sceneParameters, SceneControl.Default, lightingList, mSchedule );
 
                 mSceneProvider.Insert( scene );
             }
