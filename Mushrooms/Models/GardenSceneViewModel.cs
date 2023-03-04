@@ -16,8 +16,10 @@ namespace Mushrooms.Models {
         public  Scene                       Scene => ActiveScene.Scene;
 
         public  string                      Name => Scene.SceneName;
-        public  IEnumerable<Color>          ExampleColors => Scene.Palette.Palette.Take( 7 );
         public  bool                        IsSceneActive => ActiveScene.IsActive;
+        public  IEnumerable<Color>          SceneColors => IsSceneActive ? 
+                                                                ActiveScene.ActiveBulbs.Select( s => s.ActiveColor ) :
+                                                                Scene.Palette.Palette.Take( 7 );
 
         public  ICommand                    ActivateScene { get; }
         public  ICommand                    DeactivateScene { get; }
@@ -43,6 +45,7 @@ namespace Mushrooms.Models {
 
         private void OnSceneChanged( ActiveScene scene ) {
             RaisePropertyChanged( () => IsSceneActive );
+            RaisePropertyChanged( () => SceneColors );
         }
 
         private void OnActivateScene() {

@@ -16,7 +16,7 @@
         <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfActive" IsHidden="False" TriggerValue="True"/>
         <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfInactive" IsHidden="False" TriggerValue="False"/>
 
-        <DataTemplate x:Key="SceneTemplate" DataType="{x:Type models:GardenSceneViewModel}">
+        <DataTemplate x:Key="GardenSceneTemplate" DataType="{x:Type models:GardenSceneViewModel}">
             <Grid x:Name="SceneContainer" Background="Transparent">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -41,7 +41,16 @@
                             Command="{Binding DeactivateScene}" Content="{StaticResource Path_Power}"/>
                 </Grid>
 
-                <ContentPresenter Grid.Column="1" Margin="5,0" DataContext="{Binding Scene}" ContentTemplate="{StaticResource SceneTemplate}"/>
+                <StackPanel Grid.Column="1" Margin="5,0" Orientation="Vertical">
+                    <TextBlock Text="{Binding Name}"/>
+                    <ItemsControl Margin="15,3" ItemsSource="{Binding SceneColors}" ItemTemplate="{StaticResource ColorTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
 
                 <StackPanel x:Name="SceneControls" Grid.Column="3" Orientation="Horizontal" Opacity="0" Visibility="Hidden">
                     <Label Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Brightness:"/>
@@ -63,6 +72,6 @@
     </UserControl.Resources>
 
     <Grid Margin="0,15">
-        <ListView ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource SceneTemplate}"/>
+        <ListView ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource GardenSceneTemplate}"/>
     </Grid>
 </UserControl>
