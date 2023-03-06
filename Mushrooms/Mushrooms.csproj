@@ -5,7 +5,17 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\Mushroom.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Mushroom-Toolbar.ico" />
+    <None Remove="Resources\mushroom.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Mushroom.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ColorThief.ImageSharp" Version="1.0.0" />
@@ -28,7 +38,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Resources\" />
+    <Resource Include="Resources\Mushroom-Toolbar.ico" />
+    <Resource Include="Resources\mushroom.ico" />
   </ItemGroup>
 
 </Project>

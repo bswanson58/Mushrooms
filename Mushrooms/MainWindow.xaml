@@ -18,6 +18,15 @@
         d:DataContext="{d:DesignInstance mushrooms:MainWindowViewModel, IsDesignTimeCreatable=False}"
         Height="600" Width="1200">
 
+    <mah:MetroWindow.IconTemplate>
+        <DataTemplate>
+            <Grid Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" Margin="4,4,0,4" Background="Transparent"
+                  RenderOptions.EdgeMode="Aliased" RenderOptions.BitmapScalingMode="HighQuality">
+                <Image Source="/Resources/Mushroom-Toolbar.ico"/>
+            </Grid>
+        </DataTemplate>
+    </mah:MetroWindow.IconTemplate>
+
     <TabControl Margin="15,0" Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
         <TabItem Header="palettes">
             <paletteBuilder:PaletteBuilder/>
