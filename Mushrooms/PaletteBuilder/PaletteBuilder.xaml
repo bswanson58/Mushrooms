@@ -56,7 +56,7 @@
 
         <ControlTemplate x:Key="NoImageTemplate">
             <Border BorderThickness="1" BorderBrush="{StaticResource TrimColor}">
-                <TextBlock Style="{StaticResource EmptyListTextStyle}" Margin="15" 
+                <TextBlock Style="{StaticResource EmptyListTextStyle}" VerticalAlignment="Center"
                            Text="'Select Image' to display it's palette!"/>
             </Border>
         </ControlTemplate>
@@ -81,19 +81,21 @@
                          SelectedItem="{Binding SelectedPalette}"/>
             </StackPanel>
 
-            <Image Grid.Column="1" Margin="10" VerticalAlignment="Top" Source="{Binding PatternImage}"/>
+            <Image Grid.Column="1" Margin="10" Stretch="Uniform" Source="{Binding PatternImage}"/>
 
             <Grid Grid.Column="2" Margin="0,10,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="25"/>
                 </Grid.RowDefinitions>
 
                 <ItemsControl Grid.Row="0" BorderThickness="1" BorderBrush="{StaticResource TrimColor}" 
-                              Padding="5" Margin="5,0,0,0" VerticalAlignment="Top"
+                              Padding="5" Margin="5,0,0,0" VerticalAlignment="Top" MinHeight="148"
                               ItemsSource="{Binding SwatchList}" ItemTemplate="{StaticResource PaletteItemTemplate}"
                               ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl.ItemsPanel>
@@ -111,17 +113,27 @@
                     <Label Style="{StaticResource LabelStyle}" Content="swatches selected  (click swatches to select/deselect)"/>
                 </StackPanel>
 
-                <CheckBox Grid.Row="3" Margin="15,5" IsChecked="{Binding DisplayOnlySelected}">
+                <CheckBox Grid.Row="2" Margin="15,5" IsChecked="{Binding DisplayOnlySelected}">
                     <CheckBox.Content>
                         <Label Style="{StaticResource LabelStyle}" Content="Display only selected swatches"/>
                     </CheckBox.Content>
                 </CheckBox>
+
+                <Grid Grid.Row="4" Margin="0,5,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Palette Name:"/>
+                    <TextBox Grid.Column="1" Text="{Binding PaletteName, UpdateSourceTrigger=PropertyChanged}"/>
+                </Grid>
+
             </Grid>
         </Grid>
 
         <Grid Grid.Row="1" Margin="0,5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="4*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
@@ -129,19 +141,8 @@
             <Button Grid.Column="1" Margin="5,0,25,0" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                     Content="Select Image..." Command="{Binding SelectImage}"/>
 
-            <Grid Grid.Column="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <Label Grid.Column="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Palette Name:"/>
-                <TextBox Grid.Column="1" Text="{Binding PaletteName, UpdateSourceTrigger=PropertyChanged}"/>
-
-                <Button Grid.Column="2" Margin="25,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
-                        Content="Save Palette" Command="{Binding SavePalette}"/>
-            </Grid>
+            <Button Grid.Column="2" Margin="25,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+                    Content="Save Palette" Command="{Binding SavePalette}"/>
         </Grid>
 
     </Grid>

@@ -3,7 +3,7 @@
 					xmlns:models="clr-namespace:Mushrooms.Models">
 
     <DataTemplate x:Key="ColorTemplate" DataType="{x:Type Color}">
-        <Rectangle Margin="2" Height="15" Width="15">
+        <Rectangle Margin="2" Height="20" Width="20">
             <Rectangle.Fill>
                 <SolidColorBrush Color="{Binding}"/>
             </Rectangle.Fill>
