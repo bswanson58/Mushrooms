@@ -28,6 +28,14 @@
         </Canvas>
     </Viewbox>
 
+    <Viewbox x:Key="Path_Add" x:Shared="False">
+        <Canvas Width="492.801" Height="492.799">
+            <Path Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" 
+                  Data=" M 217.814,0.000 C 211.631,0.000 206.619,5.016 206.615,11.199 L 206.615,206.619 L 11.195,206.619 L 11.199,206.619 C 5.011,206.619 0.000,211.635 0.000,217.818 L 0.000,274.931 L 0.000,274.927 C 0.000,281.115 5.012,286.126 11.199,286.130 L 206.619,286.130 L 206.619,481.600 L 206.615,481.600 C 206.619,487.784 211.631,492.799 217.814,492.799 L 274.927,492.799 C 281.111,492.799 286.126,487.783 286.126,481.600 L 286.126,286.130 L 481.606,286.130 C 487.790,286.126 492.801,281.115 492.801,274.927 L 492.801,217.814 L 492.801,217.818 C 492.801,211.634 487.789,206.619 481.606,206.619 L 286.136,206.619 L 286.136,11.199 L 286.132,11.199 C 286.132,5.015 281.117,0.000 274.933,0.000 L 217.814,0.000 Z"/>
+        </Canvas>
+    </Viewbox>
+
+
     <Viewbox x:Key="Path_Delete" x:Shared="False">
         <Canvas Width="537.600" Height="537.608">
             <Path Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" 

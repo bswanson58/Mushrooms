@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -51,6 +52,7 @@ namespace Mushrooms.PaletteBuilder {
         public  ObservableCollectionExtended<EditablePaletteViewModel>  Palettes { get; }
         public  int                             SelectedSwatchCount => mSwatchList.Count( s => s.IsSelected );
 
+        public  DelegateCommand                 NewPalette { get; }
         public  DelegateCommand                 SavePalette { get; }
         public  DelegateCommand                 SelectImage { get; }
         public  ImageSource ?                   PatternImage { get; private set; }
@@ -74,6 +76,7 @@ namespace Mushrooms.PaletteBuilder {
                 .Bind( Palettes )
                 .Subscribe();
 
+            NewPalette = new DelegateCommand( OnNewPalette );
             SavePalette = new DelegateCommand( OnSavePalette, CanSavePalette );
             SelectImage = new DelegateCommand( OnSelectFile );
         }
@@ -124,6 +127,25 @@ namespace Mushrooms.PaletteBuilder {
             }
         }
 
+        private void OnNewPalette() {
+            mDialogService.ShowDialog<NewPaletteView>( result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    mPaletteName = result.Parameters.GetValue<string>( NewPaletteViewModel.cPaletteName ) ?? String.Empty;
+                    SelectImageFile( result.Parameters.GetValue<string>( NewPaletteViewModel.cImageFile ) ?? String.Empty );
+                }
+            });
+        }
+
+        private void UpdateAllProperties() {
+            // force the collection source to change since it is not an observable collection
+            mDisplayOnlySelectedSwatches = false;
+            RaisePropertyChanged( () => SwatchList );
+
+            mDisplayOnlySelectedSwatches = true;
+            RaiseAllPropertiesChanged();
+            SavePalette.RaiseCanExecuteChanged();
+        }
+
         private void OnSelectFile() {
             var dialog = new OpenFileDialog { Filter = "Images|*.jpg", Title = "Select Image" };
 
@@ -136,19 +158,9 @@ namespace Mushrooms.PaletteBuilder {
             SelectImageColors( fileName );
 
             PatternImage = new BitmapImage( new Uri( fileName ));
-            PaletteName = String.Empty;
             mPictureFile = fileName;
 
-            RaisePropertyChanged( () => PaletteName );
-            RaisePropertyChanged( () => PatternImage );
-
-            // force the collection source to change since it is not an observable collection
-            mDisplayOnlySelectedSwatches = true;
-            RaisePropertyChanged( () => SwatchList );
-            mDisplayOnlySelectedSwatches = false;
-            RaisePropertyChanged( () => SwatchList );
-            RaisePropertyChanged( () => SelectedSwatchCount );
-            RaisePropertyChanged( () => DisplayOnlySelected );
+            UpdateAllProperties();
         }
 
         private void OnSwatchSelectionChanged( ColorViewModel _ ) { 
@@ -158,19 +170,21 @@ namespace Mushrooms.PaletteBuilder {
 
 
         private void SelectImageColors( string fileName ) {
-            mSwatchList.Clear();
+            if( File.Exists( fileName )) {
+                mSwatchList.Clear();
 
-            using( var image = Image.Load<Rgba32>( fileName )) {
-                var colorThief = new ColorThief.ImageSharp.ColorThief();
-                var palette = colorThief.GetPalette( image, 25, 5 );
-                var swatchLimit = 10;
+                using( var image = Image.Load<Rgba32>( fileName )) {
+                    var colorThief = new ColorThief.ImageSharp.ColorThief();
+                    var palette = colorThief.GetPalette( image, 25, 5 );
+                    var swatchLimit = 10;
 
-                foreach( var color in palette.OrderByDescending( c => c.Population )) {
-                    mSwatchList.Add( 
-                        new ColorViewModel( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ), 
-                                            swatchLimit > 0,
-                                            OnSwatchSelectionChanged ));
-                    swatchLimit--;
+                    foreach( var color in palette.OrderByDescending( c => c.Population )) {
+                        mSwatchList.Add( 
+                            new ColorViewModel( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ), 
+                                swatchLimit > 0,
+                                OnSwatchSelectionChanged ));
+                        swatchLimit--;
+                    }
                 }
             }
         }
