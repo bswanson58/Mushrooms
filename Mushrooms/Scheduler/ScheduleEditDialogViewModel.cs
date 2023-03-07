@@ -12,7 +12,6 @@ namespace Mushrooms.Scheduler {
         private SceneSchedule                       mSchedule;
         private ScheduleTimeType                    mOnTimeType;
         private ScheduleTimeType                    mOffTimeType;
-        private bool                                mIsEnabled;
 
         public  string                              Title { get; }
 
@@ -52,15 +51,6 @@ namespace Mushrooms.Scheduler {
             RaiseAllPropertiesChanged();
         }
 
-        public bool IsEnabled {
-            get => mIsEnabled;
-            set {
-                mIsEnabled = value;
-
-                RaisePropertyChanged( () => IsEnabled );
-            }
-        }
-
         public ScheduleTimeType OnTimeType {
             get => mOnTimeType;
             set {
@@ -87,7 +77,7 @@ namespace Mushrooms.Scheduler {
 
         private void OnOk() {
             var schedule = new SceneSchedule( OnTimeType, TimeOnly.FromDateTime( OnTime ), 
-                                              OffTimeType, TimeOnly.FromDateTime( OffTime ), Duration, IsEnabled );
+                                              OffTimeType, TimeOnly.FromDateTime( OffTime ), Duration );
             var parameters = new DialogParameters{{ cSchedule, schedule }};
 
             RaiseRequestClose( new DialogResult( ButtonResult.Ok, parameters ));

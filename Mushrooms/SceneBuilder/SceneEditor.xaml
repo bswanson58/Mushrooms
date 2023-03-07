@@ -5,13 +5,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
              xmlns:sceneBuilder="clr-namespace:Mushrooms.SceneBuilder"
-             xmlns:models="clr-namespace:Mushrooms.Models"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance sceneBuilder:SceneEditorViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <valueConverters:BooleanVisibilityConverter x:Key="VisibleIfTrue" IsHidden="True" TriggerValue="False"/>
+        <valueConverters:NullVisibilityConverter x:Key="NullVisibilityConverter" IsHidden="True" TriggerValue="False"/>
+
         <DataTemplate x:Key="EditableSceneTemplate" DataType="{x:Type sceneBuilder:EditableSceneViewModel}">
             <Grid x:Name="SceneContainer" Background="Transparent">
                 <Grid.ColumnDefinitions>
@@ -32,128 +36,200 @@
                 </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>
-
-
-        <DataTemplate x:Key="LightingTemplate" DataType="{x:Type models:LightSourceViewModel}">
-            <TextBlock Text="{Binding DisplayName}"/>
-        </DataTemplate>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Margin="0,0,0,10">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="15"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="15"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="25"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="25"/>
+            <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0" Orientation="Vertical">
-            <Label Style="{StaticResource LabelStyle}" Content="Available Scenes:"></Label>
-            <ListBox ItemsSource="{Binding Scenes}" ItemTemplate="{StaticResource EditableSceneTemplate}"/>
-        </StackPanel>
-
-        <Grid Grid.Column="2">
+        <Grid Grid.Column="0" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Label Style="{StaticResource LabelStyle}" VerticalAlignment="Bottom" Content="Available Scenes:"></Label>
+                <Button Grid.Row="0" HorizontalAlignment="Right" Height="25" Width="25" Margin="0,5,5,0" Padding="6" Opacity="0.7"
+                        Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Create a new scene"
+                        Content="{StaticResource Path_Add}" Command="{Binding NewScene}"/>
+            </Grid>
+
+            <ListBox Grid.Row="1" ItemsSource="{Binding Scenes}" ItemTemplate="{StaticResource EditableSceneTemplate}"
+                     SelectedItem="{Binding SelectedScene}"/>
+        </Grid>
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="15"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Palettes:"/>
-            <ListView Grid.Row="1" ItemsSource="{Binding Palettes}" ItemTemplate="{StaticResource PaletteTemplate}"
-                      SelectedItem="{Binding SelectedPalette}"/>
+            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Palette for this scene:"/>
+            <Grid Grid.Row="1">
+                <ComboBox MinHeight="60" ItemsSource="{Binding Palettes}" ItemTemplate="{StaticResource PaletteTemplate}"
+                          SelectedItem="{Binding SelectedPalette}"/>
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False"
+                           Visibility="{Binding SelectedPalette, Converter={StaticResource NullVisibilityConverter}}"
+                           Text="Select a palette for this scene"/>
+            </Grid>
 
-            <Label Grid.Row="2" Style="{StaticResource LabelStyle}" Content="Parameters:"/>
+            <GroupBox Style="{StaticResource GroupBoxStyle}" Grid.Row="4" Padding="0,5">
+                <GroupBox.Header>
+                    <Label Style="{StaticResource LabelStyle}" Content="Scene Timing:"/>
+                </GroupBox.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-            <Grid Grid.Row="3" Margin="0,5,10,10">
+                    <Label Grid.Column="0" Grid.Row="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Content="Base Transition Duration:"/>
+                    <Slider Grid.Column="1" Grid.Row="0" Minimum="1" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
+                            Value="{Binding TransitionDurationSeconds}"/>
+                    <Label Grid.Column="2" Grid.Row="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
+                           Content="{Binding TransitionDuration}"/>
+
+                    <Label Grid.Column="0" Grid.Row="2" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Content="Transition Duration Jitter:"/>
+                    <Slider Grid.Column="1" Grid.Row="2" Minimum="0" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
+                            Value="{Binding TransitionDurationJitterSeconds}"/>
+                    <Label Grid.Column="2" Grid.Row="2" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
+                           Content="{Binding TransitionJitter}"/>
+
+                    <Label Grid.Column="0" Grid.Row="4" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Content="Base Display Duration:"/>
+                    <Slider Grid.Column="1" Grid.Row="4" Minimum="1" Maximum="600" Style="{DynamicResource MahApps.Styles.Slider}"
+                            Value="{Binding DisplayDurationSeconds}"/>
+                    <Label Grid.Column="2" Grid.Row="4" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
+                           Content="{Binding DisplayDuration}"/>
+
+                    <Label Grid.Column="0" Grid.Row="6" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Content="Display Duration Jitter:"/>
+                    <Slider Grid.Column="1" Grid.Row="6" Minimum="0" Maximum="600" Style="{DynamicResource MahApps.Styles.Slider}"
+                            Value="{Binding DisplayDurationJitterSeconds}"/>
+                    <Label Grid.Column="2" Grid.Row="6" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
+                           Content="{Binding DisplayJitter}"/>
+                </Grid>
+            </GroupBox>
+
+            <Grid Grid.Row="5" Margin="0,15,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="10"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="10"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="10"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
 
-                <Label Grid.Column="0" Grid.Row="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
-                       Content="Base Transition Duration:"/>
-                <Slider Grid.Column="1" Grid.Row="0" Minimum="1" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
-                        Value="{Binding TransitionDurationSeconds}"/>
-                <Label Grid.Column="2" Grid.Row="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"
-                       Content="{Binding TransitionDuration}"/>
+                <mah:ToggleSwitch Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" IsOn="{Binding IsScheduled}">
+                    <mah:ToggleSwitch.OnContent>
+                        <Label Style="{StaticResource LabelStyle}" Content="Enable Scene Schedule"/>
+                    </mah:ToggleSwitch.OnContent>
+                    <mah:ToggleSwitch.OffContent>
+                        <Label Style="{StaticResource LabelStyle}" Content="Enable Scene Schedule (Disabled)"/>
+                    </mah:ToggleSwitch.OffContent>
+                </mah:ToggleSwitch>
 
-                <Label Grid.Column="0" Grid.Row="2" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
-                       Content="Transition Duration Jitter:"/>
-                <Slider Grid.Column="1" Grid.Row="2" Minimum="0" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
-                        Value="{Binding TransitionDurationJitterSeconds}"/>
-                <Label Grid.Column="2" Grid.Row="2" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"
-                       Content="{Binding TransitionJitter}"/>
+                <Button Grid.Row="0" Grid.Column="2" Height="30" Width="30" Padding="5" Margin="5" 
+                        IsEnabled="{Binding IsScheduleActive}" Content="{StaticResource Path_Clock}"
+                        Command="{Binding EditSchedule}" ToolTip="Edit Scene Schedule"/>
 
-                <Label Grid.Column="0" Grid.Row="4" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
-               Content="Base Display Duration:"/>
-                <Slider Grid.Column="1" Grid.Row="4" Minimum="1" Maximum="600" Style="{DynamicResource MahApps.Styles.Slider}"
-                        Value="{Binding DisplayDurationSeconds}"/>
-                <Label Grid.Column="2" Grid.Row="4" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"
-                       Content="{Binding DisplayDuration}"/>
-
-                <Label Grid.Column="0" Grid.Row="6" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
-               Content="Display Duration Jitter:"/>
-                <Slider Grid.Column="1" Grid.Row="6" Minimum="0" Maximum="600" Style="{DynamicResource MahApps.Styles.Slider}"
-                        Value="{Binding DisplayDurationJitterSeconds}"/>
-                <Label Grid.Column="2" Grid.Row="6" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"
-                       Content="{Binding DisplayJitter}"/>
+                <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="75,-15,0,0" 
+                       Visibility="{Binding IsScheduleActive, Converter={StaticResource VisibleIfTrue}}"
+                       Content="{Binding ScheduleSummary}"/>
             </Grid>
         </Grid>
-        
+
         <Grid Grid.Column="4">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="25"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Lighting:"/>
-            <ListView Grid.Row="1" ItemsSource="{Binding LightingList}" ItemTemplate="{StaticResource LightingTemplate}"
-                      SelectionMode="Multiple">
-                <ListView.Resources>
-                    <Style TargetType="{x:Type ListViewItem}">
-                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                    </Style>
-                </ListView.Resources>
-            </ListView>
+            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Lighting for this scene:"/>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Rooms:"/>
+                    <ListView Grid.Row="1" ItemContainerStyle="{StaticResource ListViewNoSelectStyle}"
+                              ItemsSource="{Binding RoomsList}" ItemTemplate="{StaticResource LightingTemplate}"/>
+
+                    <Label Grid.Row="2" Style="{StaticResource LabelStyle}" Content="Zones:"/>
+                    <ListView Grid.Row="3" ItemContainerStyle="{StaticResource ListViewNoSelectStyle}"
+                              ItemsSource="{Binding ZonesList}" ItemTemplate="{StaticResource LightingTemplate}"/>
+                </Grid>
+
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Bulbs:"/>
+                    <ListView Grid.Row="1" ItemContainerStyle="{StaticResource ListViewNoSelectStyle}"
+                              ItemsSource="{Binding BulbsList}" ItemTemplate="{StaticResource LightingTemplate}"/>
+
+                </Grid>
+            </Grid>
 
             <Grid Grid.Row="2" Margin="0,10">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Height="30" Width="30" Padding="5" Margin="5" Content="{StaticResource Path_Clock}"
-                        Command="{Binding EditSchedule}" ToolTip="Edit Scene Schedule"/>
-            </Grid>
-
-            <Grid Grid.Row="3" Margin="0,5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <Label Grid.Column="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="15,0,0,0"
+                <Label Grid.Column="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" HorizontalAlignment="Right"
                        Content="Scene Name:"/>
                 <TextBox Grid.Column="1" Text="{Binding SceneName, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
 
-                <Button Grid.Column="2" Margin="25,0,5,0" HorizontalAlignment="Right" Command="{Binding CreateScene}"
-                        Content="Create Scene"/>
+            <Grid Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+
+                <Button Grid.Column="1" Command="{Binding CreateScene}" Content="Save Scene"/>
             </Grid>
         </Grid>
     </Grid>

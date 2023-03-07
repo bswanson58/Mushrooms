@@ -35,4 +35,16 @@
             </ItemsControl>
         </StackPanel>
     </DataTemplate>
+
+    <DataTemplate x:Key="LightingTemplate" DataType="{x:Type models:LightSourceViewModel}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <CheckBox Grid.Column="0" Style="{StaticResource LampCheckBoxStyle}" IsChecked="{Binding IsSelected}"/>
+            <TextBlock Grid.Column="1" Margin="0,0,0,3" VerticalAlignment="Center" Text="{Binding Name}"/>
+        </Grid>
+    </DataTemplate>
 </ResourceDictionary>

@@ -7,6 +7,7 @@ namespace Mushrooms.Models {
     internal class PaletteViewModel {
         public  ScenePalette        Palette { get; }
 
+        public  string              PaletteId => Palette.Id;
         public  string              Name => Palette.Name;
         public  IEnumerable<Color>  ExampleColors => Palette.Palette.Take( 7 );
 

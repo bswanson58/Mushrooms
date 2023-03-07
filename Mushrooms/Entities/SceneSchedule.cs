@@ -18,15 +18,15 @@ namespace Mushrooms.Entities {
         public  bool                Enabled { get; protected set; }
 
         public SceneSchedule( ScheduleTimeType onTimeType, TimeOnly onTime,
-                              ScheduleTimeType offTimeTimeType, TimeOnly offTime, TimeSpan onDuration,
-                              bool enabled ) {
+                              ScheduleTimeType offTimeTimeType, TimeOnly offTime, TimeSpan onDuration ) {
             OnTimeType = onTimeType;
             OnTime = onTime;
             OffTimeType = offTimeTimeType;
             OffTime = offTime;
             OnDuration = onDuration;
-            Enabled = enabled;
+            Enabled = true;
         }
+
         private SceneSchedule() {
             OnTimeType = ScheduleTimeType.SpecificTime;
             OnTime = TimeOnly.MinValue;
@@ -34,6 +34,10 @@ namespace Mushrooms.Entities {
             OffTime = TimeOnly.MinValue;
             OnDuration = TimeSpan.MinValue;
             Enabled = false;
+        }
+
+        public void SetEnabled( bool state ) {
+            Enabled = state;
         }
 
         public static SceneSchedule Default => new ();
@@ -99,6 +103,33 @@ namespace Mushrooms.Entities {
             var data = calculator.CalculateData( cLatitude, cLongitude );
 
             return data.SunSet;
+        }
+
+        public static string ScheduleSummary( this SceneSchedule schedule ) {
+            var startTime = schedule.StartTimeForToday().ToShortTimeString();
+            var stopTime = schedule.StopTimeForToday().ToShortTimeString();
+
+            switch ( schedule.OnTimeType ) {
+                case ScheduleTimeType.Sunrise:
+                    startTime = "Sunrise";
+                    break;
+
+                case ScheduleTimeType.Sunset:
+                    startTime = "Sunset";
+                    break;
+            }
+
+            switch ( schedule.OffTimeType ) {
+                case ScheduleTimeType.Sunrise:
+                    stopTime = "Sunrise";
+                    break;
+
+                case ScheduleTimeType.Sunset:
+                    stopTime = "Sunset";
+                    break;
+            }
+
+            return $"Scheduled from {startTime} to {stopTime}";
         }
     }
 }

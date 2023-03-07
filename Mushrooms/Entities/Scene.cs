@@ -30,5 +30,14 @@ namespace Mushrooms.Entities {
             Lights = new List<LightSource>( lights );
             Schedule = schedule;
         }
+
+        public void UpdateFrom( Scene scene ) {
+            SceneName = scene.SceneName;
+            Palette = scene.Palette;
+            Parameters = scene.Parameters;
+            Control = scene.Control;
+            Lights = scene.Lights;
+            Schedule = scene.Schedule;
+        }
     }
 }

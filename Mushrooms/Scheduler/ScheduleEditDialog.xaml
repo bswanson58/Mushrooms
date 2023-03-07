@@ -14,7 +14,7 @@
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance scheduler:ScheduleEditDialogViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
-             Height="280" Width="550">
+             Height="220" Width="550">
 
     <dialogService:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -37,8 +37,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <mah:ToggleSwitch Grid.Row="0" Margin="20,10,0,0" IsOn="{Binding IsEnabled}" 
-                          OnContent="Enable Scene Schedule" OffContent="Enable Scene Schedule (Disabled)"/>
 
         <Grid Grid.Row="1" Margin="5,15" IsEnabled="{Binding IsEnabled}">
             <Grid.ColumnDefinitions>
