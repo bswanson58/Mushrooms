@@ -17,6 +17,8 @@ namespace Mushrooms.Models {
 
         public  string                      Name => Scene.SceneName;
         public  bool                        IsSceneActive => ActiveScene.IsActive;
+        public  bool                        IsScheduled => Scene.Schedule.Enabled;
+        public  string                      ScheduleSummary => Scene.Schedule.ScheduleSummary();
         public  IEnumerable<Color>          SceneColors => IsSceneActive ? 
                                                 ActiveScene.ActiveBulbs.OrderBy( b => b.Bulb.Name ).Select( s => s.ActiveColor ) :
                                                 Scene.Palette.Palette.Take( 7 );

@@ -17,6 +17,7 @@ namespace Mushrooms.Garden {
 
             mSceneSubscription = garden.ActiveScenes
                 .Transform( scene => new GardenSceneViewModel( scene, garden ))
+                .Sort( SortExpressionComparer<GardenSceneViewModel>.Ascending( s => s.Name ))
                 .Bind( SceneList )
                 .Subscribe();
         }
