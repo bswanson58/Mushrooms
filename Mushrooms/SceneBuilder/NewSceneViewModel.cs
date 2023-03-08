@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Mushrooms.Models;
 using ReusableBits.Wpf.DialogService;
+using ReusableBits.Wpf.Platform;
 
 namespace Mushrooms.SceneBuilder {
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -17,12 +19,12 @@ namespace Mushrooms.SceneBuilder {
         private LightSourceViewModel ?      mSelectedLights;
         private string                      mSceneName;
 
-        public  List<PaletteViewModel>      Palettes { get; }
-        public  List<LightSourceViewModel>  Lighting { get; }
+        public  ObservableCollection<PaletteViewModel>      Palettes { get; }
+        public  ObservableCollection<LightSourceViewModel>  Lighting { get; }
 
         public NewSceneViewModel() {
-            Palettes = new List<PaletteViewModel>();
-            Lighting = new List<LightSourceViewModel>();
+            Palettes = new ObservableCollection<PaletteViewModel>();
+            Lighting = new ObservableCollection<LightSourceViewModel>();
 
             mSceneName = String.Empty;
         }
@@ -31,7 +33,7 @@ namespace Mushrooms.SceneBuilder {
             var lightingList = parameters.GetValue<IList<LightSourceViewModel>>( cLightingList );
 
             if( lightingList?.Any() == true) {
-                Lighting.AddRange( lightingList );
+                Lighting.AddRange( lightingList.OrderBy( l => l.Name ));
 
                 SelectedLighting = Lighting.FirstOrDefault();
             }
@@ -39,10 +41,12 @@ namespace Mushrooms.SceneBuilder {
             var paletteList = parameters.GetValue<IList<PaletteViewModel>>( cPaletteList );
 
             if( paletteList?.Any() == true ) {
-                Palettes.AddRange( paletteList );
+                Palettes.AddRange( paletteList.OrderBy( p => p.Name ));
 
                 SelectedPalette = Palettes.FirstOrDefault();
             }
+
+            mSceneName = String.Empty;
 
             RaiseAllPropertiesChanged();
         }

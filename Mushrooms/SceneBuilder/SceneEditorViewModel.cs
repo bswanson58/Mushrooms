@@ -88,6 +88,7 @@ namespace Mushrooms.SceneBuilder {
             mSceneSubscription = mSceneProvider.Entities
                 .Connect()
                 .Transform( s => new EditableSceneViewModel( s, OnDeleteScene ))
+                .Sort( SortExpressionComparer<EditableSceneViewModel>.Ascending( s => s.Name ))
                 .Bind( Scenes )
                 .Subscribe();
 
@@ -96,6 +97,7 @@ namespace Mushrooms.SceneBuilder {
             mPaletteSubscription = paletteProvider.Entities
                 .Connect()
                 .Transform( p => new PaletteViewModel( p ))
+                .Sort( SortExpressionComparer<PaletteViewModel>.Ascending( p => p.Name ))
                 .Bind( Palettes )
                 .Subscribe();
 
