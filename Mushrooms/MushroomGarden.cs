@@ -148,7 +148,7 @@ namespace Mushrooms {
                 .Bind( mActiveScenes )
                 .Subscribe();
 
-            mLightingTask = Repeat.Interval( TimeSpan.FromMilliseconds( 200 ), LightingTask, mTokenSource.Token );
+            mLightingTask = Repeat.Interval( TimeSpan.FromMilliseconds( 125 ), LightingTask, mTokenSource.Token );
             mSchedulingTask = Repeat.Interval( TimeSpan.FromSeconds( 31 ), SchedulingTask, mTokenSource.Token );
 
             return Task.CompletedTask;
@@ -212,7 +212,7 @@ namespace Mushrooms {
 
         private ActiveBulb UpdateBulb( ActiveBulb bulb, Scene inScene, SceneControl control ) {
             var color = inScene.Palette.Palette[ mLimitedRandom.Next( inScene.Palette.Palette.Count )];
-            var transitionJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Parameters.DisplayTimeJitter.TotalSeconds ));
+            var transitionJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Parameters.TransitionJitter.TotalSeconds ));
             var transitionTime = inScene.Parameters.BaseTransitionTime + transitionJitter;
             var displayJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Parameters.DisplayTimeJitter.TotalSeconds ));
             var displayTime = inScene.Parameters.BaseDisplayTime + displayJitter;
