@@ -7,6 +7,8 @@
              xmlns:garden="clr-namespace:Mushrooms.Garden"
              xmlns:models="clr-namespace:Mushrooms.Models"
              xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviours="clr-namespace:ReusableBits.Wpf.Behaviours;assembly=ReusableBits.Wpf"
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance garden:GardenDisplayViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
@@ -89,4 +91,9 @@
     <Grid Margin="0,15">
         <ListView ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource GardenSceneTemplate}"/>
     </Grid>
+
+    <b:Interaction.Behaviors>
+        <behaviours:ScrollBarOpacity FadeInAnimation="{StaticResource ScrollBarEnterAnimation}" 
+                                     FadeOutAnimation="{StaticResource ScrollBarLeaveAnimation}"/>
+    </b:Interaction.Behaviors>
 </UserControl>
