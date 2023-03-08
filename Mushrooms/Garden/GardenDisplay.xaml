@@ -46,7 +46,8 @@
 
                 <StackPanel Grid.Column="1" Margin="5,0" Orientation="Vertical">
                     <TextBlock Text="{Binding Name}"/>
-                    <ItemsControl Margin="15,3" ItemsSource="{Binding SceneColors}" ItemTemplate="{StaticResource ColorTemplate}">
+                    <ItemsControl Margin="15,3" MinHeight="25" 
+                                  ItemsSource="{Binding SceneColors}" ItemTemplate="{StaticResource ColorTemplate}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal"/>
