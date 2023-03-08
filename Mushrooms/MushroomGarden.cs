@@ -142,6 +142,7 @@ namespace Mushrooms {
         protected override Task ExecuteAsync( CancellationToken stoppingToken ) {
             mActiveSceneSubscription = mSceneProvider.Entities
                 .Connect()
+                .Sort( SortExpressionComparer<Scene>.Ascending( s => s.SceneName ))
                 .TransformWithInlineUpdate( scene => new ActiveScene( scene ),
                                           ( activeScene, scene ) => activeScene.UpdateScene( scene ))
                 .Bind( mActiveScenes )
