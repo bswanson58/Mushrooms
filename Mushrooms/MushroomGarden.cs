@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using DynamicData;
 using DynamicData.Binding;
 using HueLighting.Hub;
@@ -14,6 +11,7 @@ using HueLighting.Models;
 using Microsoft.Extensions.Hosting;
 using Mushrooms.Database;
 using Mushrooms.Entities;
+using Mushrooms.Models;
 using Mushrooms.Support;
 using ReusableBits.Wpf.DialogService;
 
@@ -25,100 +23,6 @@ namespace Mushrooms {
         Task    UpdateSceneControl( Scene forScene, SceneControl control );
         	
         IObservable<IChangeSet<ActiveScene>>    ActiveScenes { get; }
-    }
-
-    internal enum SceneState {
-        Active,
-        Scheduled,
-        Inactive
-    }
-
-    internal class ActiveScene {
-        private readonly Subject<ActiveScene>   mChangeSubject;
-
-        public  Scene                           Scene { get; }
-        public  IList<Bulb>                     SceneBulbs { get; }
-        public  IList<ActiveBulb>               ActiveBulbs { get; }
-
-        public  SceneState                      SceneState { get; private set; }
-        public  bool                            IsActive { get; private set; }
-        public  SceneControl                    Control { get; private set; }
-
-        public  IObservable<ActiveScene>        OnSceneChanged => mChangeSubject.AsObservable();
-
-        public ActiveScene( Scene scene ) {
-            Scene = scene;
-            SceneBulbs = new List<Bulb>();
-            ActiveBulbs = new List<ActiveBulb>();
-            Control = new SceneControl( Scene.Control.Brightness, Scene.Control.RateMultiplier );
-            SceneState = SceneState.Inactive;
-            IsActive = false;
-
-            mChangeSubject = new Subject<ActiveScene>();
-        }
-
-        public void UpdateSceneBulbs( IEnumerable<Bulb> bulbs ) {
-            SceneBulbs.Clear();
-            SceneBulbs.AddRange( bulbs );
-        }
-
-        public void Activate() {
-            IsActive = true;
-            SceneState = SceneState.Active;
-
-            mChangeSubject.OnNext( this );
-        }
-
-        public void ActiveBySchedule() {
-            IsActive = true;
-            SceneState = SceneState.Scheduled;
-
-            mChangeSubject.OnNext( this );
-        }
-
-        public void Deactivate() {
-            IsActive = false;
-            SceneState = SceneState.Inactive;
-
-            mChangeSubject.OnNext( this );
-        }
-
-        public void UpdateControl( SceneControl control ) {
-            Control = control;
-
-            mChangeSubject.OnNext( this );
-        }
-
-        public void UpdateActiveBulb( ActiveBulb bulb ) {
-            var existing = ActiveBulbs.FirstOrDefault( b => b.Bulb.Id.Equals( bulb.Bulb.Id ));
-
-            if( existing != null ) {
-                ActiveBulbs.Remove( existing );
-            }
-
-            ActiveBulbs.Add( bulb );
-
-            mChangeSubject.OnNext( this );
-        }
-    }
-
-    internal class ActiveBulb {
-        public  Bulb        Bulb { get; }
-        public  Color       ActiveColor { get; }
-        public  DateTime    NextUpdateTime { get; }
-
-        public ActiveBulb( Bulb bulb ) {
-            ActiveColor = Colors.Transparent;
-            Bulb = bulb;
-
-            NextUpdateTime = DateTime.MinValue;
-        }
-
-        public ActiveBulb( Bulb bulb, Color color, DateTime nextUpdateTime ) {
-            Bulb = bulb;
-            ActiveColor = color;
-            NextUpdateTime = nextUpdateTime;
-        }
     }
 
     internal class MushroomGarden : BackgroundService, IMushroomGarden {
@@ -187,6 +91,7 @@ namespace Mushrooms {
                 scene.UpdateControl( control );
 
                 await UpdateSceneControl( scene );
+//                mSceneProvider.Update( scene.Scene );
             }
         }
 

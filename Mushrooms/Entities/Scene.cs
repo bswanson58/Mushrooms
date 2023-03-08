@@ -39,5 +39,9 @@ namespace Mushrooms.Entities {
             Lights = scene.Lights;
             Schedule = scene.Schedule;
         }
+
+        public void UpdateControl( SceneControl control ) {
+            Control = control;
+        }
     }
 }
