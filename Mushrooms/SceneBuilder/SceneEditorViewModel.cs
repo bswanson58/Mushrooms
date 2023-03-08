@@ -343,8 +343,8 @@ namespace Mushrooms.SceneBuilder {
                     new SceneParameters( mTransitionDuration, mTransitionJitter, mDisplayDuration, mDisplayJitter );
 
                 mSelectedScene.Scene.UpdateFrom(
-                    new Scene( SceneName, SelectedPalette.Palette, sceneParameters, 
-                        SceneControl.Default, CollectSelectedLights(), mSchedule ));
+                    new Scene( SceneName, SelectedPalette.Palette, sceneParameters, mSelectedScene.Scene.Control,
+                               CollectSelectedLights(), mSchedule ));
 
                 mSceneProvider.Update( mSelectedScene.Scene );
             }
