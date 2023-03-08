@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Mushrooms.Database;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Mushrooms.Entities {
     internal class Scene : EntityBase {

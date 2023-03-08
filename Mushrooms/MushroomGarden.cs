@@ -29,12 +29,10 @@ namespace Mushrooms {
         private readonly IHubManager                                mHubManager;
         private readonly ISceneProvider                             mSceneProvider;
         private readonly IDialogService                             mDialogService;
-        private readonly ObservableCollectionExtended<Scene>        mScenes;
         private readonly ObservableCollectionExtended<ActiveScene>  mActiveScenes;
         private readonly CancellationTokenSource                    mTokenSource;
         private readonly LimitedRepeatingRandom                     mLimitedRandom;
         private readonly Random                                     mRandom;
-        private IDisposable ?                                       mSceneSubscription;
         private IDisposable ?                                       mActiveSceneSubscription;
         private Task ?                                              mLightingTask;
         private Task ?                                              mSchedulingTask;
@@ -47,7 +45,6 @@ namespace Mushrooms {
             mDialogService = dialogService;
 
             mActiveScenes = new ObservableCollectionExtended<ActiveScene>();
-            mScenes = new ObservableCollectionExtended<Scene>();
             mTokenSource = new CancellationTokenSource();
             mLimitedRandom = new LimitedRepeatingRandom();
             mRandom = Random.Shared;
@@ -91,7 +88,7 @@ namespace Mushrooms {
                 scene.UpdateControl( control );
 
                 await UpdateSceneControl( scene );
-//                mSceneProvider.Update( scene.Scene );
+                mSceneProvider.Update( scene.Scene );
             }
         }
 
@@ -143,14 +140,10 @@ namespace Mushrooms {
         }
 
         protected override Task ExecuteAsync( CancellationToken stoppingToken ) {
-            mSceneSubscription = mSceneProvider.Entities
-                .Connect()
-                .Bind( mScenes )
-                .Subscribe();
-
             mActiveSceneSubscription = mSceneProvider.Entities
                 .Connect()
-                .Transform( s => new ActiveScene( s ))
+                .TransformWithInlineUpdate( scene => new ActiveScene( scene ),
+                                          ( activeScene, scene ) => activeScene.UpdateScene( scene ))
                 .Bind( mActiveScenes )
                 .Subscribe();
 
@@ -244,9 +237,6 @@ namespace Mushrooms {
 
             mActiveSceneSubscription?.Dispose();
             mActiveSceneSubscription = null;
-
-            mSceneSubscription?.Dispose();
-            mSceneSubscription = null;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Mushrooms.Models {
     internal class ActiveScene {
         private readonly Subject<ActiveScene>   mChangeSubject;
 
-        public  Scene                           Scene { get; }
+        public  Scene                           Scene { get; private set; }
         public  IList<Bulb>                     SceneBulbs { get; }
         public  IList<ActiveBulb>               ActiveBulbs { get; }
 
@@ -36,11 +36,6 @@ namespace Mushrooms.Models {
             IsActive = false;
 
             mChangeSubject = new Subject<ActiveScene>();
-        }
-
-        public void UpdateSceneBulbs( IEnumerable<Bulb> bulbs ) {
-            SceneBulbs.Clear();
-            SceneBulbs.AddRange( bulbs );
         }
 
         public void Activate() {
@@ -69,6 +64,15 @@ namespace Mushrooms.Models {
             Scene.UpdateControl( control );
 
             mChangeSubject.OnNext( this );
+        }
+
+        public void UpdateScene( Scene scene ) {
+            Scene = scene;
+        }
+
+        public void UpdateSceneBulbs( IEnumerable<Bulb> bulbs ) {
+            SceneBulbs.Clear();
+            SceneBulbs.AddRange( bulbs );
         }
 
         public void UpdateActiveBulb( ActiveBulb bulb ) {
