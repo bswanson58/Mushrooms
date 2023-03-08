@@ -127,14 +127,14 @@
 
                     <Label Grid.Column="0" Grid.Row="4" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
                            Content="Base Display Duration:"/>
-                    <Slider Grid.Column="1" Grid.Row="4" Minimum="1" Maximum="600" Style="{DynamicResource MahApps.Styles.Slider}"
+                    <Slider Grid.Column="1" Grid.Row="4" Minimum="0" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
                             Value="{Binding DisplayDurationSeconds}"/>
                     <Label Grid.Column="2" Grid.Row="4" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
                            Content="{Binding DisplayDuration}"/>
 
                     <Label Grid.Column="0" Grid.Row="6" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
                            Content="Display Duration Jitter:"/>
-                    <Slider Grid.Column="1" Grid.Row="6" Minimum="0" Maximum="600" Style="{DynamicResource MahApps.Styles.Slider}"
+                    <Slider Grid.Column="1" Grid.Row="6" Minimum="0" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
                             Value="{Binding DisplayDurationJitterSeconds}"/>
                     <Label Grid.Column="2" Grid.Row="6" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
                            Content="{Binding DisplayJitter}"/>
