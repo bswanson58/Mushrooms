@@ -163,8 +163,10 @@ namespace Mushrooms {
             scene.UpdateSceneBulbs( await GetSceneBulbs( scene.Scene ));
 
             foreach( var bulb in scene.SceneBulbs ) {
+                var color = scene.Scene.Palette.Palette.Randomize().First();
+
+                await mHubManager.SetBulbState( bulb, color, 0.0, TimeSpan.FromSeconds( 3 ));
                 await mHubManager.SetBulbState( bulb, true );
-                await mHubManager.SetBulbState( bulb, scene.Control.Brightness );
             }
         }
 
