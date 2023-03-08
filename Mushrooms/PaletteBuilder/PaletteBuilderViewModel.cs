@@ -147,7 +147,7 @@ namespace Mushrooms.PaletteBuilder {
         }
 
         private void OnSelectFile() {
-            var dialog = new OpenFileDialog { Filter = "Images|*.jpg", Title = "Select Image" };
+            var dialog = new OpenFileDialog { Filter = "Images|*.jpg;*.png;", Title = "Select Image" };
 
             if( dialog.ShowDialog() == true ) {
                 SelectImageFile( dialog.FileName );
