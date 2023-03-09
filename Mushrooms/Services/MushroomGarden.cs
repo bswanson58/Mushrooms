@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using DynamicData;
 using DynamicData.Binding;
 using HueLighting.Hub;
 using HueLighting.HubSelection;
-using HueLighting.Models;
 using Microsoft.Extensions.Hosting;
 using Mushrooms.Database;
 using Mushrooms.Entities;
@@ -15,7 +13,7 @@ using Mushrooms.Models;
 using Mushrooms.Support;
 using ReusableBits.Wpf.DialogService;
 
-namespace Mushrooms {
+namespace Mushrooms.Services {
     internal interface IMushroomGarden : IDisposable {
         Task    StartScene( Scene forScene );
         Task    StopScene( Scene forScene );
@@ -27,47 +25,36 @@ namespace Mushrooms {
 
     internal class MushroomGarden : BackgroundService, IMushroomGarden {
         private readonly IHubManager                                mHubManager;
+        private readonly ISceneLightingHandler                      mLightingHandler;
         private readonly ISceneProvider                             mSceneProvider;
         private readonly IDialogService                             mDialogService;
         private readonly ObservableCollectionExtended<ActiveScene>  mActiveScenes;
         private readonly CancellationTokenSource                    mTokenSource;
-        private readonly LimitedRepeatingRandom                     mLimitedRandom;
-        private readonly Random                                     mRandom;
         private IDisposable ?                                       mActiveSceneSubscription;
         private Task ?                                              mLightingTask;
         private Task ?                                              mSchedulingTask;
 
         public  IObservable<IChangeSet<ActiveScene>>                ActiveScenes => mActiveScenes.ToObservableChangeSet();
 
-        public MushroomGarden( IHubManager hubManager, IDialogService dialogService, ISceneProvider sceneProvider ) {
+        public MushroomGarden( IHubManager hubManager, ISceneLightingHandler lightingHandler,
+                               IDialogService dialogService, ISceneProvider sceneProvider ) {
             mHubManager = hubManager;
+            mLightingHandler = lightingHandler;
             mSceneProvider = sceneProvider;
             mDialogService = dialogService;
 
             mActiveScenes = new ObservableCollectionExtended<ActiveScene>();
             mTokenSource = new CancellationTokenSource();
-            mLimitedRandom = new LimitedRepeatingRandom();
-            mRandom = Random.Shared;
         }
 
         public async Task StartScene( Scene forScene ) {
             var scene = mActiveScenes.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
 
             if( scene != null ) {
-                await ActivateScene( scene );
+                scene.Update( await mLightingHandler.GetSceneBulbs( scene.Scene ));
+                await mLightingHandler.ActivateScene( scene );
 
                 scene.Activate();
-            }
-        }
-
-        private async Task ActivateScene( ActiveScene scene ) {
-            scene.Update( await GetSceneBulbs( scene.Scene ));
-
-            foreach( var bulb in scene.SceneBulbs ) {
-                var color = scene.Scene.Palette.Palette.Randomize().First();
-
-                await mHubManager.SetBulbState( bulb, color, 0.0, TimeSpan.FromSeconds( 3 ));
-                await mHubManager.SetBulbState( bulb, true );
             }
         }
 
@@ -75,7 +62,7 @@ namespace Mushrooms {
             var scene = mActiveScenes.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
 
             if( scene != null ) {
-                await DeactivateScene( scene );
+                await mLightingHandler.DeactivateScene( scene );
 
                 scene.Deactivate();
             }
@@ -87,48 +74,9 @@ namespace Mushrooms {
             if( scene != null ) {
                 scene.Update( control );
 
-                await UpdateSceneControl( scene );
+                await mLightingHandler.UpdateSceneBrightness( scene );
                 mSceneProvider.Update( scene.Scene );
             }
-        }
-
-        private async Task UpdateSceneControl( ActiveScene scene ) {
-            foreach ( var bulb in scene.SceneBulbs ) {
-                await mHubManager.SetBulbState( bulb, scene.Control.Brightness );
-            }
-        }
-
-        private async Task DeactivateScene( ActiveScene scene ) {
-            foreach( var bulb in scene.SceneBulbs ) {
-                await mHubManager.SetBulbState( bulb, false );
-            }
-        }
-
-        private async Task<IEnumerable<Bulb>> GetSceneBulbs( Scene forScene ) {
-            var retValue = new List<Bulb>();
-            var groups = ( await mHubManager.GetBulbGroups()).ToList();
-            var bulbs = ( await mHubManager.GetBulbs()).ToList();
-
-            foreach( var lightSource in forScene.Lights ) {
-                if( lightSource.SourceType.Equals( LightSourceType.Bulb )) {
-                    var bulb = bulbs.FirstOrDefault( b => b.Name.Equals( lightSource.SourceName ));
-
-                    if( bulb != null ) {
-                        retValue.Add( bulb );
-                    }
-                }
-                else {
-                    var group = groups.FirstOrDefault( g => g.Name.Equals( lightSource.SourceName ));
-
-                    if( group != null ) {
-                        retValue.AddRange( group.Bulbs );
-                    }
-                }
-            }
-
-            return retValue                    
-                .GroupBy( b => b.Id )
-                .Select( g => g.First());
         }
 
         public override async Task StartAsync( CancellationToken cancellationToken ) {
@@ -156,10 +104,10 @@ namespace Mushrooms {
 
         private void LightingTask() {
             foreach( var scene in mActiveScenes.Where( s => s.IsActive )) {
-                var updateList = BuildBulbList( scene );
+                var updateList = mLightingHandler.BuildBulbList( scene );
 
                 if( updateList.Any()) {
-                    scene.Update( UpdateBulb( updateList.First(), scene.Scene, scene.Control ));
+                    scene.Update( mLightingHandler.UpdateBulb( updateList.First(), scene.Scene, scene.Control ));
                 }
             }
         }
@@ -182,7 +130,7 @@ namespace Mushrooms {
 
             if(( now > startTime ) &&
                ( now < startTime.AddMinutes( 2 ))) {
-                await ActivateScene( scene );
+                await mLightingHandler.ActivateScene( scene );
 
                 scene.ActiveBySchedule();
             }
@@ -192,35 +140,10 @@ namespace Mushrooms {
             var stopTime = scene.Scene.Schedule.StopTimeForToday();
 
             if( DateTime.Now > stopTime ) {
-                await DeactivateScene( scene );
+                await mLightingHandler.DeactivateScene( scene );
 
                 scene.Deactivate();
             }
-        }
-
-        private static IList<ActiveBulb> BuildBulbList( ActiveScene forScene ) {
-            var activity = new List<ActiveBulb>();
-
-            foreach( var bulb in forScene.SceneBulbs ) {
-                activity.Add( forScene.ActiveBulbs.FirstOrDefault( b => b.Bulb.Id.Equals( bulb.Id ), new ActiveBulb( bulb )));
-            }
-
-            var now = DateTime.Now;
-
-            return activity.Where( b => b.NextUpdateTime < now ).ToList();
-        }
-
-        private ActiveBulb UpdateBulb( ActiveBulb bulb, Scene inScene, SceneControl control ) {
-            var color = inScene.Palette.Palette[ mLimitedRandom.Next( inScene.Palette.Palette.Count )];
-            var transitionJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Parameters.TransitionJitter.TotalSeconds ));
-            var transitionTime = inScene.Parameters.BaseTransitionTime + transitionJitter;
-            var displayJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Parameters.DisplayTimeJitter.TotalSeconds ));
-            var displayTime = inScene.Parameters.BaseDisplayTime + displayJitter;
-            var nextUpdateTime = DateTime.Now + transitionTime + displayTime;
-
-            mHubManager.SetBulbState( bulb.Bulb, bulb.ActiveColor, control.Brightness, transitionTime );
-
-            return new ActiveBulb( bulb.Bulb, color, nextUpdateTime );
         }
 
         public override void Dispose() {

@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Mushrooms.Entities;
 using Mushrooms.Garden;
+using Mushrooms.Services;
 
 namespace Mushrooms.Models {
     internal class GardenSceneViewModel : PropertyChangeBase, IDisposable {

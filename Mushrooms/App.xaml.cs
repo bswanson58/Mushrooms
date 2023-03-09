@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mushrooms.Database;
 using Mushrooms.Platform;
+using Mushrooms.Services;
 using ReusableBits.Platform.Interfaces;
 using ReusableBits.Platform.Preferences;
 using ReusableBits.Wpf.DialogService;
@@ -64,6 +65,7 @@ namespace Mushrooms {
             services.AddScoped<ISceneDatabaseProvider, SceneProvider>();
             services.AddSingleton<ISceneProvider, SceneCache>();
 
+            services.AddScoped<ISceneLightingHandler, SceneLightingHandler>();
             services.AddSingleton<MushroomGarden>();
             services.AddSingleton<IMushroomGarden>( p => p.GetRequiredService<MushroomGarden>());
             services.AddHostedService( p => p.GetRequiredService<MushroomGarden>());

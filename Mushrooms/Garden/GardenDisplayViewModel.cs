@@ -11,6 +11,7 @@ using Mushrooms.Dialogs;
 using Mushrooms.Entities;
 using Mushrooms.Models;
 using Mushrooms.SceneBuilder;
+using Mushrooms.Services;
 using Q42.HueApi.Models.Groups;
 using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.DialogService;
