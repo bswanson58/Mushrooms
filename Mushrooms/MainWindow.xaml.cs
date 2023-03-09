@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System;
-using Mushrooms.Platform;
 using Mushrooms.Resources;
+using ReusableBits.Wpf.Platform;
 
 namespace Mushrooms {
     /// <summary>

@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Platform\" />
     <Folder Include="ViewModelSupport\" />
   </ItemGroup>
 

@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Xml;
 using System.Xml.Serialization;
+
 // ReSharper disable InconsistentNaming
 
 // from: http://blogs.msdn.com/b/davidrickard/archive/2010/03/09/saving-window-size-and-location-in-wpf-and-winforms.aspx
@@ -34,7 +35,7 @@ using System.Xml.Serialization;
 
 // Add an application settings file with an User string name 'WindowPlacement'
 
-namespace Mushrooms.Platform {
+namespace ReusableBits.Wpf.Platform {
     // RECT structure required by WINDOWPLACEMENT structure
     [Serializable]
     [StructLayout( LayoutKind.Sequential )]
