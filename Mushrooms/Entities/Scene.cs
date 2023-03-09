@@ -53,6 +53,10 @@ namespace Mushrooms.Entities {
             Parameters = parameters;
         }
 
+        public void Update( SceneSchedule schedule ) {
+            Schedule = schedule;
+        }
+
         public void UpdateControl( SceneControl control ) {
             Control = control;
         }

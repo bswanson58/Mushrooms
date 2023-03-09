@@ -18,13 +18,14 @@ namespace Mushrooms.Entities {
         public  bool                Enabled { get; protected set; }
 
         public SceneSchedule( ScheduleTimeType onTimeType, TimeOnly onTime,
-                              ScheduleTimeType offTimeTimeType, TimeOnly offTime, TimeSpan onDuration ) {
+                              ScheduleTimeType offTimeTimeType, TimeOnly offTime, TimeSpan onDuration,
+                              bool isEnabled = true ) {
             OnTimeType = onTimeType;
             OnTime = onTime;
             OffTimeType = offTimeTimeType;
             OffTime = offTime;
             OnDuration = onDuration;
-            Enabled = true;
+            Enabled = isEnabled;
         }
 
         private SceneSchedule() {

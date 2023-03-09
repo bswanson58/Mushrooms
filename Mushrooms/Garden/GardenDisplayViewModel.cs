@@ -21,6 +21,7 @@ namespace Mushrooms.Garden {
         void    SetLighting( Scene scene );
         void    SetPalette( Scene scene );
         void    SetParameters( Scene scene );
+        void    SetSchedule( Scene scene );
     }
 
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -139,6 +140,24 @@ namespace Mushrooms.Garden {
                     
                     if( sceneParameters != null ) {
                         scene.Update( sceneParameters );
+
+                        mSceneProvider.Update( scene );
+                    }
+                }
+            });
+        }
+
+        public void SetSchedule( Scene scene ) {
+            var parameters = new DialogParameters {
+                { SceneScheduleViewModel.cSchedule, scene.Schedule }
+            };
+
+            mDialogService.ShowDialog<SceneScheduleView>( parameters, result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    var sceneSchedule = result.Parameters.GetValue<SceneSchedule>( SceneScheduleViewModel.cSchedule );
+                    
+                    if( sceneSchedule != null ) {
+                        scene.Update( sceneSchedule );
 
                         mSceneProvider.Update( scene );
                     }

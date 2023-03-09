@@ -1,0 +1,92 @@
+﻿<UserControl x:Class="Mushrooms.Dialogs.SceneScheduleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mushrooms.Dialogs"
+             xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
+             xmlns:dialogService="clr-namespace:ReusableBits.Wpf.DialogService;assembly=ReusableBits.Wpf"
+             xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
+             xmlns:entities="clr-namespace:Mushrooms.Entities"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance local:SceneScheduleViewModel, IsDesignTimeCreatable=False}"
+             Height="300" Width="600">
+
+    <dialogService:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="dialogService:Dialog.WindowStartupLocation" Value="CenterOwner" />
+            <Setter Property="ResizeMode" Value="NoResize"/>
+            <Setter Property="ShowInTaskbar" Value="False"/>
+            <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+        </Style>
+    </dialogService:Dialog.WindowStyle>
+
+    <UserControl.Resources>
+        <valueConverters:EnumBooleanConverter x:Key="EnumConverter"/>
+    </UserControl.Resources>
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <mah:ToggleSwitch Grid.Row="0" Margin="20,10,0,0" IsOn="{Binding IsEnabled}" 
+                          OnContent="Enable Scene Schedule" OffContent="Enable Scene Schedule (Disabled)"/>
+
+        <Grid Grid.Row="1" Margin="5,15" IsEnabled="{Binding IsEnabled}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Grid.Column="0" Margin="0,0,5,0" Padding="8" Style="{StaticResource GroupBoxStyle}">
+                <GroupBox.Header>
+                    <TextBlock Margin="3,0" Style="{StaticResource ControlTitleStyle}" Text="Start Time:"/>
+                </GroupBox.Header>
+
+                <StackPanel Grid.Column="0" Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Content="Specific Time:"
+                                     IsChecked="{Binding OnTimeType, Mode=TwoWay, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static entities:ScheduleTimeType.SpecificTime}}"/>
+                        <mah:TimePicker Margin="5,0" SelectedTimeFormat="Short" SelectedDateTime="{Binding OnTime}"/>
+                    </StackPanel>
+                    <RadioButton Content="Sunrise" Margin="0,5"
+                                 IsChecked="{Binding OnTimeType, Mode=TwoWay, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static entities:ScheduleTimeType.Sunrise}}"/>
+                    <RadioButton Content="Sunset" Margin="0,5"
+                                 IsChecked="{Binding OnTimeType, Mode=TwoWay, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static entities:ScheduleTimeType.Sunset}}"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Grid.Column="1" Margin="5,0,0,0" Padding="8" Style="{StaticResource GroupBoxStyle}">
+                <GroupBox.Header>
+                    <TextBlock Margin="3,0" Style="{StaticResource ControlTitleStyle}" Text="Stop Time:"/>
+                </GroupBox.Header>
+
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Content="Specific Time:"
+                                 IsChecked="{Binding OffTimeType, Mode=TwoWay, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static entities:ScheduleTimeType.SpecificTime}}"/>
+                        <mah:TimePicker Margin="5,0" SelectedTimeFormat="Short" SelectedDateTime="{Binding OffTime}"/>
+                    </StackPanel>
+                    <RadioButton Content="Sunrise" Margin="0,5"
+                             IsChecked="{Binding OffTimeType, Mode=TwoWay, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static entities:ScheduleTimeType.Sunrise}}"/>
+                    <RadioButton Content="Sunset" Margin="0,5"
+                             IsChecked="{Binding OffTimeType, Mode=TwoWay, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static entities:ScheduleTimeType.Sunset}}"/>
+                    <RadioButton Content="Duration" Margin="0,5"
+                             IsChecked="{Binding OffTimeType, Mode=TwoWay, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static entities:ScheduleTimeType.Duration}}"/>
+
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Right">
+            <Button Style="{StaticResource GeneralButtonStyle}" Width="70" Margin="10,0" Content="Ok" Command="{Binding Ok}" IsDefault="True"/>
+            <Button Style="{StaticResource GeneralButtonStyle}" Width="70" Content="Cancel" Command="{Binding Cancel}" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

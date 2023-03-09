@@ -70,18 +70,11 @@
                         <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Parameters}"
                                 Command="{Binding SetParameters}" ToolTip="Set Scene Parameters"/>
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                                Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Clock}"
+                                Command="{Binding SetSchedule}" ToolTip="Set Scene Schedule"/>
                     </StackPanel>
                 </Grid>
-                <!--
-                <Grid Grid.Column="2">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" 
-                                Visibility="{Binding IsScheduled, Converter={StaticResource DisplayIfScheduled}}">
-                        <ContentControl Height="16" Width="16" Content="{StaticResource Path_Scheduled}" Opacity="0.6"/>
-                        <Label Margin="3,0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"
-                               Content="{Binding ScheduleSummary}"/>
-                    </StackPanel>
-                </Grid>
-                -->
 
                 <StackPanel x:Name="SceneControls" Grid.Column="4" Orientation="Horizontal" Opacity="0.3" Visibility="Hidden">
                     <Label Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Brightness:"/>
@@ -96,7 +89,7 @@
                 </DataTrigger>
                 <Trigger SourceName="SceneContainer" Property="IsMouseOver" Value="True">
                     <Setter TargetName="PowerControls" Property="Opacity" Value="1.0"/>
-                    <Setter TargetName="SceneConfiguration" Property="Opacity" Value="1.0"/>
+                    <Setter TargetName="SceneConfiguration" Property="Opacity" Value="0.8"/>
                     <Setter TargetName="SceneControls" Property="Opacity" Value="1.0"/>
                 </Trigger>
             </DataTemplate.Triggers>

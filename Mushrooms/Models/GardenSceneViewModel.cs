@@ -30,6 +30,7 @@ namespace Mushrooms.Models {
         public  ICommand                    SetPalette { get; }
         public  ICommand                    SetParameters { get; }
         public  ICommand                    SetLighting { get; }
+        public  ICommand                    SetSchedule { get; }
 
         public GardenSceneViewModel( ActiveScene scene, IMushroomGarden garden, ISceneCommands sceneCommands ) {
             ActiveScene = scene;
@@ -41,6 +42,7 @@ namespace Mushrooms.Models {
             SetLighting = new DelegateCommand( OnSetLighting );
             SetPalette = new DelegateCommand( OnSetPalette );
             SetParameters = new DelegateCommand( OnSetParameters );
+            SetSchedule = new DelegateCommand( OnSetSchedule );
 
             mSceneSubscription = ActiveScene.OnSceneChanged.Subscribe( OnSceneChanged );
         }
@@ -60,6 +62,7 @@ namespace Mushrooms.Models {
 
         private void OnSetParameters() => mSceneCommands.SetParameters( Scene );
 
+        private void OnSetSchedule() => mSceneCommands.SetSchedule( Scene );
 
         private void OnSceneChanged( ActiveScene scene ) {
             RaiseAllPropertiesChanged();
