@@ -8,7 +8,6 @@
         xmlns:mushrooms="clr-namespace:Mushrooms"
         xmlns:paletteBuilder="clr-namespace:Mushrooms.PaletteBuilder"
         xmlns:garden="clr-namespace:Mushrooms.Garden"
-        xmlns:sceneBuilder="clr-namespace:Mushrooms.SceneBuilder"
         mc:Ignorable="d"
         Title="Mushrooms"
         ResizeMode="CanResizeWithGrip"

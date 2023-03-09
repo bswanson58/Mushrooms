@@ -106,6 +106,12 @@ namespace Mushrooms.Services {
             await base.StartAsync( cancellationToken );
         }
 
+        public override async Task StopAsync( CancellationToken cancellationToken ) {
+            await StopAll();
+
+            await base.StopAsync( cancellationToken );
+        }
+
         protected override Task ExecuteAsync( CancellationToken stoppingToken ) {
             mActiveSceneSubscription = mSceneProvider.Entities
                 .Connect()
