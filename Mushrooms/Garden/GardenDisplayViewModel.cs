@@ -7,18 +7,24 @@ using DynamicData;
 using DynamicData.Binding;
 using HueLighting.Hub;
 using Mushrooms.Database;
+using Mushrooms.Dialogs;
 using Mushrooms.Entities;
 using Mushrooms.Models;
 using Mushrooms.SceneBuilder;
+using Q42.HueApi.Models.Groups;
 using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.DialogService;
 using ReusableBits.Wpf.ViewModelSupport;
 
 namespace Mushrooms.Garden {
+    internal interface ISceneCommands {
+        void    SetLighting( Scene scene );
+        void    SetPalette( Scene scene );
+        void    SetParameters( Scene scene );
+    }
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class GardenDisplayViewModel : PropertyChangeBase, IDisposable {
-        private readonly IMushroomGarden    mGarden;
+    internal class GardenDisplayViewModel : PropertyChangeBase, ISceneCommands, IDisposable {
         private readonly IHubManager        mHubManager;
         private readonly IPaletteProvider   mPaletteProvider;
         private readonly ISceneProvider     mSceneProvider;
@@ -27,28 +33,27 @@ namespace Mushrooms.Garden {
 
         public  ObservableCollectionExtended<GardenSceneViewModel> SceneList { get; }
 
-        public  ICommand        QuickScene { get; }
+        public  ICommand                    CreateScene { get; }
 
         public GardenDisplayViewModel( IMushroomGarden garden, IDialogService dialogService, ISceneProvider sceneProvider,
                                        IPaletteProvider paletteProvider, IHubManager hubManager ) {
-            mGarden = garden;
             mDialogService = dialogService;
             mPaletteProvider = paletteProvider;
             mSceneProvider = sceneProvider;
             mHubManager = hubManager;
             SceneList = new ObservableCollectionExtended<GardenSceneViewModel>();
 
-            mSceneSubscription = mGarden.ActiveScenes
-                .Transform( scene => new GardenSceneViewModel( scene, garden ))
+            mSceneSubscription = garden.ActiveScenes
+                .Transform( scene => new GardenSceneViewModel( scene, garden, this ))
                 .Sort( SortExpressionComparer<GardenSceneViewModel>.Ascending( s => s.Name ))
                 .Bind( SceneList )
                 .Subscribe();
 
-            QuickScene = new DelegateCommand( OnQuickScene );
+            CreateScene = new DelegateCommand( OnCreateScene );
         }
 
-        private async void OnQuickScene() {
-            var lighting = await LoadLighting();
+        private async void OnCreateScene() {
+            var lighting = await LoadGroupLighting();
             var palettes = mPaletteProvider.Entities.Items.Select( p => new PaletteViewModel( p )).ToList();
             var parameters = new DialogParameters {
                 { NewSceneViewModel.cPaletteList, palettes.ToList() },
@@ -79,7 +84,80 @@ namespace Mushrooms.Garden {
             });
         }
 
-        private async Task<IList<LightSourceViewModel>> LoadLighting() {
+        public async void SetLighting( Scene scene ) {
+            var lighting = await LoadAllLighting();
+            var parameters = new DialogParameters {
+                { LightingSelectorViewModel.cLightingList, lighting },
+                { LightingSelectorViewModel.cSelectedLights, scene.Lights }
+            };
+
+            mDialogService.ShowDialog<LightingSelectorView>( parameters, result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    var selectedLights = result.Parameters.GetValue<IList<LightSource>?>( LightingSelectorViewModel.cSelectedLights );
+
+                    if( selectedLights?.Any() == true ) {
+                        scene.Update( selectedLights );
+
+                        mSceneProvider.Update( scene );
+                    }
+                }
+            });
+        }
+
+        public void SetPalette( Scene scene ) {
+            var palettes = mPaletteProvider.Entities.Items.Select( p => new PaletteViewModel( p )).ToList();
+            var parameters = new DialogParameters {
+                { PaletteSelectorViewModel.cPaletteList, palettes.ToList() },
+                { PaletteSelectorViewModel.cSelectedPalette, scene.Palette.Id }
+            };
+
+            mDialogService.ShowDialog<PaletteSelectorView>( parameters, result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    var paletteId = result.Parameters.GetValue<string>( PaletteSelectorViewModel.cSelectedPalette );
+
+                    if(!String.IsNullOrWhiteSpace( paletteId )) {
+                        var palette = palettes.FirstOrDefault( p => p.Palette.Id.Equals( paletteId ));
+
+                        if( palette != null ) {
+                            scene.Update( palette.Palette );
+
+                            mSceneProvider.Update( scene );
+                        }
+                    }
+                }
+            });
+        }
+
+        public void SetParameters( Scene scene ) {
+            var parameters = new DialogParameters {
+                { AnimationParametersViewModel.cSceneParameters, scene.Parameters }
+            };
+
+            mDialogService.ShowDialog<AnimationParametersView>( parameters, result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    var sceneParameters = result.Parameters.GetValue<SceneParameters>( AnimationParametersViewModel.cSceneParameters );
+                    
+                    if( sceneParameters != null ) {
+                        scene.Update( sceneParameters );
+
+                        mSceneProvider.Update( scene );
+                    }
+                }
+            });
+        }
+
+        private async Task<IList<LightSourceViewModel>> LoadAllLighting() {
+            var bulbs = await mHubManager.GetBulbs();
+            var retValue = bulbs
+                .Select( bulb => new LightSourceViewModel( 
+                    new LightSource( bulb.Name, GroupType.Free ), new []{ bulb }, _ => { }));
+
+            return retValue
+                .Concat( await LoadGroupLighting())
+                .ToList();
+        }
+
+        private async Task<IList<LightSourceViewModel>> LoadGroupLighting() {
             var groups = await mHubManager.GetBulbGroups();
 
             return groups

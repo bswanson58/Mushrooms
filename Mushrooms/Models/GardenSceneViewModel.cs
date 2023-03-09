@@ -6,10 +6,12 @@ using ReusableBits.Wpf.ViewModelSupport;
 using System.Windows.Input;
 using System.Windows.Media;
 using Mushrooms.Entities;
+using Mushrooms.Garden;
 
 namespace Mushrooms.Models {
     internal class GardenSceneViewModel : PropertyChangeBase, IDisposable {
         private readonly IMushroomGarden    mGarden;
+        private readonly ISceneCommands     mSceneCommands;
         private IDisposable ?               mSceneSubscription;
 
         public  ActiveScene                 ActiveScene { get; }
@@ -25,13 +27,20 @@ namespace Mushrooms.Models {
 
         public  ICommand                    ActivateScene { get; }
         public  ICommand                    DeactivateScene { get; }
+        public  ICommand                    SetPalette { get; }
+        public  ICommand                    SetParameters { get; }
+        public  ICommand                    SetLighting { get; }
 
-        public GardenSceneViewModel( ActiveScene scene, IMushroomGarden garden ) {
+        public GardenSceneViewModel( ActiveScene scene, IMushroomGarden garden, ISceneCommands sceneCommands ) {
             ActiveScene = scene;
             mGarden = garden;
+            mSceneCommands = sceneCommands;
 
             ActivateScene = new DelegateCommand( OnActivateScene );
             DeactivateScene = new DelegateCommand( OnDeactivateScene );
+            SetLighting = new DelegateCommand( OnSetLighting );
+            SetPalette = new DelegateCommand( OnSetPalette );
+            SetParameters = new DelegateCommand( OnSetParameters );
 
             mSceneSubscription = ActiveScene.OnSceneChanged.Subscribe( OnSceneChanged );
         }
@@ -45,9 +54,15 @@ namespace Mushrooms.Models {
             }
         }
 
+        private void OnSetLighting() => mSceneCommands.SetLighting( Scene );
+
+        private void OnSetPalette() => mSceneCommands.SetPalette( Scene );
+
+        private void OnSetParameters() => mSceneCommands.SetParameters( Scene );
+
+
         private void OnSceneChanged( ActiveScene scene ) {
-            RaisePropertyChanged( () => IsSceneActive );
-            RaisePropertyChanged( () => SceneColors );
+            RaiseAllPropertiesChanged();
         }
 
         private void OnActivateScene() {

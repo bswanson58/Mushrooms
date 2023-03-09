@@ -60,6 +60,20 @@
 
 
                 <Grid Grid.Column="2">
+                    <StackPanel x:Name="SceneConfiguration" Orientation="Horizontal" Opacity="0">
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                                Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Palette}"
+                                Command="{Binding SetPalette}" ToolTip="Set Scene Palette"/>
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                                Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Lighting}"
+                                Command="{Binding SetLighting}" ToolTip="Set Scene Lighting"/>
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                                Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Parameters}"
+                                Command="{Binding SetParameters}" ToolTip="Set Scene Parameters"/>
+                    </StackPanel>
+                </Grid>
+                <!--
+                <Grid Grid.Column="2">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" 
                                 Visibility="{Binding IsScheduled, Converter={StaticResource DisplayIfScheduled}}">
                         <ContentControl Height="16" Width="16" Content="{StaticResource Path_Scheduled}" Opacity="0.6"/>
@@ -67,7 +81,7 @@
                                Content="{Binding ScheduleSummary}"/>
                     </StackPanel>
                 </Grid>
-
+                -->
 
                 <StackPanel x:Name="SceneControls" Grid.Column="4" Orientation="Horizontal" Opacity="0.3" Visibility="Hidden">
                     <Label Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Brightness:"/>
@@ -82,6 +96,7 @@
                 </DataTrigger>
                 <Trigger SourceName="SceneContainer" Property="IsMouseOver" Value="True">
                     <Setter TargetName="PowerControls" Property="Opacity" Value="1.0"/>
+                    <Setter TargetName="SceneConfiguration" Property="Opacity" Value="1.0"/>
                     <Setter TargetName="SceneControls" Property="Opacity" Value="1.0"/>
                 </Trigger>
             </DataTemplate.Triggers>
@@ -98,7 +113,7 @@
 
         <Button Grid.Row="0" HorizontalAlignment="Right" Height="25" Width="25" Margin="0,0,35,10" Padding="6" Opacity="0.7"
                 Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Create a new scene"
-                Content="{StaticResource Path_Add}" Command="{Binding QuickScene}"/>
+                Content="{StaticResource Path_Add}" Command="{Binding CreateScene}"/>
 
         <ListView Grid.Row="1" ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource GardenSceneTemplate}"/>
     </Grid>
