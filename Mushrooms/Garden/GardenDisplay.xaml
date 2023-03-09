@@ -27,6 +27,7 @@
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <Button x:Name="SceneActive" Grid.Column="0" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
@@ -81,7 +82,15 @@
                     <Slider Style="{DynamicResource MahApps.Styles.Slider}" Width="120" Margin="5,0" VerticalAlignment="Center"
                             Minimum="0.0" Maximum="1.0" Value="{Binding Brightness}"/>
                 </StackPanel>
+
+                <StackPanel x:Name="SceneCommands" Grid.Column="5" Orientation="Horizontal" Opacity="0">
+                    <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Padding="1"
+                            BorderThickness="0" Background="Transparent" Opacity="0.7"
+                            Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Delete}"
+                            Command="{Binding DeleteScene}" ToolTip="Delete Scene"/>
+                </StackPanel>
             </Grid>
+
             <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding IsSceneActive}" Value="True">
                     <Setter TargetName="SceneActive" Property="Visibility" Value="Visible"/>
@@ -91,6 +100,7 @@
                     <Setter TargetName="PowerControls" Property="Opacity" Value="1.0"/>
                     <Setter TargetName="SceneConfiguration" Property="Opacity" Value="0.8"/>
                     <Setter TargetName="SceneControls" Property="Opacity" Value="1.0"/>
+                    <Setter TargetName="SceneCommands" Property="Opacity" Value="1.0"/>
                 </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>

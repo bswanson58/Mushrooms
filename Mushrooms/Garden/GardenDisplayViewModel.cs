@@ -22,6 +22,8 @@ namespace Mushrooms.Garden {
         void    SetPalette( Scene scene );
         void    SetParameters( Scene scene );
         void    SetSchedule( Scene scene );
+
+        void    DeleteScene( Scene scene );
     }
 
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -161,6 +163,19 @@ namespace Mushrooms.Garden {
 
                         mSceneProvider.Update( scene );
                     }
+                }
+            });
+        }
+
+        public void DeleteScene( Scene scene ) {
+            var parameters = new DialogParameters {
+                { ConfirmationDialogViewModel.cTitle, "Confirm Deletion" },
+                { ConfirmationDialogViewModel.cMessage, $"Would you like to delete scene '{scene.SceneName}'?" }
+            };
+
+            mDialogService.ShowDialog<ConfirmationDialog>( parameters, result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    mSceneProvider.Delete( scene );
                 }
             });
         }
