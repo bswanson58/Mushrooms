@@ -30,6 +30,7 @@ namespace Mushrooms.Garden {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class GardenDisplayViewModel : PropertyChangeBase, ISceneCommands, IDisposable {
         private readonly IHubManager        mHubManager;
+        private readonly IMushroomGarden    mGarden;
         private readonly IPaletteProvider   mPaletteProvider;
         private readonly ISceneProvider     mSceneProvider;
         private readonly IDialogService     mDialogService;
@@ -38,6 +39,8 @@ namespace Mushrooms.Garden {
         public  ObservableCollectionExtended<GardenSceneViewModel> SceneList { get; }
 
         public  ICommand                    CreateScene { get; }
+        public  ICommand                    StopAll { get; }
+        public  ICommand                    StartAll { get; }
 
         public GardenDisplayViewModel( IMushroomGarden garden, IDialogService dialogService, ISceneProvider sceneProvider,
                                        IPaletteProvider paletteProvider, IHubManager hubManager ) {
@@ -45,15 +48,18 @@ namespace Mushrooms.Garden {
             mPaletteProvider = paletteProvider;
             mSceneProvider = sceneProvider;
             mHubManager = hubManager;
+            mGarden = garden;
             SceneList = new ObservableCollectionExtended<GardenSceneViewModel>();
 
-            mSceneSubscription = garden.ActiveScenes
+            mSceneSubscription = mGarden.ActiveScenes
                 .Transform( scene => new GardenSceneViewModel( scene, garden, this ))
                 .Sort( SortExpressionComparer<GardenSceneViewModel>.Ascending( s => s.Name ))
                 .Bind( SceneList )
                 .Subscribe();
 
             CreateScene = new DelegateCommand( OnCreateScene );
+            StartAll = new DelegateCommand( OnStartAll );
+            StopAll = new DelegateCommand( OnStopAll );
         }
 
         private async void OnCreateScene() {
@@ -201,6 +207,14 @@ namespace Mushrooms.Garden {
                     new LightSourceViewModel(
                         new LightSource( group.Name, group.GroupType ), group.Bulbs, _ => { } ))
                 .ToList();
+        }
+
+        private void OnStartAll() {
+            mGarden.StartAll();
+        }
+
+        private void OnStopAll() {
+            mGarden.StopAll();
         }
 
         public void Dispose() {

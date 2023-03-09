@@ -124,9 +124,18 @@
 
         <Label Grid.Row="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Bottom" Content="Scenes:"/>
 
-        <Button Grid.Row="0" HorizontalAlignment="Right" Height="25" Width="25" Margin="0,0,35,10" Padding="6" Opacity="0.7"
-                Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Create a new scene"
-                Content="{StaticResource Path_Add}" Command="{Binding CreateScene}"/>
+        <StackPanel Grid.Row="0" Margin="0,0,35,0" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button HorizontalAlignment="Right" Height="32" Width="32" Padding="7" Opacity="0.7"
+                    Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Create a new scene"
+                    Content="{StaticResource Path_Add}" Command="{Binding CreateScene}"/>
+
+            <Button HorizontalAlignment="Right" Margin="15,0,0,0" Height="32" Width="32" Padding="9,7,6,7" Opacity="0.6"
+                    Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Start all favorite scenes"
+                    Content="{StaticResource Path_StartAll}" Command="{Binding StartAll}"/>
+            <Button HorizontalAlignment="Right" Margin="5,0,0,0" Height="32" Width="32" Padding="5,6,7,6" Opacity="0.6"
+                    Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Stop all scenes"
+                    Content="{StaticResource Path_StopAll}" Command="{Binding StopAll}"/>
+        </StackPanel>
 
         <ListView Grid.Row="1" ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource GardenSceneTemplate}">
             <b:Interaction.Behaviors>

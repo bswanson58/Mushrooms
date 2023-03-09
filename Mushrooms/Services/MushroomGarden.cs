@@ -18,6 +18,9 @@ namespace Mushrooms.Services {
         Task    StartScene( Scene forScene );
         Task    StopScene( Scene forScene );
 
+        Task    StartAll();
+        Task    StopAll();
+
         Task    UpdateSceneControl( Scene forScene, SceneControl control );
         	
         IObservable<IChangeSet<ActiveScene>>    ActiveScenes { get; }
@@ -58,6 +61,14 @@ namespace Mushrooms.Services {
             }
         }
 
+        public async Task StartAll() {
+            var activeScenes = mActiveScenes.Where( s => !s.IsActive );
+
+            foreach( var scene in activeScenes ) {
+                await StartScene( scene.Scene );
+            }
+        }
+
         public async Task StopScene( Scene forScene ) {
             var scene = mActiveScenes.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
 
@@ -65,6 +76,14 @@ namespace Mushrooms.Services {
                 scene.Deactivate();
 
                 await mLightingHandler.DeactivateScene( scene );
+            }
+        }
+
+        public async Task StopAll() {
+            var activeScenes = mActiveScenes.Where( s => s.IsActive );
+
+            foreach( var scene in activeScenes ) {
+                await StopScene( scene.Scene );
             }
         }
 
