@@ -68,6 +68,8 @@ namespace Mushrooms.Models {
 
         public void UpdateScene( Scene scene ) {
             Scene = scene;
+
+            mChangeSubject.OnNext( this );
         }
 
         public void UpdateSceneBulbs( IEnumerable<Bulb> bulbs ) {

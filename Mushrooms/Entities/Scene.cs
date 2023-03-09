@@ -41,6 +41,10 @@ namespace Mushrooms.Entities {
             Schedule = scene.Schedule;
         }
 
+        public void Update( ScenePalette palette ) {
+            Palette = palette;
+        }
+
         public void UpdateControl( SceneControl control ) {
             Control = control;
         }
