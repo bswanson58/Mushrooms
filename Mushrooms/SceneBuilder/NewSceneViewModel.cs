@@ -33,6 +33,7 @@ namespace Mushrooms.SceneBuilder {
             var lightingList = parameters.GetValue<IList<LightSourceViewModel>>( cLightingList );
 
             if( lightingList?.Any() == true) {
+                Lighting.Clear();
                 Lighting.AddRange( lightingList.OrderBy( l => l.Name ));
 
                 SelectedLighting = Lighting.FirstOrDefault();
@@ -41,6 +42,7 @@ namespace Mushrooms.SceneBuilder {
             var paletteList = parameters.GetValue<IList<PaletteViewModel>>( cPaletteList );
 
             if( paletteList?.Any() == true ) {
+                Palettes.Clear();
                 Palettes.AddRange( paletteList.OrderBy( p => p.Name ));
 
                 SelectedPalette = Palettes.FirstOrDefault();
