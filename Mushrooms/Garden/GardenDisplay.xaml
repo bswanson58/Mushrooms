@@ -104,6 +104,16 @@
                 </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>
+
+        <ControlTemplate x:Key="NoScenesTemplate">
+            <StackPanel Margin="0,100,0,0" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center">
+                <TextBlock Style="{StaticResource EmptyListTextStyle}" VerticalAlignment="Center"
+                           Text="Let's get started by creating a scene:"/>
+                <Button Height="30" Width="30" Margin="8,0" Padding="8" Opacity="0.7"
+                        Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Create a new scene"
+                        Content="{StaticResource Path_Add}" Command="{Binding CreateScene}"/>
+            </StackPanel>
+        </ControlTemplate>
     </UserControl.Resources>
 
     <Grid Margin="0,15">
@@ -118,7 +128,11 @@
                 Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Create a new scene"
                 Content="{StaticResource Path_Add}" Command="{Binding CreateScene}"/>
 
-        <ListView Grid.Row="1" ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource GardenSceneTemplate}"/>
+        <ListView Grid.Row="1" ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource GardenSceneTemplate}">
+            <b:Interaction.Behaviors>
+                <behaviours:EmptyListBehavior EmptyTemplate="{StaticResource NoScenesTemplate}"/>
+            </b:Interaction.Behaviors>
+        </ListView>
     </Grid>
 
     <b:Interaction.Behaviors>
