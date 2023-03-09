@@ -45,6 +45,10 @@ namespace Mushrooms.Entities {
             Palette = palette;
         }
 
+        public void Update( IList<LightSource> lighting ) {
+            Lights = lighting;
+        }
+
         public void UpdateControl( SceneControl control ) {
             Control = control;
         }

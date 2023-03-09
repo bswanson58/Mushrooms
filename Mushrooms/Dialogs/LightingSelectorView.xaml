@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="Mushrooms.Dialogs.LightingSelectorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mushrooms.Dialogs"
+             xmlns:dialogService="clr-namespace:ReusableBits.Wpf.DialogService;assembly=ReusableBits.Wpf"
+             xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
+             viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance local:LightingSelectorViewModel, IsDesignTimeCreatable=False}"
+             Height="350" Width="700">
+
+    <dialogService:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="dialogService:Dialog.WindowStartupLocation" Value="CenterOwner" />
+            <Setter Property="ResizeMode" Value="NoResize"/>
+            <Setter Property="ShowInTaskbar" Value="False"/>
+            <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+        </Style>
+    </dialogService:Dialog.WindowStyle>
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">
+            <Label Style="{StaticResource LabelStyle}" Content="Rooms:"/>
+            <ListView Margin="5,0,0,0" ItemsSource="{Binding Rooms}" ItemTemplate="{StaticResource LightingTemplate}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical">
+            <Label Style="{StaticResource LabelStyle}" Content="Zones:"/>
+            <ListView Margin="5,0,0,0" ItemsSource="{Binding Zones}" ItemTemplate="{StaticResource LightingTemplate}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="0" Grid.Column="4" Orientation="Vertical">
+            <Label Style="{StaticResource LabelStyle}" Content="Bulbs:"/>
+            <ListView Margin="5,0,0,0" ItemsSource="{Binding Bulbs}" ItemTemplate="{StaticResource LightingTemplate}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="4" Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Right">
+            <Button Style="{StaticResource GeneralButtonStyle}" Width="70" Margin="10,0" Content="Ok" Command="{Binding Ok}" IsDefault="True"/>
+            <Button Style="{StaticResource GeneralButtonStyle}" Width="70" Content="Cancel" Command="{Binding Cancel}" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
