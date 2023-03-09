@@ -116,7 +116,7 @@
         </ControlTemplate>
     </UserControl.Resources>
 
-    <Grid Margin="0,15">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -124,7 +124,7 @@
 
         <Label Grid.Row="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Bottom" Content="Scenes:"/>
 
-        <StackPanel Grid.Row="0" Margin="0,0,35,0" HorizontalAlignment="Right" Orientation="Horizontal">
+        <StackPanel Grid.Row="0" Margin="0,0,15,10" HorizontalAlignment="Right" Orientation="Horizontal">
             <Button HorizontalAlignment="Right" Height="32" Width="32" Padding="7" Opacity="0.7"
                     Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Create a new scene"
                     Content="{StaticResource Path_Add}" Command="{Binding CreateScene}"/>
