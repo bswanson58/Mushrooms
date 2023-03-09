@@ -10,7 +10,7 @@ using Mushrooms.Support;
 
 namespace Mushrooms.Services {
     internal interface ISceneLightingHandler {
-        IList<ActiveBulb>           BuildBulbList( ActiveScene forScene );
+        IList<ActiveBulb>           GetBulbUpdateList( ActiveScene forScene );
         Task<IEnumerable<Bulb>>     GetSceneBulbs( Scene forScene );
         ActiveBulb                  UpdateBulb( ActiveBulb bulb, Scene inScene, SceneControl control );
 
@@ -78,7 +78,7 @@ namespace Mushrooms.Services {
                 .Select( g => g.First());
         }
 
-        public IList<ActiveBulb> BuildBulbList( ActiveScene forScene ) {
+        public IList<ActiveBulb> GetBulbUpdateList( ActiveScene forScene ) {
             var activity = new List<ActiveBulb>();
 
             foreach( var bulb in forScene.SceneBulbs ) {
