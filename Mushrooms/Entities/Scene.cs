@@ -57,7 +57,7 @@ namespace Mushrooms.Entities {
             Schedule = schedule;
         }
 
-        public void UpdateControl( SceneControl control ) {
+        public void Update( SceneControl control ) {
             Control = control;
         }
     }

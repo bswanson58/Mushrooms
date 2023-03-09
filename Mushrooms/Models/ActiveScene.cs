@@ -59,25 +59,25 @@ namespace Mushrooms.Models {
             mChangeSubject.OnNext( this );
         }
 
-        public void UpdateControl( SceneControl control ) {
+        public void Update( SceneControl control ) {
             Control = control;
-            Scene.UpdateControl( control );
+            Scene.Update( control );
 
             mChangeSubject.OnNext( this );
         }
 
-        public void UpdateScene( Scene scene ) {
+        public void Update( Scene scene ) {
             Scene = scene;
 
             mChangeSubject.OnNext( this );
         }
 
-        public void UpdateSceneBulbs( IEnumerable<Bulb> bulbs ) {
+        public void Update( IEnumerable<Bulb> bulbs ) {
             SceneBulbs.Clear();
             SceneBulbs.AddRange( bulbs );
         }
 
-        public void UpdateActiveBulb( ActiveBulb bulb ) {
+        public void Update( ActiveBulb bulb ) {
             var existing = ActiveBulbs.FirstOrDefault( b => b.Bulb.Id.Equals( bulb.Bulb.Id ));
 
             if( existing != null ) {

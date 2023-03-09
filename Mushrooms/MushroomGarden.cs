@@ -61,7 +61,7 @@ namespace Mushrooms {
         }
 
         private async Task ActivateScene( ActiveScene scene ) {
-            scene.UpdateSceneBulbs( await GetSceneBulbs( scene.Scene ));
+            scene.Update( await GetSceneBulbs( scene.Scene ));
 
             foreach( var bulb in scene.SceneBulbs ) {
                 var color = scene.Scene.Palette.Palette.Randomize().First();
@@ -85,7 +85,7 @@ namespace Mushrooms {
             var scene = mActiveScenes.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
 
             if( scene != null ) {
-                scene.UpdateControl( control );
+                scene.Update( control );
 
                 await UpdateSceneControl( scene );
                 mSceneProvider.Update( scene.Scene );
@@ -144,7 +144,7 @@ namespace Mushrooms {
                 .Connect()
                 .Sort( SortExpressionComparer<Scene>.Ascending( s => s.SceneName ))
                 .TransformWithInlineUpdate( scene => new ActiveScene( scene ),
-                                          ( activeScene, scene ) => activeScene.UpdateScene( scene ))
+                                          ( activeScene, scene ) => activeScene.Update( scene ))
                 .Bind( mActiveScenes )
                 .Subscribe();
 
@@ -159,7 +159,7 @@ namespace Mushrooms {
                 var updateList = BuildBulbList( scene );
 
                 if( updateList.Any()) {
-                    scene.UpdateActiveBulb( UpdateBulb( updateList.First(), scene.Scene, scene.Control ));
+                    scene.Update( UpdateBulb( updateList.First(), scene.Scene, scene.Control ));
                 }
             }
         }
