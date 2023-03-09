@@ -91,8 +91,7 @@ namespace Mushrooms.Services {
             mActiveSceneSubscription = mSceneProvider.Entities
                 .Connect()
                 .Sort( SortExpressionComparer<Scene>.Ascending( s => s.SceneName ))
-                .TransformWithInlineUpdate( scene => new ActiveScene( scene ),
-                                          ( activeScene, scene ) => activeScene.Update( scene ))
+                .TransformWithInlineUpdate( scene => new ActiveScene( scene ), UpdateActiveScene )
                 .Bind( mActiveScenes )
                 .Subscribe();
 
@@ -100,6 +99,30 @@ namespace Mushrooms.Services {
             mSchedulingTask = Repeat.Interval( TimeSpan.FromSeconds( 31 ), SchedulingTask, mTokenSource.Token );
 
             return Task.CompletedTask;
+        }
+
+        private void UpdateActiveScene( ActiveScene activeScene, Scene scene ) {
+            if( activeScene.IsActive ) {
+                SwitchSceneLighting( activeScene, scene );
+            }
+
+            activeScene.Update( scene );
+        }
+
+        private async void SwitchSceneLighting( ActiveScene activeScene, Scene scene ) {
+            var originalLights = activeScene.OriginalLights;
+            var currentLights = scene.Lights;
+
+            // if the lighting list has changed, clear the current list and start over.
+            if(( originalLights.Except( currentLights ).Any()) ||
+               ( currentLights.Except( originalLights ).Any())) {
+                await mLightingHandler.DeactivateScene( activeScene );
+
+                activeScene.Update( currentLights );
+                activeScene.ClearActiveBulbs();
+                activeScene.Update( await mLightingHandler.GetSceneBulbs( scene ));
+                await mLightingHandler.ActivateScene( activeScene );
+            }
         }
 
         private void LightingTask() {

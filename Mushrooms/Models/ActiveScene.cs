@@ -18,6 +18,7 @@ namespace Mushrooms.Models {
         private readonly Subject<ActiveScene>   mChangeSubject;
 
         public  Scene                           Scene { get; private set; }
+        public  IList<LightSource>              OriginalLights { get; private set; }
         public  IList<Bulb>                     SceneBulbs { get; }
         public  IList<ActiveBulb>               ActiveBulbs { get; }
 
@@ -29,6 +30,7 @@ namespace Mushrooms.Models {
 
         public ActiveScene( Scene scene ) {
             Scene = scene;
+            OriginalLights = new List<LightSource>( scene.Lights );
             SceneBulbs = new List<Bulb>();
             ActiveBulbs = new List<ActiveBulb>();
             Control = new SceneControl( Scene.Control.Brightness, Scene.Control.RateMultiplier );
@@ -75,6 +77,14 @@ namespace Mushrooms.Models {
         public void Update( IEnumerable<Bulb> bulbs ) {
             SceneBulbs.Clear();
             SceneBulbs.AddRange( bulbs );
+        }
+
+        public void Update( IList<LightSource> originalLights ) {
+            OriginalLights = originalLights;
+        }
+
+        public void ClearActiveBulbs() {
+            ActiveBulbs.Clear();
         }
 
         public void Update( ActiveBulb bulb ) {
