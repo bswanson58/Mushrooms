@@ -31,12 +31,6 @@
         <TabItem Header="palettes">
             <paletteBuilder:PaletteBuilder/>
         </TabItem>
-        <TabItem Header="spaces">
-
-        </TabItem>
-        <TabItem Header="scenes">
-            <sceneBuilder:SceneEditor/>
-        </TabItem>
         <TabItem Header="garden">
             <garden:GardenDisplay/>
         </TabItem>
