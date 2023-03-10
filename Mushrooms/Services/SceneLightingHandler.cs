@@ -13,6 +13,7 @@ namespace Mushrooms.Services {
         IList<ActiveBulb>           GetBulbUpdateList( ActiveScene forScene );
         Task<IEnumerable<Bulb>>     GetSceneBulbs( Scene forScene );
         ActiveBulb                  UpdateBulb( ActiveBulb bulb, Scene inScene, SceneControl control );
+        IList<ActiveBulb>           UpdateBulbs( IList<ActiveBulb> bulb, Scene inScene, SceneControl control );
 
         Task                        ActivateScene( ActiveScene scene );
         Task                        DeactivateScene( ActiveScene scene );
@@ -32,9 +33,6 @@ namespace Mushrooms.Services {
 
         public async Task ActivateScene( ActiveScene scene ) {
             foreach( var bulb in scene.SceneBulbs ) {
-                var color = scene.Scene.Palette.Palette.Randomize().First();
-
-                await mHubManager.SetBulbState( bulb, color, 0.0, TimeSpan.FromSeconds( 3 ));
                 await mHubManager.SetBulbState( bulb, true );
             }
         }
@@ -90,7 +88,10 @@ namespace Mushrooms.Services {
             return activity.Where( b => b.NextUpdateTime < now ).ToList();
         }
 
-        public ActiveBulb UpdateBulb( ActiveBulb bulb, Scene inScene, SceneControl control ) {
+        public ActiveBulb UpdateBulb( ActiveBulb bulb, Scene inScene, SceneControl control ) =>
+            UpdateBulbs( new []{ bulb }, inScene, control ).First();
+
+        public IList<ActiveBulb> UpdateBulbs( IList<ActiveBulb> bulbs, Scene inScene, SceneControl control ) {
             var color = inScene.Palette.Palette[ mLimitedRandom.Next( inScene.Palette.Palette.Count )];
             var transitionJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Parameters.TransitionJitter.TotalSeconds ));
             var transitionTime = inScene.Parameters.BaseTransitionTime + transitionJitter;
@@ -98,9 +99,9 @@ namespace Mushrooms.Services {
             var displayTime = inScene.Parameters.BaseDisplayTime + displayJitter;
             var nextUpdateTime = DateTime.Now + transitionTime + displayTime;
 
-            mHubManager.SetBulbState( bulb.Bulb, bulb.ActiveColor, control.Brightness, transitionTime );
+            mHubManager.SetBulbState( bulbs.Select( b => b.Bulb ), color, control.Brightness, transitionTime );
 
-            return new ActiveBulb( bulb.Bulb, color, nextUpdateTime );
+            return bulbs.Select( b => new ActiveBulb( b.Bulb, color, nextUpdateTime )).ToList();
         }
     }
 }

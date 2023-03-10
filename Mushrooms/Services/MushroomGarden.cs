@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,7 +56,23 @@ namespace Mushrooms.Services {
 
             if( scene != null ) {
                 scene.Update( await mLightingHandler.GetSceneBulbs( scene.Scene ));
+
                 await mLightingHandler.ActivateScene( scene );
+
+                var bulbs = scene.SceneBulbs.Select( b => new ActiveBulb( b )).ToList();
+
+                if( scene.Scene.Parameters.SynchronizeLights ) {
+                    var updates = mLightingHandler.UpdateBulbs( bulbs, scene.Scene, scene.Control );
+
+                    foreach( var update in updates ) {
+                        scene.Update( update );
+                    }
+                }
+                else {
+                    foreach( var bulb in bulbs ) {
+                        scene.Update( mLightingHandler.UpdateBulb( bulb, scene.Scene, scene.Control ));
+                    }
+                }
 
                 scene.Activate();
             }
@@ -151,14 +168,29 @@ namespace Mushrooms.Services {
         }
 
         private void LightingTask() {
-            var scenes = mActiveScenes.Where( s => s.IsActive ).ToList();
+            var scenes = mActiveScenes
+                .Where( s => s is { IsActive: true, Scene.Parameters.AnimationEnabled: true })
+                .ToList();
 
             foreach( var scene in scenes ) {
                 var updateList = mLightingHandler.GetBulbUpdateList( scene );
 
                 if( updateList.Any()) {
-                    scene.Update( mLightingHandler.UpdateBulb( updateList.First(), scene.Scene, scene.Control ));
+                    UpdateSceneLights( scene, updateList );
                 }
+            }
+        }
+
+        private void UpdateSceneLights( ActiveScene scene, IList<ActiveBulb> updateList ) {
+            if( scene.Scene.Parameters.SynchronizeLights ) {
+                var updates = mLightingHandler.UpdateBulbs( scene.ActiveBulbs, scene.Scene, scene.Control );
+
+                foreach( var update in updates ) {
+                    scene.Update( update );
+                }
+            }
+            else {
+                scene.Update( mLightingHandler.UpdateBulb( updateList.First(), scene.Scene, scene.Control ));
             }
         }
 
