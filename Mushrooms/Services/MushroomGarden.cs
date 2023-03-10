@@ -23,6 +23,7 @@ namespace Mushrooms.Services {
         Task    StopAll();
 
         Task    UpdateSceneControl( Scene forScene, SceneControl control );
+        void    UpdateSceneColors( Scene forScene );
         	
         IObservable<IChangeSet<ActiveScene>>    ActiveScenes { get; }
     }
@@ -59,6 +60,16 @@ namespace Mushrooms.Services {
 
                 await mLightingHandler.ActivateScene( scene );
 
+                UpdateSceneColors( scene.Scene );
+
+                scene.Activate();
+            }
+        }
+
+        public void UpdateSceneColors( Scene forScene ) {
+            var scene = mActiveScenes.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
+
+            if( scene != null ) {
                 var bulbs = scene.SceneBulbs.Select( b => new ActiveBulb( b )).ToList();
 
                 if( scene.Scene.Parameters.SynchronizeLights ) {
@@ -73,8 +84,6 @@ namespace Mushrooms.Services {
                         scene.Update( mLightingHandler.UpdateBulb( bulb, scene.Scene, scene.Control ));
                     }
                 }
-
-                scene.Activate();
             }
         }
 
@@ -125,6 +134,9 @@ namespace Mushrooms.Services {
 
         public override async Task StopAsync( CancellationToken cancellationToken ) {
             await StopAll();
+
+            // wait for light commands to stream out.
+            await Task.Delay( 500, cancellationToken );
 
             await base.StopAsync( cancellationToken );
         }

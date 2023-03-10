@@ -22,6 +22,7 @@ namespace Mushrooms.Models {
         public  bool                        IsSceneActive => ActiveScene.IsActive;
         public  bool                        IsScheduled => Scene.Schedule.Enabled;
         public  string                      ScheduleSummary => Scene.Schedule.ScheduleSummary();
+        public  bool                        CanRecolorScene => ActiveScene.IsActive && !Scene.Parameters.AnimationEnabled;
         public  IEnumerable<Color>          SceneColors => IsSceneActive ? 
                                                 ActiveScene.ActiveBulbs.OrderBy( b => b.Bulb.Name ).Select( s => s.ActiveColor ) :
                                                 Scene.Palette.Palette.Take( 7 );
@@ -32,6 +33,7 @@ namespace Mushrooms.Models {
         public  ICommand                    SetParameters { get; }
         public  ICommand                    SetLighting { get; }
         public  ICommand                    SetSchedule { get; }
+        public  ICommand                    RecolorScene { get; }
         public  ICommand                    DeleteScene { get; }
 
         public GardenSceneViewModel( ActiveScene scene, IMushroomGarden garden, ISceneCommands sceneCommands ) {
@@ -45,6 +47,7 @@ namespace Mushrooms.Models {
             SetPalette = new DelegateCommand( OnSetPalette );
             SetParameters = new DelegateCommand( OnSetParameters );
             SetSchedule = new DelegateCommand( OnSetSchedule );
+            RecolorScene = new DelegateCommand( OnRecolorScene );
             DeleteScene = new DelegateCommand( OnDeleteScene );
 
             mSceneSubscription = ActiveScene.OnSceneChanged.Subscribe( OnSceneChanged );
@@ -71,14 +74,24 @@ namespace Mushrooms.Models {
 
         private void OnSceneChanged( ActiveScene scene ) {
             RaiseAllPropertiesChanged();
+
+            RaisePropertyChanged( () => CanRecolorScene );
         }
 
         private void OnActivateScene() {
             mGarden.StartScene( Scene );
+
+            RaisePropertyChanged( () => CanRecolorScene );
         }
 
         private void OnDeactivateScene() {
             mGarden.StopScene( Scene );
+
+            RaisePropertyChanged( () => CanRecolorScene );
+        }
+
+        private void OnRecolorScene() {
+            mGarden.UpdateSceneColors( Scene );
         }
 
         public void Dispose() {

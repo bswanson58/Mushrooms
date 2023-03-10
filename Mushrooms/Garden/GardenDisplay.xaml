@@ -15,7 +15,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfScheduled" IsHidden="True" TriggerValue="False"/>
+        <valueConverters:BooleanVisibilityConverter x:Key="CollapseIfFalse" IsHidden="False" TriggerValue="False"/>
         <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfActive" IsHidden="False" TriggerValue="True"/>
         <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfInactive" IsHidden="False" TriggerValue="False"/>
 
@@ -71,6 +71,10 @@
                         <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Parameters}"
                                 Command="{Binding SetParameters}" ToolTip="Set Scene Parameters"/>
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Opacity="0.9"
+                                Visibility="{Binding CanRecolorScene, Converter={StaticResource CollapseIfFalse}}"
+                                Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Recolor}"
+                                Command="{Binding RecolorScene}" ToolTip="Recolor Scene Lights"/>
                         <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Clock}"
                                 Command="{Binding SetSchedule}" ToolTip="Set Scene Schedule"/>
