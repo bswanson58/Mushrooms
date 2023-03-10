@@ -38,7 +38,7 @@
                 <Border.BorderBrush>
                     <SolidColorBrush Color="{Binding IsSelected, Converter={StaticResource DisplayBorder}}"/>
                 </Border.BorderBrush>
-                <Rectangle>
+                <Rectangle ToolTip="{Binding Tooltip}">
                     <Rectangle.Fill>
                         <SolidColorBrush Color="{Binding SwatchColor}"/>
                     </Rectangle.Fill>
@@ -65,7 +65,7 @@
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="4*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
@@ -91,7 +91,7 @@
                 </b:Interaction.Behaviors>
             </Grid>
 
-            <Image Grid.Column="1" Margin="10" Stretch="Uniform" Source="{Binding PatternImage}"/>
+            <Image Grid.Column="1" Margin="10" Stretch="Uniform" VerticalAlignment="Top" Source="{Binding PatternImage}"/>
 
             <Grid Grid.Column="2" Margin="0,10,0,0">
                 <Grid.RowDefinitions>
@@ -100,30 +100,39 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="25"/>
                 </Grid.RowDefinitions>
 
-                <ItemsControl Grid.Row="0" BorderThickness="1" BorderBrush="{StaticResource TrimColor}" 
-                              Padding="5" Margin="5,0,0,0" VerticalAlignment="Top" MinHeight="148"
-                              ItemsSource="{Binding SwatchList}" ItemTemplate="{StaticResource PaletteItemTemplate}"
-                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <b:Interaction.Behaviors>
-                        <behaviours:EmptyListBehavior EmptyTemplate="{StaticResource NoImageTemplate}"/>
-                    </b:Interaction.Behaviors>
-                </ItemsControl>
 
-                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="15,0,0,0">
-                    <Label Style="{StaticResource LabelStyle}" Content="{Binding SelectedSwatchCount}"/>
-                    <Label Style="{StaticResource LabelStyle}" Content="swatches selected  (click swatches to select/deselect)"/>
+                <StackPanel Grid.Row="0" Orientation="Vertical" MinHeight="250">
+                    <Label Style="{StaticResource LabelStyle}" Content="Colors From Image:"/>
+
+                    <ItemsControl BorderThickness="1" BorderBrush="{StaticResource TrimColor}" 
+                                  Padding="5" Margin="5,0,0,0" VerticalAlignment="Top" MinHeight="148"
+                                  ItemsSource="{Binding SwatchList}" ItemTemplate="{StaticResource PaletteItemTemplate}"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <b:Interaction.Behaviors>
+                            <behaviours:EmptyListBehavior EmptyTemplate="{StaticResource NoImageTemplate}"/>
+                        </b:Interaction.Behaviors>
+                    </ItemsControl>
+
+                    <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                        <Label Style="{StaticResource LabelStyle}" Content="{Binding SelectedSwatchCount}"/>
+                        <Label Style="{StaticResource LabelStyle}" Content="swatches selected  (click swatches to select/deselect)"/>
+                    </StackPanel>
                 </StackPanel>
 
-                <CheckBox Grid.Row="2" Margin="15,5" IsChecked="{Binding DisplayOnlySelected}">
+                <StackPanel Grid.Row="1" Margin="15,15" Orientation="Horizontal">
+                    <Label Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Order color swatches by:"/>
+                    <ComboBox Width="100" ItemsSource="{Binding ColorOrderList}" SelectedItem="{Binding ColorBy}"/>
+                </StackPanel>
+
+                <CheckBox Grid.Row="2" Margin="20,0" IsChecked="{Binding DisplayOnlySelected}">
                     <CheckBox.Content>
                         <Label Style="{StaticResource LabelStyle}" Content="Display only selected swatches"/>
                     </CheckBox.Content>
@@ -133,25 +142,25 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Palette Name:"/>
                     <TextBox Grid.Column="1" Text="{Binding PaletteName, UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
-
             </Grid>
         </Grid>
 
         <Grid Grid.Row="1" Margin="0,5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="4*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="1" Margin="5,0,25,0" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+            <Button Grid.Column="1" Margin="5,0" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                     Content="Select Image..." Command="{Binding SelectImage}"/>
 
-            <Button Grid.Column="2" Margin="25,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+            <Button Grid.Column="2" Margin="5,0" VerticalAlignment="Bottom" HorizontalAlignment="Right" 
                     Content="Save Palette" Command="{Binding SavePalette}"/>
         </Grid>
     </Grid>

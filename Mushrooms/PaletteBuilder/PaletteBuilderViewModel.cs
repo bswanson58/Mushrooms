@@ -14,12 +14,20 @@ using Mushrooms.Entities;
 using Mushrooms.Models;
 using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.DialogService;
+using ReusableBits.Wpf.Utility;
 using ReusableBits.Wpf.ViewModelSupport;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Color = System.Windows.Media.Color;
 
 namespace Mushrooms.PaletteBuilder {
+    internal enum ColorByProperty {
+        Population,
+        Hue,
+        Saturation,
+        Luminosity
+    }
+
     internal class EditablePaletteViewModel : PaletteViewModel {
         private readonly Action<EditablePaletteViewModel> mOnDelete;
 
@@ -47,9 +55,11 @@ namespace Mushrooms.PaletteBuilder {
         private string                          mPaletteName;
         private string                          mPictureFile;
         private bool                            mDisplayOnlySelectedSwatches;
+        private ColorByProperty                 mColorOrder;
         private IDisposable ?                   mPaletteSubscription;
 
         public  ObservableCollectionExtended<EditablePaletteViewModel>  Palettes { get; }
+        public  IList<ColorByProperty>          ColorOrderList { get; }
         public  int                             SelectedSwatchCount => mSwatchList.Count( s => s.IsSelected );
 
         public  DelegateCommand                 NewPalette { get; }
@@ -64,10 +74,18 @@ namespace Mushrooms.PaletteBuilder {
             mDialogService = dialogService;
             mPaletteName = String.Empty;
             mPictureFile = String.Empty;
+            mColorOrder = ColorByProperty.Population;
             mDisplayOnlySelectedSwatches = false;
             mSwatchList = new List<ColorViewModel>();
 
             Palettes = new ObservableCollectionExtended<EditablePaletteViewModel>();
+
+            ColorOrderList = new List<ColorByProperty> {
+                ColorByProperty.Population, 
+                ColorByProperty.Hue, 
+                ColorByProperty.Saturation, 
+                ColorByProperty.Luminosity
+            };
 
             mPaletteSubscription = mPaletteProvider.Entities
                 .Connect()
@@ -90,6 +108,15 @@ namespace Mushrooms.PaletteBuilder {
             }
         }
 
+        public ColorByProperty ColorBy {
+            get => mColorOrder;
+            set {
+                mColorOrder = value;
+
+                UpdateColorSwatches();
+            }
+        }
+
         private void SelectPalette() {
             if( mSelectedPalette != null ) {
                 SelectImageFile( mPictureCache.GetPalettePictureFile( mSelectedPalette.Palette ));
@@ -106,8 +133,25 @@ namespace Mushrooms.PaletteBuilder {
 
         public IEnumerable<ColorViewModel> SwatchList =>
             mDisplayOnlySelectedSwatches ?
-                mSwatchList.Where( s => s.IsSelected ) :
-                mSwatchList;
+                mSwatchList.OrderByDescending( OrderByProperty ).Where( s => s.IsSelected ) :
+                mSwatchList.OrderByDescending( OrderByProperty );
+
+        private double OrderByProperty( ColorViewModel color ) {
+            switch ( mColorOrder ) {
+                default:
+                case ColorByProperty.Population:
+                    return color.Population;
+
+                case ColorByProperty.Hue:
+                    return -color.HslColor.H;
+
+                case ColorByProperty.Saturation:
+                    return color.HslColor.S;
+
+                case ColorByProperty.Luminosity:
+                    return color.HslColor.L;
+            }
+        }
 
         public string PaletteName {
             get => mPaletteName;
@@ -137,13 +181,17 @@ namespace Mushrooms.PaletteBuilder {
         }
 
         private void UpdateAllProperties() {
-            // force the collection source to change since it is not an observable collection
-            mDisplayOnlySelectedSwatches = false;
-            RaisePropertyChanged( () => SwatchList );
-
-            mDisplayOnlySelectedSwatches = true;
+            UpdateColorSwatches();
             RaiseAllPropertiesChanged();
             SavePalette.RaiseCanExecuteChanged();
+        }
+
+        private void UpdateColorSwatches() {
+            // force the collection source to change since it is not an observable collection
+            mDisplayOnlySelectedSwatches = !mDisplayOnlySelectedSwatches;
+            RaisePropertyChanged( () => SwatchList );
+            mDisplayOnlySelectedSwatches = !mDisplayOnlySelectedSwatches;
+            RaisePropertyChanged( () => SwatchList );
         }
 
         private void OnSelectFile() {
@@ -175,12 +223,15 @@ namespace Mushrooms.PaletteBuilder {
 
                 using( var image = Image.Load<Rgba32>( fileName )) {
                     var colorThief = new ColorThief.ImageSharp.ColorThief();
-                    var palette = colorThief.GetPalette( image, 25, 5 );
+                    var palette = colorThief.GetPalette( image, 25, 1 );
                     var swatchLimit = 10;
 
-                    foreach( var color in palette.OrderByDescending( c => c.Population )) {
+                    foreach( var color in palette.Where( c => c.Population > 100 ).OrderByDescending( c => c.Population )) {
+                        var hsl = new HslColor( color.Color.A, color.Color.R, color.Color.G, color.Color.B );
+
                         mSwatchList.Add( 
-                            new ColorViewModel( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ), 
+                            new ColorViewModel( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ),
+                                hsl, color.Population,
                                 swatchLimit > 0,
                                 OnSwatchSelectionChanged ));
                         swatchLimit--;
