@@ -326,7 +326,7 @@ namespace Mushrooms.SceneBuilder {
         private void InsertScene() {
             if( mSelectedPalette != null ) {
                 var sceneParameters = 
-                    new SceneParameters( mTransitionDuration, mTransitionJitter, mDisplayDuration, mDisplayJitter );
+                    new SceneParameters( mTransitionDuration, mTransitionJitter, mDisplayDuration, mDisplayJitter, true, false );
 
                 var scene = 
                     new Scene( SceneName, mSelectedPalette.Palette, sceneParameters, 
@@ -340,7 +340,7 @@ namespace Mushrooms.SceneBuilder {
             if(( mSelectedScene != null ) &&
                ( SelectedPalette != null )) {
                 var sceneParameters = 
-                    new SceneParameters( mTransitionDuration, mTransitionJitter, mDisplayDuration, mDisplayJitter );
+                    new SceneParameters( mTransitionDuration, mTransitionJitter, mDisplayDuration, mDisplayJitter, true, false );
 
                 mSelectedScene.Scene.UpdateFrom(
                     new Scene( SceneName, SelectedPalette.Palette, sceneParameters, mSelectedScene.Scene.Control,
