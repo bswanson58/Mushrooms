@@ -107,10 +107,16 @@ namespace Mushrooms.Garden {
         }
 
         public void StartSceneStationary( Scene scene ) {
-            mDialogService.ShowDialog<ColorSelectionView>( result => {
+            var parameters = new DialogParameters {
+                { ColorSelectionViewModel.cSelectedColor, scene.StationaryPalette.Palette.First()}
+            };
+
+            mDialogService.ShowDialog<ColorSelectionView>( parameters, result => {
                 if( result.Result.Equals( ButtonResult.Ok )) {
-                    var palette = new ScenePalette( 
-                        new []{ Colors.AntiqueWhite }, new []{ Colors.AntiqueWhite }, "Stationary" );
+                    var selectedColor = result.Parameters.GetValue<Color>( ColorSelectionViewModel.cSelectedColor );
+
+                    var palette = new ScenePalette(
+                        new []{ selectedColor }, new []{ selectedColor }, "Stationary" );
 
                     scene.SetMode( SceneMode.Stationary );
                     scene.StationaryPalette.UpdateFrom( palette );

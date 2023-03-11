@@ -7,6 +7,7 @@
              xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
              xmlns:dialogs="clr-namespace:Mushrooms.Dialogs"
              xmlns:effects="http://gu.se/Geometry"
+             xmlns:controls="clr-namespace:Mushrooms.Controls"
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance dialogs:ColorSelectionViewModel, IsDesignTimeCreatable=False}"
@@ -21,6 +22,20 @@
         </Style>
     </dialogService:Dialog.WindowStyle>
 
+    <UserControl.Resources>
+        <ControlTemplate x:Key="MoveThumbTemplate" TargetType="{x:Type controls:CircularSelectionThumb}">
+            <Rectangle Fill="Transparent"/>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="DraggableItemTemplate" TargetType="ContentControl">
+            <Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+                <controls:CircularSelectionThumb EllipseSize="1000" ThumbSize="100" Template="{StaticResource MoveThumbTemplate}" Cursor="Hand"/>
+                <ContentPresenter Content="{TemplateBinding ContentControl.Content}"/>
+            </Grid>
+        </ControlTemplate>
+
+    </UserControl.Resources>
+
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -28,12 +43,34 @@
         </Grid.RowDefinitions>
 
         <Viewbox Grid.Row="0" Stretch="Uniform">
-            <Ellipse Height="100" Width="100" Fill="White">
-                <Ellipse.Effect>
-                    <effects:HslWheelEffect InnerRadius="0.8" InnerSaturation="1" />
-                </Ellipse.Effect>
-            </Ellipse>
+            <Grid>
+                <Ellipse Height="1000" Width="1000" Fill="White">
+                    <Ellipse.Effect>
+                        <effects:HslWheelEffect InnerRadius="0.8" InnerSaturation="1" />
+                    </Ellipse.Effect>
+                </Ellipse>
+
+                <Canvas>
+                    <ContentControl Width="100" Height="100" 
+                                    Canvas.Top="{Binding SelectorTop, Mode=TwoWay}" Canvas.Left="{Binding SelectorLeft, Mode=TwoWay}"
+                                    Template="{StaticResource DraggableItemTemplate}" >
+                        <Ellipse StrokeThickness="8" IsHitTestVisible="False">
+                            <Ellipse.Stroke>
+                                <SolidColorBrush Color="{Binding OpposingColor}"/>
+                            </Ellipse.Stroke>
+                            <Ellipse.Fill>
+                                <SolidColorBrush Color="{Binding SelectedColor}"/>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </ContentControl>
+                </Canvas>
+            </Grid>
         </Viewbox>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Label Style="{StaticResource LabelStyle}" Content="Angle: "/>
+            <Label Style="{StaticResource LabelStyle}" Content="{Binding Angle}"/>
+        </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5,10" HorizontalAlignment="Right">
             <Button Style="{StaticResource GeneralButtonStyle}" Width="70" Margin="10,0" Content="Ok" Command="{Binding Ok}" IsDefault="True"/>

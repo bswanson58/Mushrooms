@@ -64,5 +64,26 @@ namespace ReusableBits.Wpf.Utility {
                 }
             }
         }
-	}
+
+        public static T ? FindParent<T>( this DependencyObject ? child ) where T : DependencyObject {
+            if( child == null ) {
+				return  null;
+            }
+
+            var currentParent = VisualTreeHelper.GetParent( child );
+            T ? foundParent = null;
+
+			while( currentParent != null ) {
+                if( currentParent is T parent ) {
+                    foundParent = parent;
+
+                    break;
+                }
+
+                currentParent = VisualTreeHelper.GetParent( currentParent );
+            }
+
+            return foundParent;
+		}
+    }
 }
