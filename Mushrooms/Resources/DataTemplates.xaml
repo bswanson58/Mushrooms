@@ -47,4 +47,8 @@
             <TextBlock Grid.Column="1" Margin="0,0,0,3" VerticalAlignment="Center" Text="{Binding Name}"/>
         </Grid>
     </DataTemplate>
+
+    <DataTemplate x:Key="HorizontalSeparator">
+        <Grid Width="2" Background="{StaticResource ControlTextColor}"/>
+    </DataTemplate>
 </ResourceDictionary>

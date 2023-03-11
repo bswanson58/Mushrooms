@@ -63,6 +63,15 @@
                 <Grid Grid.Column="2">
                     <StackPanel x:Name="SceneConfiguration" Orientation="Horizontal" Opacity="0">
                         <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                                Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_StartAll}"
+                                Command="{Binding StartSceneAnimated}" ToolTip="Start Scene Animation"/>
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                                Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_SelectColor}"
+                                Command="{Binding StartSceneStationary}" ToolTip="Turn On Scene"/>
+
+                        <ContentPresenter Margin="5,10" ContentTemplate="{StaticResource HorizontalSeparator}" Opacity="0.8"/>
+
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Palette}"
                                 Command="{Binding SetPalette}" ToolTip="Set Scene Palette"/>
                         <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"

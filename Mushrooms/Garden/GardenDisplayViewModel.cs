@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media;
 using DynamicData;
 using DynamicData.Binding;
 using HueLighting.Hub;
@@ -19,6 +20,9 @@ using ReusableBits.Wpf.ViewModelSupport;
 
 namespace Mushrooms.Garden {
     internal interface ISceneCommands {
+        void    StartSceneAnimated( Scene scene );
+        void    StartSceneStationary( Scene scene );
+
         void    SetLighting( Scene scene );
         void    SetPalette( Scene scene );
         void    SetParameters( Scene scene );
@@ -84,12 +88,36 @@ namespace Mushrooms.Garden {
 
                         if(( palette != null ) &&
                            ( lightSource != null )) {
-                            var scene = new Scene( sceneName, palette.Palette, SceneParameters.Default, SceneControl.Default, 
+                            var scene = new Scene( sceneName, SceneMode.Animating, palette.Palette, ScenePalette.Default,
+                                                   SceneParameters.Default, SceneControl.Default, 
                                                    new []{lightSource.LightSource }, SceneSchedule.Default );
 
                             mSceneProvider.Insert( scene );
                         }
                     }
+                }
+            });
+        }
+
+        public void StartSceneAnimated( Scene scene ) {
+            scene.SetMode( SceneMode.Animating );
+            mSceneProvider.Update( scene );
+
+            mGarden.StartScene( scene );
+        }
+
+        public void StartSceneStationary( Scene scene ) {
+            mDialogService.ShowDialog<ColorSelectionView>( result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    var palette = new ScenePalette( 
+                        new []{ Colors.AntiqueWhite }, new []{ Colors.AntiqueWhite }, "Stationary" );
+
+                    scene.SetMode( SceneMode.Stationary );
+                    scene.StationaryPalette.UpdateFrom( palette );
+
+                    mSceneProvider.Update( scene );
+
+                    mGarden.StartScene( scene );
                 }
             });
         }

@@ -329,7 +329,7 @@ namespace Mushrooms.SceneBuilder {
                     new SceneParameters( mTransitionDuration, mTransitionJitter, mDisplayDuration, mDisplayJitter, true, false );
 
                 var scene = 
-                    new Scene( SceneName, mSelectedPalette.Palette, sceneParameters, 
+                    new Scene( SceneName, SceneMode.Animating, mSelectedPalette.Palette, ScenePalette.Default, sceneParameters, 
                         SceneControl.Default, CollectSelectedLights(), mSchedule );
 
                 mSceneProvider.Insert( scene );
@@ -343,7 +343,8 @@ namespace Mushrooms.SceneBuilder {
                     new SceneParameters( mTransitionDuration, mTransitionJitter, mDisplayDuration, mDisplayJitter, true, false );
 
                 mSelectedScene.Scene.UpdateFrom(
-                    new Scene( SceneName, SelectedPalette.Palette, sceneParameters, mSelectedScene.Scene.Control,
+                    new Scene( SceneName, mSelectedScene.Scene.SceneMode, SelectedPalette.Palette,
+                               mSelectedScene.Scene.StationaryPalette, sceneParameters, mSelectedScene.Scene.Control,
                                CollectSelectedLights(), mSchedule ));
 
                 mSceneProvider.Update( mSelectedScene.Scene );

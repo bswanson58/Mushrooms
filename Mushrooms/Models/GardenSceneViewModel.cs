@@ -27,6 +27,9 @@ namespace Mushrooms.Models {
                                                 ActiveScene.ActiveBulbs.OrderBy( b => b.Bulb.Name ).Select( s => s.ActiveColor ) :
                                                 Scene.Palette.Palette.Take( 7 );
 
+        public  ICommand                    StartSceneAnimated { get; }
+        public  ICommand                    StartSceneStationary { get; }
+
         public  ICommand                    ActivateScene { get; }
         public  ICommand                    DeactivateScene { get; }
         public  ICommand                    SetPalette { get; }
@@ -40,6 +43,9 @@ namespace Mushrooms.Models {
             ActiveScene = scene;
             mGarden = garden;
             mSceneCommands = sceneCommands;
+
+            StartSceneAnimated = new DelegateCommand( OnStartSceneAnimated );
+            StartSceneStationary = new DelegateCommand( OnStartSceneStationary );
 
             ActivateScene = new DelegateCommand( OnActivateScene );
             DeactivateScene = new DelegateCommand( OnDeactivateScene );
@@ -61,6 +67,10 @@ namespace Mushrooms.Models {
                 mGarden.UpdateSceneControl( Scene, new SceneControl( brightness, 1.0 ));
             }
         }
+
+        private void OnStartSceneAnimated() => mSceneCommands.StartSceneAnimated( Scene );
+
+        private void OnStartSceneStationary() => mSceneCommands.StartSceneStationary( Scene );
 
         private void OnSetLighting() => mSceneCommands.SetLighting( Scene );
 
