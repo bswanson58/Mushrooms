@@ -14,7 +14,6 @@ using Mushrooms.Entities;
 using Mushrooms.Models;
 using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.DialogService;
-using ReusableBits.Wpf.Utility;
 using ReusableBits.Wpf.ViewModelSupport;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -227,11 +226,9 @@ namespace Mushrooms.PaletteBuilder {
                     var swatchLimit = 10;
 
                     foreach( var color in palette.Where( c => c.Population > 100 ).OrderByDescending( c => c.Population )) {
-                        var hsl = new HslColor( color.Color.A, color.Color.R, color.Color.G, color.Color.B );
-
                         mSwatchList.Add( 
                             new ColorViewModel( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ),
-                                hsl, color.Population,
+                                color.Population,
                                 swatchLimit > 0,
                                 OnSwatchSelectionChanged ));
                         swatchLimit--;

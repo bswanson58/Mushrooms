@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media;
 using HueLighting.Models;
 using Mushrooms.Entities;
 using Mushrooms.Support;
@@ -14,6 +15,7 @@ namespace Mushrooms.Services {
         Task<IEnumerable<Bulb>>     GetSceneBulbs( Scene forScene );
         ActiveBulb                  UpdateBulb( ActiveBulb bulb, Scene inScene, SceneControl control );
         IList<ActiveBulb>           UpdateBulbs( IList<ActiveBulb> bulb, Scene inScene, SceneControl control );
+        IList<ActiveBulb>           UpdateBulbs( IList<ActiveBulb> bulbs, Color color, SceneControl control );
 
         Task                        ActivateScene( ActiveScene scene );
         Task                        DeactivateScene( ActiveScene scene );
@@ -98,6 +100,15 @@ namespace Mushrooms.Services {
             var displayJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Parameters.DisplayTimeJitter.TotalSeconds ));
             var displayTime = inScene.Parameters.BaseDisplayTime + displayJitter;
             var nextUpdateTime = DateTime.Now + transitionTime + displayTime;
+
+            mHubManager.SetBulbState( bulbs.Select( b => b.Bulb ), color, control.Brightness, transitionTime );
+
+            return bulbs.Select( b => new ActiveBulb( b.Bulb, color, nextUpdateTime )).ToList();
+        }
+
+        public IList<ActiveBulb> UpdateBulbs( IList<ActiveBulb> bulbs, Color color, SceneControl control ) {
+            var transitionTime = TimeSpan.FromMilliseconds( 300 );
+            var nextUpdateTime = DateTime.Now + transitionTime;
 
             mHubManager.SetBulbState( bulbs.Select( b => b.Bulb ), color, control.Brightness, transitionTime );
 

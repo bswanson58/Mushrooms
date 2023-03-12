@@ -17,15 +17,32 @@ namespace Mushrooms.Models {
 
         public  DelegateCommand     SelectSwatch { get; }
 
-        public ColorViewModel( Color color, HslColor hslColor, int population, bool isSelected, Action<ColorViewModel> onSelectionChanged ) {
+        public ColorViewModel( Color color, int population, bool isSelected, Action<ColorViewModel> onSelectionChanged ) {
             mOnBulbSelectionChanged = onSelectionChanged;
 
             SwatchColor = color;
-            HslColor = hslColor;
+            HslColor = new HslColor( SwatchColor );
             Population = population;
             IsSelected = isSelected;
 
             SelectSwatch = new DelegateCommand( OnSelectSwatch );
+        }
+
+        public ColorViewModel( Color color, Action<ColorViewModel> onSelectionChanged ) {
+            mOnBulbSelectionChanged = onSelectionChanged;
+
+            SwatchColor = color;
+            HslColor = new HslColor( SwatchColor );
+            Population = 1;
+            IsSelected = false;
+
+            SelectSwatch = new DelegateCommand( OnSelectSwatch );
+        }
+
+        public void SetSelection( bool state ) {
+            IsSelected = state;
+
+            RaisePropertyChanged( () => IsSelected );
         }
 
         private void OnSelectSwatch() {

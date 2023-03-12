@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Mushrooms.Entities;
+using Mushrooms.Models;
 using ReusableBits.Wpf.DialogService;
+using ReusableBits.Wpf.Platform;
 using ReusableBits.Wpf.Utility;
 
 namespace Mushrooms.Dialogs {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class ColorSelectionViewModel : DialogAwareBase {
-        public  const string    cSelectedColor = "selected color";
+        public  const string    cColorPalette = "color palette";
 
         // the center point of the color wheel
         private const double    cCenterPoint = 500;
@@ -16,24 +21,43 @@ namespace Mushrooms.Dialogs {
         // the radius of the selector
         private const double    cSelectorRadius = 75;
 
+        private ScenePalette    mPalette;
         private float           mSelectorLeft;
         private float           mSelectorTop;
 
         public  Color           SelectedColor { get; private set; }
 
+        public  ObservableCollection<ColorViewModel>  Swatches { get; }
+
         public ColorSelectionViewModel() {
             Title = "Color Selection";
 
-            SelectorTop = 0;
-            SelectorLeft = 425;
-            SelectedColor = Colors.White;
+            mPalette = ScenePalette.Default;
+            Swatches = new ObservableCollection<ColorViewModel>();
 
-            UpdateSelectedColor();
-            UpdateSelectorPosition();
+            mSelectorTop = 0;
+            mSelectorLeft = 425;
         }
 
         public override void OnDialogOpened( IDialogParameters parameters ) {
-            SelectedColor = parameters.GetValue<Color>( cSelectedColor );
+            mPalette = parameters.GetValue<ScenePalette>( cColorPalette ) ?? ScenePalette.Default;
+
+            Swatches.Clear();
+
+            if( mPalette.Palette.Any()) {
+                SelectedColor = mPalette.Palette.First();
+
+                Swatches.AddRange( mPalette.Palette.Select( c => new ColorViewModel( c, OnSwatchSelected )));
+
+                Swatches.First().IsSelected = true;
+            }
+
+            UpdateSelectorPosition();
+            RaisePropertyChanged( () => SelectedColor );
+        }
+
+        private void OnSwatchSelected( ColorViewModel color ) {
+            SelectedColor = color.SwatchColor;
 
             UpdateSelectorPosition();
             RaisePropertyChanged( () => SelectedColor );
@@ -64,7 +88,14 @@ namespace Mushrooms.Dialogs {
 
             SelectedColor = hsl.ToRgb();
 
+            UpdateSwatchSelection();
             RaisePropertyChanged( () => SelectedColor );
+        }
+
+        private void UpdateSwatchSelection() {
+            foreach( var swatch in Swatches ) {
+                swatch.SetSelection( swatch.SwatchColor.Equals( SelectedColor ));
+            }
         }
 
         private void UpdateSelectorPosition() {
@@ -96,9 +127,10 @@ namespace Mushrooms.Dialogs {
             return new Point( origin.X + pointX, origin.Y + pointY );
         }
 
-        protected override DialogParameters CreateClosingParameters() =>
-            new() {
-                { cSelectedColor, SelectedColor }
-            };
+        protected override DialogParameters CreateClosingParameters() {
+            mPalette.InsertPaletteColor( SelectedColor );
+
+            return new () { { cColorPalette, mPalette } };
+        }
     }
 }

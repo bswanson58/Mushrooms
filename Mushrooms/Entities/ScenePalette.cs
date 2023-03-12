@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
+using DynamicData;
 using Mushrooms.Database;
 
 namespace Mushrooms.Entities {
@@ -26,7 +27,22 @@ namespace Mushrooms.Entities {
             Name = palette.Name;
         }
 
+        public ScenePalette Copy() =>
+            new ( SourceColors, Palette, Name );
+
         public static ScenePalette Default =>
             new ();
+    }
+
+    internal static class ScenePaletteEx {
+        public static void InsertPaletteColor( this ScenePalette palette, Color color ) {
+            var newPalette = new List<Color>( 
+                ( new []{ color })
+                .Concat( palette.Palette.Where( c => c != color ))
+                .Take( 7 ));
+
+            palette.Palette.Clear();
+            palette.Palette.AddRange( newPalette );
+        }
     }
 }

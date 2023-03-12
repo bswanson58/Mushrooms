@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-					xmlns:models="clr-namespace:Mushrooms.Models">
+					xmlns:models="clr-namespace:Mushrooms.Models"
+					xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf">
 
     <DataTemplate x:Key="ColorTemplate" DataType="{x:Type Color}">
         <Rectangle Margin="2" Height="20" Width="20">
@@ -8,6 +9,24 @@
                 <SolidColorBrush Color="{Binding}"/>
             </Rectangle.Fill>
         </Rectangle>
+    </DataTemplate>
+
+    <valueConverters:BooleanColorConverter x:Key="DisplayBorder" TrueColor="DimGray"/>
+
+    <DataTemplate x:Key="PaletteItemTemplate" DataType="{x:Type models:ColorViewModel}">
+        <Border Height="35" Width="35" Padding="3" Margin="5" BorderThickness="1">
+            <Border.BorderBrush>
+                <SolidColorBrush Color="{Binding IsSelected, Converter={StaticResource DisplayBorder}}"/>
+            </Border.BorderBrush>
+            <Rectangle ToolTip="{Binding Tooltip}">
+                <Rectangle.Fill>
+                    <SolidColorBrush Color="{Binding SwatchColor}"/>
+                </Rectangle.Fill>
+                <Rectangle.InputBindings>
+                    <MouseBinding Gesture="LeftClick" Command="{Binding SelectSwatch}"/>
+                </Rectangle.InputBindings>
+            </Rectangle>
+        </Border>
     </DataTemplate>
 
     <DataTemplate x:Key="PaletteTemplate" DataType="{x:Type models:PaletteViewModel}">

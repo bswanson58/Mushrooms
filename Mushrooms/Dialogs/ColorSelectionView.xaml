@@ -11,7 +11,7 @@
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance dialogs:ColorSelectionViewModel, IsDesignTimeCreatable=False}"
-             Height="600" Width="650">
+             Height="550" Width="675">
 
     <dialogService:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -42,7 +42,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Viewbox Grid.Row="0" Margin="0, 25" Stretch="Uniform">
+        <Viewbox Grid.Row="0" Margin="0,10,0,15" Stretch="Uniform">
             <Grid>
                 <Ellipse Height="1000" Width="1000" Fill="White">
                     <Ellipse.Effect>
@@ -63,6 +63,17 @@
                 </Canvas>
             </Grid>
         </Viewbox>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Label Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Previous Colors:"/>
+            <ItemsControl Margin="5,3" ItemsSource="{Binding Swatches}" ItemTemplate="{StaticResource PaletteItemTemplate}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5,10" HorizontalAlignment="Right">
             <Button Style="{StaticResource GeneralButtonStyle}" Width="70" Margin="10,0" Content="Ok" Command="{Binding Ok}" IsDefault="True"/>

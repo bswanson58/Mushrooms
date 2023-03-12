@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using DynamicData;
 using DynamicData.Binding;
 using HueLighting.Hub;
@@ -72,8 +73,15 @@ namespace Mushrooms.Services {
             if( scene != null ) {
                 var bulbs = scene.SceneBulbs.Select( b => new ActiveBulb( b )).ToList();
 
-                if(( scene.Scene.SceneMode.Equals( SceneMode.Stationary )) ||
-                   ( scene.Scene.Parameters.SynchronizeLights )) {
+                if( scene.Scene.SceneMode.Equals( SceneMode.Stationary )) {
+                    var sceneColor = scene.Scene.Palette.Palette.FirstOrDefault( Colors.AntiqueWhite );
+                    var updates = mLightingHandler.UpdateBulbs( bulbs, sceneColor, scene.Control );
+
+                    foreach( var update in updates ) {
+                        scene.Update( update );
+                    }
+                }
+                else if( scene.Scene.Parameters.SynchronizeLights ) {
                     var updates = mLightingHandler.UpdateBulbs( bulbs, scene.Scene, scene.Control );
 
                     foreach( var update in updates ) {

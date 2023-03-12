@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Media;
 using DynamicData;
 using DynamicData.Binding;
 using HueLighting.Hub;
@@ -108,22 +107,21 @@ namespace Mushrooms.Garden {
 
         public void StartSceneStationary( Scene scene ) {
             var parameters = new DialogParameters {
-                { ColorSelectionViewModel.cSelectedColor, scene.StationaryPalette.Palette.First()}
+                { ColorSelectionViewModel.cColorPalette, scene.StationaryPalette.Copy() }
             };
 
             mDialogService.ShowDialog<ColorSelectionView>( parameters, result => {
                 if( result.Result.Equals( ButtonResult.Ok )) {
-                    var selectedColor = result.Parameters.GetValue<Color>( ColorSelectionViewModel.cSelectedColor );
+                    var palette = result.Parameters.GetValue<ScenePalette>( ColorSelectionViewModel.cColorPalette );
 
-                    var palette = new ScenePalette(
-                        new []{ selectedColor }, new []{ selectedColor }, "Stationary" );
+                    if( palette != null ) {
+                        scene.SetMode( SceneMode.Stationary );
+                        scene.StationaryPalette.UpdateFrom( palette );
 
-                    scene.SetMode( SceneMode.Stationary );
-                    scene.StationaryPalette.UpdateFrom( palette );
+                        mSceneProvider.Update( scene );
 
-                    mSceneProvider.Update( scene );
-
-                    mGarden.StartScene( scene );
+                        mGarden.StartScene( scene );
+                    }
                 }
             });
         }

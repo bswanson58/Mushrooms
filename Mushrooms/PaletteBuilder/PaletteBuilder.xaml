@@ -4,9 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
-             xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
              xmlns:paletteBuilder="clr-namespace:Mushrooms.PaletteBuilder"
-             xmlns:models="clr-namespace:Mushrooms.Models"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviours="clr-namespace:ReusableBits.Wpf.Behaviours;assembly=ReusableBits.Wpf"
              mc:Ignorable="d" 
@@ -15,7 +13,6 @@
              d:DesignHeight="350" d:DesignWidth="700">
 
     <UserControl.Resources>
-        <valueConverters:BooleanColorConverter x:Key="DisplayBorder" TrueColor="DimGray"/>
 
         <DataTemplate x:Key="EditablePaletteTemplate" DataType="{x:Type paletteBuilder:EditablePaletteViewModel}">
             <Grid x:Name="PaletteContainer" Background="Transparent">
@@ -31,22 +28,6 @@
                     <Setter TargetName="PaletteControls" Property="Opacity" Value="0.7"/>
                 </Trigger>
             </DataTemplate.Triggers>
-        </DataTemplate>
-
-        <DataTemplate x:Key="PaletteItemTemplate" DataType="{x:Type models:ColorViewModel}">
-            <Border Height="35" Width="35" Padding="3" Margin="5" BorderThickness="1">
-                <Border.BorderBrush>
-                    <SolidColorBrush Color="{Binding IsSelected, Converter={StaticResource DisplayBorder}}"/>
-                </Border.BorderBrush>
-                <Rectangle ToolTip="{Binding Tooltip}">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding SwatchColor}"/>
-                    </Rectangle.Fill>
-                    <Rectangle.InputBindings>
-                        <MouseBinding Gesture="LeftClick" Command="{Binding SelectSwatch}"/>
-                    </Rectangle.InputBindings>
-                </Rectangle>
-            </Border>
         </DataTemplate>
 
         <ControlTemplate x:Key="NoImageTemplate">
