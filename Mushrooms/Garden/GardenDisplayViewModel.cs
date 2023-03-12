@@ -26,6 +26,7 @@ namespace Mushrooms.Garden {
         void    SetPalette( Scene scene );
         void    SetParameters( Scene scene );
         void    SetSchedule( Scene scene );
+        void    SetFavorite( Scene scene, bool state );
 
         void    DeleteScene( Scene scene );
     }
@@ -204,6 +205,12 @@ namespace Mushrooms.Garden {
                     }
                 }
             });
+        }
+
+        public void SetFavorite( Scene scene, bool state ) {
+            scene.SetFavorite( state );
+
+            mSceneProvider.Update( scene );
         }
 
         public void DeleteScene( Scene scene ) {

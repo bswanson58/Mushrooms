@@ -23,6 +23,7 @@
             <Grid x:Name="SceneContainer" Background="Transparent">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="230"/>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="*"/>
@@ -30,24 +31,28 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Button x:Name="SceneActive" Grid.Column="0" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
-                        Style="{StaticResource PathButtonStyle}" Foreground="LawnGreen" BorderThickness="0"
-                        Visibility="Collapsed" Content="{StaticResource Path_Power}"/>
+                <Grid Grid.Column="0">
+                    <Button x:Name="SceneActive" Grid.Column="0" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                            Style="{StaticResource PathButtonStyle}" Foreground="LawnGreen" BorderThickness="0"
+                            Visibility="Collapsed" Content="{StaticResource Path_Power}"/>
 
-                <Grid x:Name="PowerControls" Grid.Column="0" Background="Transparent" Opacity="0">
-                    <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
-                            Style="{StaticResource PathButtonStyle}" 
-                            Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfActive}}"
-                            Command="{Binding ActivateScene}" Content="{StaticResource Path_Power}"/>
+                    <Grid x:Name="PowerControls" Grid.Column="0" Background="Transparent" Opacity="0">
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                                Style="{StaticResource PathButtonStyle}" 
+                                Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfActive}}"
+                                Command="{Binding ActivateScene}" Content="{StaticResource Path_Power}"/>
 
-                    <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
-                            Style="{StaticResource PathButtonStyle}" 
-                            Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfInactive}}"
-                            Command="{Binding DeactivateScene}" Content="{StaticResource Path_Power}"/>
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                                Style="{StaticResource PathButtonStyle}" 
+                                Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfInactive}}"
+                                Command="{Binding DeactivateScene}" Content="{StaticResource Path_Power}"/>
+                    </Grid>
                 </Grid>
 
+                <CheckBox x:Name="Favorite" Grid.Column="1" VerticalAlignment="Center" Margin="8,0,3,0" Opacity="0"
+                          Style="{StaticResource FavoriteCheckBoxStyle}" IsChecked="{Binding IsFavorite}"/>
 
-                <StackPanel Grid.Column="1" Margin="5,0" Orientation="Vertical">
+                <StackPanel Grid.Column="2" Margin="5,0" Orientation="Vertical">
                     <TextBlock Text="{Binding Name}"/>
                     <ItemsControl Margin="15,3" MinHeight="25" 
                                   ItemsSource="{Binding SceneColors}" ItemTemplate="{StaticResource ColorTemplate}">
@@ -60,7 +65,7 @@
                 </StackPanel>
 
 
-                <Grid Grid.Column="2">
+                <Grid Grid.Column="3">
                     <StackPanel x:Name="SceneConfiguration" Orientation="Horizontal" Opacity="0">
                         <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_StartAll}"
@@ -109,7 +114,11 @@
                     <Setter TargetName="SceneActive" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="SceneControls" Property="Visibility" Value="Visible"/>
                 </DataTrigger>
+                <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                    <Setter TargetName="Favorite" Property="Opacity" Value="1.0"/>
+                </DataTrigger>
                 <Trigger SourceName="SceneContainer" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="Favorite" Property="Opacity" Value="1.0"/>
                     <Setter TargetName="PowerControls" Property="Opacity" Value="1.0"/>
                     <Setter TargetName="SceneConfiguration" Property="Opacity" Value="0.8"/>
                     <Setter TargetName="SceneControls" Property="Opacity" Value="1.0"/>

@@ -68,6 +68,11 @@ namespace Mushrooms.Models {
             }
         }
 
+        public bool IsFavorite {
+            get => Scene.IsFavorite;
+            set => mSceneCommands.SetFavorite( Scene, value );
+        }
+
         private void OnStartSceneAnimated() => mSceneCommands.StartSceneAnimated( Scene );
 
         private void OnStartSceneStationary() => mSceneCommands.StartSceneStationary( Scene );
