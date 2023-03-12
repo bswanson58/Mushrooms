@@ -58,7 +58,7 @@
                 </Grid.RowDefinitions>
 
                 <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Available Palettes:"/>
-                <Button Grid.Row="0" HorizontalAlignment="Right" Height="25" Width="25" Margin="0,0,5,0" Padding="6" Opacity="0.7"
+                <Button Grid.Row="0" HorizontalAlignment="Right" Height="25" Width="25" Margin="0,0,25,0" Padding="6" Opacity="0.7"
                         Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Create a new palette"
                         Content="{StaticResource Path_Add}" Command="{Binding NewPalette}"/>
 
