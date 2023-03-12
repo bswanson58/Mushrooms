@@ -64,11 +64,6 @@
             </Grid>
         </Viewbox>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <Label Style="{StaticResource LabelStyle}" Content="Angle: "/>
-            <Label Style="{StaticResource LabelStyle}" Content="{Binding Angle}"/>
-        </StackPanel>
-
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5,10" HorizontalAlignment="Right">
             <Button Style="{StaticResource GeneralButtonStyle}" Width="70" Margin="10,0" Content="Ok" Command="{Binding Ok}" IsDefault="True"/>
             <Button Style="{StaticResource GeneralButtonStyle}" Width="70" Content="Cancel" Command="{Binding Cancel}" IsCancel="True"/>

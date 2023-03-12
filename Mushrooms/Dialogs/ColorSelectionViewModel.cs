@@ -13,7 +13,6 @@ namespace Mushrooms.Dialogs {
         private float           mSelectorTop;
 
         public  Color           SelectedColor { get; private set; }
-        public  string          Angle { get; private set; }
 
         public ColorSelectionViewModel() {
             Title = "Color Selection";
@@ -22,7 +21,6 @@ namespace Mushrooms.Dialogs {
             SelectorLeft = 425;
             SelectedColor = Colors.White;
 
-            Angle = String.Empty;
             UpdateSelectedColor();
         }
 
@@ -55,15 +53,6 @@ namespace Mushrooms.Dialogs {
             SelectedColor = hsl.ToRgb();
 
             RaisePropertyChanged( () => SelectedColor );
-
-            UpdateAngle();
-        }
-
-        private void UpdateAngle() {
-            var angle = CalculateAngle( new Point( 500, 500 ), new Point( SelectorLeft + 50, SelectorTop + 50 ));
-
-            Angle = $"{angle:F2}";
-            RaisePropertyChanged( () => Angle );
         }
 
         private double CalculateAngle( Point origin, Point visitor ) {
