@@ -13,16 +13,14 @@ namespace Mushrooms.Dialogs {
         private float           mSelectorTop;
 
         public  Color           SelectedColor { get; private set; }
-        public  Color           OpposingColor { get; private set; }
         public  string          Angle { get; private set; }
 
         public ColorSelectionViewModel() {
             Title = "Color Selection";
 
             SelectorTop = 0;
-            SelectorLeft = 450;
+            SelectorLeft = 425;
             SelectedColor = Colors.White;
-            OpposingColor = Colors.Black;
 
             Angle = String.Empty;
             UpdateSelectedColor();
@@ -56,12 +54,7 @@ namespace Mushrooms.Dialogs {
 
             SelectedColor = hsl.ToRgb();
 
-            hsl.H = ( angle + 180 ) % 360;
-
-            OpposingColor = hsl.ToRgb();
-
             RaisePropertyChanged( () => SelectedColor );
-            RaisePropertyChanged( () => OpposingColor );
 
             UpdateAngle();
         }

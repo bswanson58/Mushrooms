@@ -11,7 +11,7 @@
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance dialogs:ColorSelectionViewModel, IsDesignTimeCreatable=False}"
-             Height="500" Width="550">
+             Height="600" Width="650">
 
     <dialogService:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -29,7 +29,7 @@
 
         <ControlTemplate x:Key="DraggableItemTemplate" TargetType="ContentControl">
             <Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
-                <controls:CircularSelectionThumb EllipseSize="1000" ThumbSize="100" Template="{StaticResource MoveThumbTemplate}" Cursor="Hand"/>
+                <controls:CircularSelectionThumb EllipseSize="1000" ThumbSize="150" Template="{StaticResource MoveThumbTemplate}" Cursor="Hand"/>
                 <ContentPresenter Content="{TemplateBinding ContentControl.Content}"/>
             </Grid>
         </ControlTemplate>
@@ -42,22 +42,19 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Viewbox Grid.Row="0" Stretch="Uniform">
+        <Viewbox Grid.Row="0" Margin="0, 25" Stretch="Uniform">
             <Grid>
                 <Ellipse Height="1000" Width="1000" Fill="White">
                     <Ellipse.Effect>
-                        <effects:HslWheelEffect InnerRadius="0.8" InnerSaturation="1" />
+                        <effects:HslWheelEffect InnerRadius="0.7" InnerSaturation="1" />
                     </Ellipse.Effect>
                 </Ellipse>
 
                 <Canvas>
-                    <ContentControl Width="100" Height="100" 
+                    <ContentControl Width="150" Height="150" 
                                     Canvas.Top="{Binding SelectorTop, Mode=TwoWay}" Canvas.Left="{Binding SelectorLeft, Mode=TwoWay}"
                                     Template="{StaticResource DraggableItemTemplate}" >
-                        <Ellipse StrokeThickness="8" IsHitTestVisible="False">
-                            <Ellipse.Stroke>
-                                <SolidColorBrush Color="{Binding OpposingColor}"/>
-                            </Ellipse.Stroke>
+                        <Ellipse Stroke="#80000000" StrokeThickness="16" IsHitTestVisible="False" Margin="20">
                             <Ellipse.Fill>
                                 <SolidColorBrush Color="{Binding SelectedColor}"/>
                             </Ellipse.Fill>
