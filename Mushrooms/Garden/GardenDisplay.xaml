@@ -25,24 +25,28 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="230"/>
-                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0">
-                    <Button x:Name="SceneActive" Grid.Column="0" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                    <Button x:Name="SceneActive" Height="32" Width="32" VerticalAlignment="Center" Margin="5,0"
                             Style="{StaticResource PathButtonStyle}" Foreground="LawnGreen" BorderThickness="0"
-                            Visibility="Collapsed" Content="{StaticResource Path_Power}"/>
+                            Background="Transparent" Visibility="Collapsed" Content="{StaticResource Path_Power}"/>
+                    <Button x:Name="SceneScheduled" Height="32" Width="32" VerticalAlignment="Center" Margin="5,0"
+                            Style="{StaticResource PathButtonStyle}" Foreground="LawnGreen" BorderThickness="0"
+                            Background="Transparent" Visibility="Collapsed" Content="{StaticResource Path_Clock}"/>
 
-                    <Grid x:Name="PowerControls" Grid.Column="0" Background="Transparent" Opacity="0">
-                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                    <Grid x:Name="PowerControls" Background="Transparent" Opacity="0">
+                        <Button Height="32" Width="32" VerticalAlignment="Center" Margin="5,0"
                                 Style="{StaticResource PathButtonStyle}" 
                                 Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfActive}}"
                                 Command="{Binding ActivateScene}" Content="{StaticResource Path_Power}"/>
 
-                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                        <Button Height="32" Width="32" VerticalAlignment="Center" Margin="5,0"
                                 Style="{StaticResource PathButtonStyle}" 
                                 Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfInactive}}"
                                 Command="{Binding DeactivateScene}" Content="{StaticResource Path_Power}"/>
@@ -64,9 +68,14 @@
                     </ItemsControl>
                 </StackPanel>
 
+                <Button Grid.Column="3" x:Name="SceneSchedule" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                        Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Clock}" Opacity="0"
+                        Command="{Binding SetSchedule}" ToolTip="{Binding ScheduleSummary}"/>
 
-                <Grid Grid.Column="3">
+                <Grid Grid.Column="4">
                     <StackPanel x:Name="SceneConfiguration" Orientation="Horizontal" Opacity="0">
+                        <ContentPresenter Margin="5,10" ContentTemplate="{StaticResource HorizontalSeparator}" Opacity="0.8"/>
+
                         <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_StartAll}"
                                 Command="{Binding StartSceneAnimated}" ToolTip="Start Scene Animation"/>
@@ -89,19 +98,16 @@
                                 Visibility="{Binding CanRecolorScene, Converter={StaticResource CollapseIfFalse}}"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Recolor}"
                                 Command="{Binding RecolorScene}" ToolTip="Recolor Scene Lights"/>
-                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
-                                Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Clock}"
-                                Command="{Binding SetSchedule}" ToolTip="Set Scene Schedule"/>
                     </StackPanel>
                 </Grid>
 
-                <StackPanel x:Name="SceneControls" Grid.Column="4" Orientation="Horizontal" Opacity="0.3" Visibility="Hidden">
+                <StackPanel x:Name="SceneControls" Grid.Column="6" Orientation="Horizontal" Opacity="0.3" Visibility="Hidden">
                     <Label Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Content="Brightness:"/>
                     <Slider Style="{DynamicResource MahApps.Styles.Slider}" Width="120" Margin="5,0" VerticalAlignment="Center"
                             Minimum="0.0" Maximum="1.0" Value="{Binding Brightness}"/>
                 </StackPanel>
 
-                <StackPanel x:Name="SceneCommands" Grid.Column="5" Orientation="Horizontal" Opacity="0">
+                <StackPanel x:Name="SceneCommands" Grid.Column="7" Orientation="Horizontal" Opacity="0">
                     <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Padding="1"
                             BorderThickness="0" Background="Transparent" Opacity="0.7"
                             Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Delete}"
@@ -114,12 +120,19 @@
                     <Setter TargetName="SceneActive" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="SceneControls" Property="Visibility" Value="Visible"/>
                 </DataTrigger>
+                <DataTrigger Binding="{Binding IsScheduleActive}" Value="True">
+                    <Setter TargetName="SceneScheduled" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsScheduled}" Value="True">
+                    <Setter TargetName="SceneSchedule" Property="Opacity" Value="0.3"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding IsFavorite}" Value="True">
-                    <Setter TargetName="Favorite" Property="Opacity" Value="1.0"/>
+                    <Setter TargetName="Favorite" Property="Opacity" Value="0.6"/>
                 </DataTrigger>
                 <Trigger SourceName="SceneContainer" Property="IsMouseOver" Value="True">
-                    <Setter TargetName="Favorite" Property="Opacity" Value="1.0"/>
                     <Setter TargetName="PowerControls" Property="Opacity" Value="1.0"/>
+                    <Setter TargetName="Favorite" Property="Opacity" Value="1.0"/>
+                    <Setter TargetName="SceneSchedule" Property="Opacity" Value="1.0"/>
                     <Setter TargetName="SceneConfiguration" Property="Opacity" Value="0.8"/>
                     <Setter TargetName="SceneControls" Property="Opacity" Value="1.0"/>
                     <Setter TargetName="SceneCommands" Property="Opacity" Value="1.0"/>

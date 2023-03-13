@@ -254,7 +254,7 @@ namespace Mushrooms.Services {
 
             if(( now > startTime ) &&
                ( now < startTime.AddMinutes( 2 ))) {
-                await mLightingHandler.ActivateScene( scene );
+                await StartScene( scene.Scene );
 
                 scene.ActiveBySchedule();
             }

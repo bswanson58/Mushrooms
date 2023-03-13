@@ -19,11 +19,12 @@ namespace Mushrooms.Models {
         public  Scene                       Scene => ActiveScene.Scene;
 
         public  string                      Name => Scene.SceneName;
-        public  bool                        IsSceneActive => ActiveScene.IsActive;
+        public  bool                        IsSceneActive => ActiveScene.SceneState.Equals( SceneState.Active );
         public  bool                        IsScheduled => Scene.Schedule.Enabled;
-        public  string                      ScheduleSummary => Scene.Schedule.ScheduleSummary();
+        public  bool                        IsScheduleActive => ActiveScene.SceneState.Equals( SceneState.Scheduled );
+        public  string                      ScheduleSummary => $"Scene Schedule: {Scene.Schedule.ScheduleSummary()}";
         public  bool                        CanRecolorScene => ActiveScene.IsActive && !Scene.Parameters.AnimationEnabled;
-        public  IEnumerable<Color>          SceneColors => IsSceneActive ? 
+        public  IEnumerable<Color>          SceneColors => ActiveScene.IsActive ? 
                                                 ActiveScene.ActiveBulbs.OrderBy( b => b.Bulb.Name ).Select( s => s.ActiveColor ) :
                                                 Scene.Palette.Palette.Take( 7 );
 
