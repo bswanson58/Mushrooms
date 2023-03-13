@@ -105,7 +105,11 @@ namespace Mushrooms.Services {
         }
 
         public async Task StartAll() {
-            var activeScenes = mActiveScenes.Where( s => !s.IsActive );
+            var activeScenes = mActiveScenes
+                .Where( s => s is {
+                    IsActive: false, 
+                    Scene.IsFavorite: true
+                });
 
             foreach( var scene in activeScenes ) {
                 await StartScene( scene.Scene );
