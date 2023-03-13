@@ -25,6 +25,7 @@ namespace Mushrooms.Models {
         public  SceneState                      SceneState { get; private set; }
         public  bool                            IsActive { get; private set; }
         public  SceneControl                    Control { get; private set; }
+        public  Object                          SceneLock { get; }
 
         public  IObservable<ActiveScene>        OnSceneChanged => mChangeSubject.AsObservable();
 
@@ -36,6 +37,7 @@ namespace Mushrooms.Models {
             Control = new SceneControl( Scene.Control.Brightness, Scene.Control.RateMultiplier );
             SceneState = SceneState.Inactive;
             IsActive = false;
+            SceneLock = new ();
 
             mChangeSubject = new Subject<ActiveScene>();
         }
@@ -75,28 +77,36 @@ namespace Mushrooms.Models {
         }
 
         public void Update( IEnumerable<Bulb> bulbs ) {
-            SceneBulbs.Clear();
-            SceneBulbs.AddRange( bulbs );
+            lock( SceneLock ) {
+                SceneBulbs.Clear();
+                SceneBulbs.AddRange( bulbs );
+            }
         }
 
         public void Update( IList<LightSource> originalLights ) {
-            OriginalLights = originalLights;
+            lock( SceneLock ) {
+                OriginalLights = originalLights;
+            }
         }
 
         public void ClearActiveBulbs() {
-            ActiveBulbs.Clear();
+            lock( SceneLock ) {
+                ActiveBulbs.Clear();
+            }
         }
 
         public void Update( ActiveBulb bulb ) {
-            var existing = ActiveBulbs.FirstOrDefault( b => b.Bulb.Id.Equals( bulb.Bulb.Id ));
+            lock( SceneLock ) {
+                var existing = ActiveBulbs.FirstOrDefault( b => b.Bulb.Id.Equals( bulb.Bulb.Id ));
 
-            if( existing != null ) {
-                ActiveBulbs.Remove( existing );
+                if( existing != null ) {
+                    ActiveBulbs.Remove( existing );
+                }
+
+                ActiveBulbs.Add( bulb );
+
+                mChangeSubject.OnNext( this );
             }
-
-            ActiveBulbs.Add( bulb );
-
-            mChangeSubject.OnNext( this );
         }
     }
 }
