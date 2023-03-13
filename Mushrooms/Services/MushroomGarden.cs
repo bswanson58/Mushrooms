@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,8 +35,8 @@ namespace Mushrooms.Services {
         private readonly ISceneLightingHandler                      mLightingHandler;
         private readonly ISceneProvider                             mSceneProvider;
         private readonly IDialogService                             mDialogService;
-        private readonly ObservableCollectionExtended<ActiveScene>  mActiveScenes;
         private readonly CancellationTokenSource                    mTokenSource;
+        private readonly ReadOnlyObservableCollection<ActiveScene>  mActiveScenes;
         private IDisposable ?                                       mActiveSceneSubscription;
         private Task ?                                              mLightingTask;
         private Task ?                                              mSchedulingTask;
@@ -49,8 +50,14 @@ namespace Mushrooms.Services {
             mSceneProvider = sceneProvider;
             mDialogService = dialogService;
 
-            mActiveScenes = new ObservableCollectionExtended<ActiveScene>();
             mTokenSource = new CancellationTokenSource();
+
+            mActiveSceneSubscription = mSceneProvider.Entities
+                .Connect()
+                .Sort( SortExpressionComparer<Scene>.Ascending( s => s.SceneName ))
+                .TransformWithInlineUpdate( scene => new ActiveScene( scene ), UpdateActiveScene )
+                .Bind( out mActiveScenes )
+                .Subscribe();
         }
 
         public async Task StartScene( Scene forScene ) {
@@ -145,19 +152,12 @@ namespace Mushrooms.Services {
             await StopAll();
 
             // wait for light commands to stream out.
-            await Task.Delay( 500, cancellationToken );
+            await Task.Delay( 1000, cancellationToken );
 
             await base.StopAsync( cancellationToken );
         }
 
         protected override Task ExecuteAsync( CancellationToken stoppingToken ) {
-            mActiveSceneSubscription = mSceneProvider.Entities
-                .Connect()
-                .Sort( SortExpressionComparer<Scene>.Ascending( s => s.SceneName ))
-                .TransformWithInlineUpdate( scene => new ActiveScene( scene ), UpdateActiveScene )
-                .Bind( mActiveScenes )
-                .Subscribe();
-
             mLightingTask = Repeat.Interval( TimeSpan.FromMilliseconds( 125 ), LightingTask, mTokenSource.Token );
             mSchedulingTask = Repeat.Interval( TimeSpan.FromSeconds( 31 ), SchedulingTask, mTokenSource.Token );
 
@@ -184,6 +184,7 @@ namespace Mushrooms.Services {
                 activeScene.Update( currentLights );
                 activeScene.ClearActiveBulbs();
                 activeScene.Update( await mLightingHandler.GetSceneBulbs( scene ));
+
                 await mLightingHandler.ActivateScene( activeScene );
             }
         }
