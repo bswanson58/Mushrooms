@@ -60,6 +60,8 @@ namespace Mushrooms.Models {
             IsActive = false;
             SceneState = SceneState.Inactive;
 
+            ClearActiveBulbs();
+
             mChangeSubject.OnNext( this );
         }
 

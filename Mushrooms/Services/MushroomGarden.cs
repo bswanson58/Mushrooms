@@ -66,6 +66,7 @@ namespace Mushrooms.Services {
             if( scene != null ) {
                 scene.Update( await mLightingHandler.GetSceneBulbs( scene.Scene ));
 
+                await StopConflictingScenes( scene );
                 await mLightingHandler.ActivateScene( scene );
 
                 UpdateSceneColors( scene.Scene );
@@ -157,6 +158,16 @@ namespace Mushrooms.Services {
             await base.StopAsync( cancellationToken );
         }
 
+        private async Task StopConflictingScenes( ActiveScene scene ) {
+            var activeScenes = mActiveScenes.Where( s => s.IsActive ).ToList();
+
+            foreach( var activeScene in activeScenes.Where( s => !s.Scene.Id.Equals( scene.Scene.Id ))) {
+                if( activeScene.SceneBulbs.Any( bulb => scene.SceneBulbs.Any( b => b.Id.Equals( bulb.Id )))) {
+                    await StopScene( activeScene.Scene );
+                }
+            }
+        }
+
         protected override Task ExecuteAsync( CancellationToken stoppingToken ) {
             mLightingTask = Repeat.Interval( TimeSpan.FromMilliseconds( 125 ), LightingTask, mTokenSource.Token );
             mSchedulingTask = Repeat.Interval( TimeSpan.FromSeconds( 31 ), SchedulingTask, mTokenSource.Token );
@@ -184,6 +195,8 @@ namespace Mushrooms.Services {
                 activeScene.Update( currentLights );
                 activeScene.ClearActiveBulbs();
                 activeScene.Update( await mLightingHandler.GetSceneBulbs( scene ));
+
+                await StopConflictingScenes( activeScene );
 
                 await mLightingHandler.ActivateScene( activeScene );
             }
