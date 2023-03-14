@@ -58,6 +58,11 @@ namespace Mushrooms {
             if( store != null ) {
                 await store.InitializeAsync();
             }
+
+            DispatcherUnhandledException += AppDispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomainUnhandledException;
+            TaskScheduler.UnobservedTaskException += TaskSchedulerUnobservedTaskException;
+
         }
     
         private static void ConfigureServices( IServiceCollection services ) {
@@ -101,6 +106,31 @@ namespace Mushrooms {
                                                             classType.FullName?.EndsWith( "Dialog" ) == true ))
                     .AsSelf()
                     .WithScopedLifetime());
+        }
+
+        private void CurrentDomainUnhandledException( object sender, UnhandledExceptionEventArgs e ) {
+            if( e.ExceptionObject is Exception exception ) {
+                mLog?.LogException( "Application Domain unhandled exception", exception );
+            }
+
+            Shutdown( -1 );
+        }
+
+        private void AppDispatcherUnhandledException( object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e ) {
+            if( Debugger.IsAttached ) {
+                Clipboard.SetText( e.Exception.ToString());
+            }
+
+            mLog?.LogException( "Application Dispatcher unhandled exception", e.Exception );
+
+            e.Handled = true;
+            Shutdown( -1 );
+        }
+
+        private void TaskSchedulerUnobservedTaskException( object ? sender, UnobservedTaskExceptionEventArgs e ) {
+            mLog?.LogException( "Task Scheduler unobserved exception", e.Exception );
+
+            e.SetObserved(); 
         }
     }
 }
