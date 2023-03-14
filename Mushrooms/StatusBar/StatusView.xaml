@@ -23,26 +23,46 @@
             <TextBlock Foreground="LightGray" FontSize="12" Text="{Binding Message}"/>
         </DataTemplate>
 
+        <DataTemplate x:Key="CelestialTemplate">
+            <Grid ToolTip="{Binding CelestialInfo}" Opacity="0.6">
+                <ContentControl x:Name="Day" Margin="1" Content="{StaticResource Path_Sun}"/>
+                <ContentControl x:Name="Night" Margin="3" Content="{StaticResource Path_Moon}"/>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsDay}" Value="True">
+                    <Setter TargetName="Night" Property="Visibility" Value="Hidden"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsDay}" Value="False">
+                    <Setter TargetName="Day" Property="Visibility" Value="Hidden"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
     </UserControl.Resources>
 
     <StatusBar VerticalAlignment="Bottom" behaviours:ViewAttachedNotifier.NotifyCommand="{Binding ViewAttached}">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <StatusBarItem Margin="0,0,15,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Margin="3,0" BorderThickness="0" VerticalAlignment="Center" Background="Transparent" 
-                    Foreground="LightGray" Focusable="False" Padding="3,1" Width="24" 
-                    Content="{StaticResource Path_Folder}" Command="{Binding OpenDataFolder}" ToolTip="Open Configuration Folder"/>
+                <Button Grid.Column="0" Margin="3,0" BorderThickness="0" VerticalAlignment="Center" Background="Transparent" 
+                        Foreground="LightGray" Focusable="False" Padding="3,1" Width="24" 
+                        Content="{StaticResource Path_Folder}" Command="{Binding OpenDataFolder}" ToolTip="Open Configuration Folder"/>
 
-            <TextBlock Grid.Column="1" Margin="5,0" FontSize="12" Foreground="LightGray" VerticalAlignment="Center"
-                       Text="{Binding VersionString}"/>
-            <Separator Grid.Column="2" Margin ="3,0"/>
-            <statusPresenter:StatusPresenter Grid.Column="3" Margin="5,0" VerticalAlignment="Center" 
-                                             StatusMessage="{Binding StatusMessage}"/>
-        </Grid>
+                <TextBlock Grid.Column="1" Margin="5,0" FontSize="12" Foreground="LightGray" VerticalAlignment="Center"
+                           Text="{Binding VersionString}"/>
+                <Separator Grid.Column="2" Margin ="3,0"/>
+                <statusPresenter:StatusPresenter Grid.Column="3" Margin="5,0" VerticalAlignment="Center" 
+                                                 StatusMessage="{Binding StatusMessage}"/>
+
+                <ContentControl Grid.Column="4" Content="{Binding}" ContentTemplate="{StaticResource CelestialTemplate}"/>
+            </Grid>
+        </StatusBarItem>
     </StatusBar>
 </UserControl>

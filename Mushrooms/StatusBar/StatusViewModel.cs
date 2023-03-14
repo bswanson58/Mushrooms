@@ -5,32 +5,44 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Windows.Input;
+using Mushrooms.Models;
 using ReusableBits.Platform.Interfaces;
 using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.Platform;
 using ReusableBits.Wpf.StatusPresenter;
 using ReusableBits.Wpf.VersionSpinner;
+using Mushrooms.Support;
 
 namespace Mushrooms.StatusBar {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class StatusViewModel : AutomaticPropertyBase, IHandle<Events.StatusEvent>, IDisposable {
 		private readonly IEventAggregator       mEventAggregator;
+		private readonly IPreferences			mPreferences;
 		private readonly IApplicationConstants	mAppConstants;
 		private readonly IEnvironment			mEnvironment;
         private readonly IVersionFormatter      mVersionFormatter;
+        private readonly ICelestialCalculator   mCelestialCalculator;
 		private readonly Queue<StatusMessage>	mHoldingQueue;
+        private CelestialData ?                 mCelestialData;
 		private bool							mViewAttached;
 
-		public	ICommand						OpenDataFolder { get; }
+        public  bool                            IsDay {get; private set; }
+        public  string                          CelestialInfo { get; private set; }
+
+        public	ICommand						OpenDataFolder { get; }
 		public	ICommand						ViewAttached { get; }
 
 		public	string							VersionString => $"{mAppConstants.ApplicationName} v{mVersionFormatter.VersionString}";
 
-		public StatusViewModel( IEventAggregator eventAggregator, IEnvironment environment, 
-                                IApplicationConstants applicationConstants, IVersionFormatter versionFormatter ) {
+		public StatusViewModel( IEventAggregator eventAggregator, IEnvironment environment, IPreferences preferences,
+                                ICelestialCalculator celestialCalculator, IApplicationConstants applicationConstants, 
+                                IVersionFormatter versionFormatter ) {
 			mEventAggregator = eventAggregator;
 			mAppConstants = applicationConstants;
+			mPreferences = preferences;
+			mCelestialCalculator = celestialCalculator;
 			mEnvironment = environment;
             mVersionFormatter = versionFormatter;
 
@@ -42,6 +54,11 @@ namespace Mushrooms.StatusBar {
             mVersionFormatter.SetVersion( AssemblyInfo.Version );
             mVersionFormatter.DisplayLevel = VersionLevel.Build;
             mVersionFormatter.PropertyChanged += VersionFormatterOnPropertyChanged;
+
+            mCelestialData = new CelestialData();
+			IsDay = true;
+			CelestialInfo = String.Empty;
+			UpdateCelestialData();
 
 			mEventAggregator.Subscribe( this );
 		}
@@ -72,6 +89,8 @@ namespace Mushrooms.StatusBar {
 
             mVersionFormatter.StartFormatting();
 			mViewAttached = true;
+
+			Repeat.Interval( TimeSpan.FromMinutes( 5 ), UpdateCelestialData, CancellationToken.None );
 		}
 
 		public void Handle( Events.StatusEvent status ) {
@@ -89,6 +108,23 @@ namespace Mushrooms.StatusBar {
 
         private void OnOpenDataFolder() =>
             mEventAggregator.Publish( new Events.DisplayExplorerRequest( mEnvironment.ApplicationDirectory()));
+
+        private void UpdateCelestialData() {
+            if(( mCelestialData == null ) ||
+               ( mCelestialData.SunRise.Date != DateTime.Now.Date )) {
+                var preferences = mPreferences.Load<MushroomPreferences>();
+
+                mCelestialData = mCelestialCalculator.CalculateData( preferences.Latitude, preferences.Longitude );
+                var daylight = mCelestialData.SunSet - mCelestialData.SunRise;
+
+                CelestialInfo = $"  Sunrise: {mCelestialData.SunRise:h:mm tt}\n   Sunset: {mCelestialData.SunSet:h:mm tt}\nDaylight: {daylight:h\\:mm} hours";
+                RaisePropertyChanged( () => CelestialInfo );
+            }
+
+            IsDay = DateTime.Now > mCelestialData?.SunRise && DateTime.Now < mCelestialData?.SunSet;
+            RaisePropertyChanged( () => IsDay );
+        }
+
 
         public void Dispose() {
             mEventAggregator.Unsubscribe( this );

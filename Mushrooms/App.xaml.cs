@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Mushrooms.Database;
 using Mushrooms.Platform;
 using Mushrooms.Services;
+using Mushrooms.Support;
 using ReusableBits.Platform.Interfaces;
 using ReusableBits.Platform.Preferences;
 using ReusableBits.Wpf.DialogService;
@@ -69,6 +70,7 @@ namespace Mushrooms {
             services.AddLogging();
             services.AddScoped<IBasicLog, BasicLog>();
 
+            services.AddScoped<ICelestialCalculator, CelestialCalculator>();
             services.AddScoped<IPictureCache, PictureCache>();
 
             services.AddScoped<IPaletteDatabaseProvider, PaletteProvider>();
