@@ -42,6 +42,8 @@ namespace Mushrooms {
             var mainWindow = serviceProvider.GetService<MainWindow>();
             var lifetime = serviceProvider.GetService<IHostApplicationLifetime>();
 
+            mLog?.LogMessage( "--- Mushrooms Launched ---" );
+
             if( mainWindow != null ) {
                 mainWindow.Closing += ( _, _ ) => lifetime?.StopApplication();
 
@@ -63,12 +65,10 @@ namespace Mushrooms {
             DispatcherUnhandledException += AppDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskSchedulerUnobservedTaskException;
-
         }
     
         private static void ConfigureServices( IServiceCollection services ) {
-            services.AddLogging();
-            services.AddScoped<IBasicLog, BasicLog>();
+            services.AddScoped<IBasicLog, SeriLogAdapter>();
 
             services.AddScoped<ICelestialCalculator, CelestialCalculator>();
             services.AddScoped<IPictureCache, PictureCache>();
