@@ -7,9 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mushrooms", "Mushrooms\Mush
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReusableBits.Wpf", "ReusableBits.Wpf\ReusableBits.Wpf.csproj", "{326C61C4-0D58-44E4-BE97-5A35226258E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HueLighting", "HueLighting\HueLighting.csproj", "{62CB0F38-1C65-4228-96FD-64BCC0E0D323}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HueLighting", "HueLighting\HueLighting.csproj", "{62CB0F38-1C65-4228-96FD-64BCC0E0D323}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReusableBits.Platform", "ReusableBits.Platform\ReusableBits.Platform.csproj", "{79C8B86F-0826-48FB-9454-39F29EAF8F96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReusableBits.Platform", "ReusableBits.Platform\ReusableBits.Platform.csproj", "{79C8B86F-0826-48FB-9454-39F29EAF8F96}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F741A109-2F3A-43C0-BA40-CC4820554968}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -8,6 +8,7 @@
         xmlns:mushrooms="clr-namespace:Mushrooms"
         xmlns:paletteBuilder="clr-namespace:Mushrooms.PaletteBuilder"
         xmlns:garden="clr-namespace:Mushrooms.Garden"
+        xmlns:statusBar="clr-namespace:Mushrooms.StatusBar"
         mc:Ignorable="d"
         Title="Mushrooms"
         ResizeMode="CanResizeWithGrip"
@@ -26,13 +27,21 @@
         </DataTemplate>
     </mah:MetroWindow.IconTemplate>
 
-    <TabControl Margin="15,0" Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
-        <TabItem Header="palettes">
-            <paletteBuilder:PaletteBuilder/>
-        </TabItem>
-        <TabItem Header="garden">
-            <garden:GardenDisplay/>
-        </TabItem>
-    </TabControl>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
+        <TabControl Grid.Row="0" Margin="15,0" Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
+            <TabItem Header="palettes">
+                <paletteBuilder:PaletteBuilder/>
+            </TabItem>
+            <TabItem Header="garden">
+                <garden:GardenDisplay/>
+            </TabItem>
+        </TabControl>
+
+        <statusBar:StatusView Grid.Row="1"/>
+    </Grid>
 </mah:MetroWindow>

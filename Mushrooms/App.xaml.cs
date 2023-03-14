@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using Fluxor;
@@ -11,6 +12,8 @@ using Mushrooms.Services;
 using ReusableBits.Platform.Interfaces;
 using ReusableBits.Platform.Preferences;
 using ReusableBits.Wpf.DialogService;
+using ReusableBits.Wpf.EventAggregator;
+using ReusableBits.Wpf.VersionSpinner;
 using ReusableBits.Wpf.ViewModelLocator;
 
 namespace Mushrooms {
@@ -18,6 +21,8 @@ namespace Mushrooms {
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App {
+        private IBasicLog ?     mLog;
+
         // designated startup method in App.xaml
         private async void OnStartup( object sender, StartupEventArgs e ) {
             var builder = Host.CreateDefaultBuilder()
@@ -45,6 +50,8 @@ namespace Mushrooms {
 
         private async Task InitializeApp( IServiceProvider serviceProvider ) {
             ViewModelLocationProvider.SetDefaultViewModelFactory( serviceProvider.GetService );
+
+            mLog = serviceProvider.GetRequiredService<IBasicLog>();
 
             var store = serviceProvider.GetService<IStore>();
 
@@ -80,6 +87,9 @@ namespace Mushrooms {
             services.AddScoped<IDialogServiceContainer, DialogServiceResolver>();
 
             services.AddSingleton<IHubManager, HubManager>();
+
+            services.AddScoped<IEventAggregator, EventAggregator>();
+            services.AddScoped<IVersionFormatter, VersionSpinnerViewModel>();
 
             services.AddFluxor( options => options.ScanAssemblies( typeof( App ).Assembly ));
 
