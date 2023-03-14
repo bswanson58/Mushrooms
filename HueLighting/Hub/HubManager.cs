@@ -9,6 +9,7 @@ using Q42.HueApi.Interfaces;
 using Q42.HueApi.Models.Groups;
 using Q42.HueApi.ColorConverters;
 using Q42.HueApi.ColorConverters.HSB;
+using Q42.HueApi.Models.Bridge;
 using ReusableBits.Platform.Interfaces;
 using ReusableBits.Platform.Preferences;
 
@@ -18,6 +19,7 @@ namespace HueLighting.Hub {
         bool                                IsInitialized { get; }
 
         Task<IEnumerable<HubInformation>>   LocateHubs();
+        Task<IList<HubInformation>>         GetRegisteredHubs();
         Task<String>                        RegisterApp( HubInformation hub, bool setAsConfiguredHub = false );
         void                                SetConfiguredHub( HubInformation hub );
 
@@ -82,6 +84,34 @@ namespace HueLighting.Hub {
             return retValue;
         }
 
+        public async Task<IList<HubInformation>> GetRegisteredHubs() {
+            var retValue = new List<HubInformation>();
+            var installationInfo = mPreferences.Load<HueConfiguration>();
+
+            if(!String.IsNullOrWhiteSpace( installationInfo.BridgeIp )) {
+                try {
+                    var client = new LocalHueClient( installationInfo.BridgeIp, installationInfo.BridgeAppKey );
+
+                    var bridgeInfo = await client.GetBridgeAsync();
+
+                    if( bridgeInfo?.Config != null ) {
+                        var bridge = new LocatedBridge {
+                            BridgeId = bridgeInfo.Config.BridgeId, 
+                            IpAddress = bridgeInfo.Config.IpAddress
+                        };
+
+                        retValue.Add( new HubInformation( bridge, bridgeInfo, installationInfo.BridgeAppKey, 
+                                                          installationInfo.BridgeStreamingKey, true ));
+                    }
+                }
+                catch( Exception ex ) {
+                    mLog.LogException( "Attempt to GetRegisteredHubs", ex );
+                }
+            }
+
+            return retValue;
+        }
+
         public void EmulateHub() {
             mEmulating = true;
         }
@@ -89,8 +119,7 @@ namespace HueLighting.Hub {
         public async Task<IEnumerable<HubInformation>> LocateHubs() { 
             var retValue = new List<HubInformation>();
             var installationInfo = mPreferences.Load<HueConfiguration>();
-            var bridges = await HueBridgeDiscovery
-                .FastDiscoveryWithNetworkScanFallbackAsync( TimeSpan.FromSeconds( 5 ), TimeSpan.FromSeconds( 30 ));
+            var bridges = await HueBridgeDiscovery.FastDiscoveryWithNetworkScanFallbackAsync( TimeSpan.FromSeconds( 15 ), TimeSpan.FromSeconds( 30 ));
 
             foreach( var bridge in bridges ) {
                 try {

@@ -5,9 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dialogs="clr-namespace:Mushrooms.Dialogs"
              xmlns:dialogService="clr-namespace:ReusableBits.Wpf.DialogService;assembly=ReusableBits.Wpf"
+             xmlns:models="clr-namespace:Mushrooms.Models"
+             xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              d:DataContext="{d:DesignInstance dialogs:ConfigurationViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
-             Height="250" Width="500">
+             Height="350" Width="550">
 
     <dialogService:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -18,12 +21,65 @@
         </Style>
     </dialogService:Dialog.WindowStyle>
     
+    <UserControl.Resources>
+        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfTrue" IsHidden="False" TriggerValue="False"/>
+        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfFalse" IsHidden="False" TriggerValue="True"/>
+
+        <DataTemplate x:Key="ScanningTemplate">
+            <Grid>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Locating Hubs"/>
+                    <mah:MetroProgressBar Width="125" Margin="4" IsIndeterminate="True" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="BridgeTemplate" DataType="{x:Type models:HubViewModel}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- define the row height -->
+                <Rectangle Grid.Column="0" Height="22" Width="0"/>
+
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding IpAddress}"/>
+                <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding HubName}"/>
+
+                <Button Grid.Column="2" Margin="5,0" BorderThickness="0" Content="Register" Command="{Binding RegisterHub}" 
+                        Background="Transparent" VerticalAlignment="Center"
+                        Visibility="{Binding IsRegistered, Converter={StaticResource DisplayIfFalse}}"/>
+                <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="(Registered)"
+                           Visibility="{Binding IsRegistered, Converter={StaticResource DisplayIfTrue}}"/>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Available Hue Hubs:"/>
+
+            <ListView Grid.Row="1" ItemsSource="{Binding Hubs}" ItemTemplate="{StaticResource BridgeTemplate}"/>
+            <ContentPresenter Grid.Row="1" Content="{Binding}" ContentTemplate="{StaticResource ScanningTemplate}"
+                              Visibility="{Binding ScanningForHubs, Converter={StaticResource DisplayIfTrue}}"/>
+
+            <Button Grid.Row="2" Style="{StaticResource GeneralButtonStyle}" HorizontalAlignment="Right"
+                    Content="Locate All Hubs" Command="{Binding LocateHubs}"/>
+        </Grid>
 
         <!-- Location -->
         <Grid Grid.Row="1" Margin="0,12,0,0">
