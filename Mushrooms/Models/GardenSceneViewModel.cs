@@ -25,9 +25,6 @@ namespace Mushrooms.Models {
         public  bool                        IsScheduled => Scene.Schedule.Enabled;
         public  bool                        IsScheduleActive => ActiveScene.SceneState.Equals( SceneState.Scheduled );
         public  bool                        CanRecolorScene => ActiveScene.IsActive && !Scene.Parameters.AnimationEnabled;
-        public  IEnumerable<Color>          SceneColors => ActiveScene.IsActive ? 
-                                                ActiveScene.ActiveBulbs.OrderBy( b => b.Bulb.Name ).Select( s => s.ActiveColor ) :
-                                                Scene.Palette.Palette.Take( 7 );
 
         public  ICommand                    StartSceneAnimated { get; }
         public  ICommand                    StartSceneStationary { get; }
@@ -61,6 +58,20 @@ namespace Mushrooms.Models {
             DeleteScene = new DelegateCommand( OnDeleteScene );
 
             mSceneSubscription = ActiveScene.OnSceneChanged.Subscribe( OnSceneChanged );
+        }
+
+        public IEnumerable<Color> SceneColors {
+            get {
+                if( ActiveScene.IsActive ) {
+                    return ActiveScene.ActiveBulbs.OrderBy( b => b.Bulb.Name ).Select( s => s.ActiveColor );
+                }
+
+                if( ActiveScene.Scene.SceneMode.Equals( SceneMode.Animating )) {
+                    return Scene.Palette.Palette.Take( 7 );
+                }
+
+                return Scene.Palette.Palette.Take( 1 );
+            }
         }
 
         public string ScheduleSummary {
