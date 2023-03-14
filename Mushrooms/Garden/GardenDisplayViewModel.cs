@@ -13,6 +13,7 @@ using Mushrooms.Models;
 using Mushrooms.SceneBuilder;
 using Mushrooms.Services;
 using Q42.HueApi.Models.Groups;
+using ReusableBits.Platform.Preferences;
 using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.DialogService;
 using ReusableBits.Wpf.ViewModelSupport;
@@ -47,7 +48,7 @@ namespace Mushrooms.Garden {
         public  ICommand                    StartAll { get; }
 
         public GardenDisplayViewModel( IMushroomGarden garden, IDialogService dialogService, ISceneProvider sceneProvider,
-                                       IPaletteProvider paletteProvider, IHubManager hubManager ) {
+                                       IPaletteProvider paletteProvider, IHubManager hubManager, IPreferences preferences ) {
             mDialogService = dialogService;
             mPaletteProvider = paletteProvider;
             mSceneProvider = sceneProvider;
@@ -56,7 +57,7 @@ namespace Mushrooms.Garden {
             SceneList = new ObservableCollectionExtended<GardenSceneViewModel>();
 
             mSceneSubscription = mGarden.ActiveScenes
-                .Transform( scene => new GardenSceneViewModel( scene, garden, this ))
+                .Transform( scene => new GardenSceneViewModel( scene, garden, this, preferences ))
                 .Sort( SortExpressionComparer<GardenSceneViewModel>.Ascending( s => s.Name ))
                 .Bind( SceneList )
                 .Subscribe();

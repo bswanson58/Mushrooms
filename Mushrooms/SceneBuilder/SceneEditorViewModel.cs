@@ -62,7 +62,7 @@ namespace Mushrooms.SceneBuilder {
         public  string                              TransitionJitter => mTransitionJitter.ToString();
 
         public  bool                                IsScheduleActive => mSchedule.Enabled;
-        public  string                              ScheduleSummary => mSchedule.ScheduleSummary();
+        public  string                              ScheduleSummary => mSchedule.ScheduleSummary( 42, -88.0 );
 
         public  DelegateCommand                     NewScene { get; }
         public  DelegateCommand                     EditSchedule { get; }

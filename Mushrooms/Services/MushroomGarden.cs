@@ -14,6 +14,7 @@ using Mushrooms.Database;
 using Mushrooms.Entities;
 using Mushrooms.Models;
 using Mushrooms.Support;
+using ReusableBits.Platform.Preferences;
 using ReusableBits.Wpf.DialogService;
 
 namespace Mushrooms.Services {
@@ -35,6 +36,7 @@ namespace Mushrooms.Services {
         private readonly ISceneLightingHandler                      mLightingHandler;
         private readonly ISceneProvider                             mSceneProvider;
         private readonly IDialogService                             mDialogService;
+        private readonly IPreferences                               mPreferences;
         private readonly CancellationTokenSource                    mTokenSource;
         private readonly ReadOnlyObservableCollection<ActiveScene>  mActiveScenes;
         private IDisposable ?                                       mActiveSceneSubscription;
@@ -43,11 +45,12 @@ namespace Mushrooms.Services {
 
         public  IObservable<IChangeSet<ActiveScene>>                ActiveScenes => mActiveScenes.ToObservableChangeSet();
 
-        public MushroomGarden( IHubManager hubManager, ISceneLightingHandler lightingHandler,
+        public MushroomGarden( IHubManager hubManager, ISceneLightingHandler lightingHandler, IPreferences preferences,
                                IDialogService dialogService, ISceneProvider sceneProvider ) {
             mHubManager = hubManager;
             mLightingHandler = lightingHandler;
             mSceneProvider = sceneProvider;
+            mPreferences = preferences;
             mDialogService = dialogService;
 
             mTokenSource = new CancellationTokenSource();
@@ -249,7 +252,8 @@ namespace Mushrooms.Services {
         }
 
         private async Task ActivateIfScheduleStart( ActiveScene scene ) {
-            var startTime = scene.Scene.Schedule.StartTimeForToday();
+            var preferences = mPreferences.Load<MushroomPreferences>();
+            var startTime = scene.Scene.Schedule.StartTimeForToday( preferences.Latitude, preferences.Longitude );
             var now = DateTime.Now;
 
             if(( now > startTime ) &&
@@ -261,7 +265,8 @@ namespace Mushrooms.Services {
         }
 
         private async Task DeactivateIfScheduleEnd( ActiveScene scene ) {
-            var stopTime = scene.Scene.Schedule.StopTimeForToday();
+            var preferences = mPreferences.Load<MushroomPreferences>();
+            var stopTime = scene.Scene.Schedule.StopTimeForToday( preferences.Latitude, preferences.Longitude );
 
             if( DateTime.Now > stopTime ) {
                 await mLightingHandler.DeactivateScene( scene );

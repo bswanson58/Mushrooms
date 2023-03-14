@@ -45,7 +45,7 @@ namespace Mushrooms.Entities {
     }
 
     internal static class SceneScheduleExtensions {
-        public static DateTime StartTimeForToday( this SceneSchedule schedule ) {
+        public static DateTime StartTimeForToday( this SceneSchedule schedule, double latitude, double longitude ) {
             var retValue = DateTime.MaxValue;
 
             switch ( schedule.OnTimeType ) {
@@ -54,18 +54,18 @@ namespace Mushrooms.Entities {
                     break;
 
                 case ScheduleTimeType.Sunrise:
-                    retValue = Sunrise();
+                    retValue = Sunrise( latitude, longitude );
                     break;
 
                 case ScheduleTimeType.Sunset:
-                    retValue = Sunset();
+                    retValue = Sunset( latitude, longitude );
                     break;
             }
 
             return retValue;
         }
 
-        public static DateTime StopTimeForToday( this SceneSchedule schedule ) {
+        public static DateTime StopTimeForToday( this SceneSchedule schedule, double latitude, double longitude ) {
             var retValue = DateTime.MaxValue;
 
             switch ( schedule.OffTimeType ) {
@@ -74,11 +74,11 @@ namespace Mushrooms.Entities {
                     break;
 
                 case ScheduleTimeType.Sunrise:
-                    retValue = Sunrise();
+                    retValue = Sunrise( latitude, longitude );
                     break;
 
                 case ScheduleTimeType.Sunset:
-                    retValue = Sunset();
+                    retValue = Sunset( latitude, longitude );
                     break;
 
                 case ScheduleTimeType.Duration:
@@ -89,26 +89,23 @@ namespace Mushrooms.Entities {
             return retValue;
         }
 
-        private const double cLatitude = 41.997D;
-        private const double cLongitude = -88.458D;
-
-        private static DateTime Sunrise() {
+        private static DateTime Sunrise( double latitude, double longitude ) {
             var calculator = new CelestialCalculator();
-            var data = calculator.CalculateData( cLatitude, cLongitude );
+            var data = calculator.CalculateData( latitude, longitude );
 
             return data.SunRise;
         }
 
-        private static DateTime Sunset() {
+        private static DateTime Sunset( double latitude, double longitude ) {
             var calculator = new CelestialCalculator();
-            var data = calculator.CalculateData( cLatitude, cLongitude );
+            var data = calculator.CalculateData( latitude, longitude );
 
             return data.SunSet;
         }
 
-        public static string ScheduleSummary( this SceneSchedule schedule ) {
-            var startTime = schedule.StartTimeForToday().ToShortTimeString();
-            var stopTime = schedule.StopTimeForToday().ToShortTimeString();
+        public static string ScheduleSummary( this SceneSchedule schedule, double latitude, double longitude ) {
+            var startTime = schedule.StartTimeForToday( latitude, longitude ).ToShortTimeString();
+            var stopTime = schedule.StopTimeForToday( latitude, longitude ).ToShortTimeString();
 
             switch ( schedule.OnTimeType ) {
                 case ScheduleTimeType.Sunrise:

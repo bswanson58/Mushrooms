@@ -8,10 +8,12 @@ using System.Windows.Media;
 using Mushrooms.Entities;
 using Mushrooms.Garden;
 using Mushrooms.Services;
+using ReusableBits.Platform.Preferences;
 
 namespace Mushrooms.Models {
     internal class GardenSceneViewModel : PropertyChangeBase, IDisposable {
         private readonly IMushroomGarden    mGarden;
+        private readonly IPreferences       mPreferences;
         private readonly ISceneCommands     mSceneCommands;
         private IDisposable ?               mSceneSubscription;
 
@@ -22,7 +24,6 @@ namespace Mushrooms.Models {
         public  bool                        IsSceneActive => ActiveScene.SceneState.Equals( SceneState.Active );
         public  bool                        IsScheduled => Scene.Schedule.Enabled;
         public  bool                        IsScheduleActive => ActiveScene.SceneState.Equals( SceneState.Scheduled );
-        public  string                      ScheduleSummary => $"Scene Schedule: {Scene.Schedule.ScheduleSummary()}";
         public  bool                        CanRecolorScene => ActiveScene.IsActive && !Scene.Parameters.AnimationEnabled;
         public  IEnumerable<Color>          SceneColors => ActiveScene.IsActive ? 
                                                 ActiveScene.ActiveBulbs.OrderBy( b => b.Bulb.Name ).Select( s => s.ActiveColor ) :
@@ -40,10 +41,12 @@ namespace Mushrooms.Models {
         public  ICommand                    RecolorScene { get; }
         public  ICommand                    DeleteScene { get; }
 
-        public GardenSceneViewModel( ActiveScene scene, IMushroomGarden garden, ISceneCommands sceneCommands ) {
+        public GardenSceneViewModel( ActiveScene scene, IMushroomGarden garden, ISceneCommands sceneCommands,
+                                     IPreferences preferences ) {
             ActiveScene = scene;
             mGarden = garden;
             mSceneCommands = sceneCommands;
+            mPreferences = preferences;
 
             StartSceneAnimated = new DelegateCommand( OnStartSceneAnimated );
             StartSceneStationary = new DelegateCommand( OnStartSceneStationary );
@@ -58,6 +61,14 @@ namespace Mushrooms.Models {
             DeleteScene = new DelegateCommand( OnDeleteScene );
 
             mSceneSubscription = ActiveScene.OnSceneChanged.Subscribe( OnSceneChanged );
+        }
+
+        public string ScheduleSummary {
+            get {
+                var preferences = mPreferences.Load<MushroomPreferences>();
+
+                return $"Scene Schedule: {Scene.Schedule.ScheduleSummary( preferences.Latitude, preferences.Longitude )}";
+            }
         }
 
         public double Brightness {
