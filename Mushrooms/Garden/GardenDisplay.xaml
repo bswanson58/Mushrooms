@@ -69,32 +69,32 @@
                 </StackPanel>
 
                 <Button Grid.Column="3" x:Name="SceneSchedule" Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
-                        Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Clock}" Opacity="0"
+                        Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Clock}" Focusable="False" Opacity="0"
                         Command="{Binding SetSchedule}" ToolTip="{Binding ScheduleSummary}"/>
 
                 <Grid Grid.Column="4">
                     <StackPanel x:Name="SceneConfiguration" Orientation="Horizontal" Opacity="0">
                         <ContentPresenter Margin="5,10" ContentTemplate="{StaticResource HorizontalSeparator}" Opacity="0.8"/>
 
-                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Focusable="False"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_StartAll}"
                                 Command="{Binding StartSceneAnimated}" ToolTip="Start Scene Animation"/>
-                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Focusable="False"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_SelectColor}"
                                 Command="{Binding StartSceneStationary}" ToolTip="Turn On Scene"/>
 
                         <ContentPresenter Margin="5,10" ContentTemplate="{StaticResource HorizontalSeparator}" Opacity="0.8"/>
 
-                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Focusable="False"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Palette}"
                                 Command="{Binding SetPalette}" ToolTip="Set Scene Palette"/>
-                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Focusable="False"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Lighting}"
                                 Command="{Binding SetLighting}" ToolTip="Set Scene Lighting"/>
-                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0"
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Focusable="False"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Parameters}"
                                 Command="{Binding SetParameters}" ToolTip="Set Scene Parameters"/>
-                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Opacity="0.9"
+                        <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Opacity="0.9" Focusable="False"
                                 Visibility="{Binding CanRecolorScene, Converter={StaticResource CollapseIfFalse}}"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Recolor}"
                                 Command="{Binding RecolorScene}" ToolTip="Recolor Scene Lights"/>
