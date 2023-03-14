@@ -14,8 +14,10 @@ using Mushrooms.Database;
 using Mushrooms.Entities;
 using Mushrooms.Models;
 using Mushrooms.Support;
+using ReusableBits.Platform.Interfaces;
 using ReusableBits.Platform.Preferences;
 using ReusableBits.Wpf.DialogService;
+using ReusableBits.Wpf.EventAggregator;
 
 namespace Mushrooms.Services {
     internal interface IMushroomGarden : IDisposable {
@@ -37,6 +39,8 @@ namespace Mushrooms.Services {
         private readonly ISceneProvider                             mSceneProvider;
         private readonly IDialogService                             mDialogService;
         private readonly IPreferences                               mPreferences;
+        private readonly IBasicLog                                  mLog;
+        private readonly IEventAggregator                           mEventAggregator;
         private readonly CancellationTokenSource                    mTokenSource;
         private readonly ReadOnlyObservableCollection<ActiveScene>  mActiveScenes;
         private IDisposable ?                                       mActiveSceneSubscription;
@@ -46,12 +50,15 @@ namespace Mushrooms.Services {
         public  IObservable<IChangeSet<ActiveScene>>                ActiveScenes => mActiveScenes.ToObservableChangeSet();
 
         public MushroomGarden( IHubManager hubManager, ISceneLightingHandler lightingHandler, IPreferences preferences,
-                               IDialogService dialogService, ISceneProvider sceneProvider ) {
+                               IDialogService dialogService, ISceneProvider sceneProvider, IEventAggregator eventAggregator,
+                               IBasicLog log ) {
             mHubManager = hubManager;
             mLightingHandler = lightingHandler;
             mSceneProvider = sceneProvider;
             mPreferences = preferences;
             mDialogService = dialogService;
+            mEventAggregator = eventAggregator;
+            mLog = log;
 
             mTokenSource = new CancellationTokenSource();
 
@@ -254,13 +261,20 @@ namespace Mushrooms.Services {
         private async Task ActivateIfScheduleStart( ActiveScene scene ) {
             var preferences = mPreferences.Load<MushroomPreferences>();
             var startTime = scene.Scene.Schedule.StartTimeForToday( preferences.Latitude, preferences.Longitude );
+            var stopTime = scene.Scene.Schedule.StopTimeForToday( preferences.Latitude, preferences.Longitude );
             var now = DateTime.Now;
 
             if(( now > startTime ) &&
+               ( now < stopTime ) &&
                ( now < startTime.AddMinutes( 2 ))) {
                 await StartScene( scene.Scene );
 
                 scene.ActiveBySchedule();
+
+                mLog.LogMessage( $"Started scheduled scene '{scene.Scene.SceneName}' at {DateTime.Now.ToShortTimeString()}" );
+                mEventAggregator.Publish( 
+                    new Events.StatusEvent( $"Started scheduled scene '{scene.Scene.SceneName}'" ) 
+                        { ExtendDisplay = true });
             }
         }
 
@@ -272,6 +286,11 @@ namespace Mushrooms.Services {
                 await mLightingHandler.DeactivateScene( scene );
 
                 scene.Deactivate();
+
+                mLog.LogMessage( $"Stopped scheduled scene '{scene.Scene.SceneName}' at {DateTime.Now.ToShortTimeString()}" );
+                mEventAggregator.Publish( 
+                    new Events.StatusEvent( $"Stopped scheduled scene '{scene.Scene.SceneName}'" ) 
+                        { ExtendDisplay = true });
             }
         }
 
