@@ -1,25 +1,16 @@
 ﻿using HueLighting.Hub;
-using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.ViewModelSupport;
 
 namespace Mushrooms.Models {
     internal class HubViewModel : PropertyChangeBase {
-        private readonly HubInformation mHub;
+        public  HubInformation  Hub { get; }
 
-        public  string                  IpAddress => mHub.IpAddress;
-        public  string                  HubName => mHub.BridgeName;
-        public  bool                    IsRegistered => mHub.IsAppRegistered;
-
-        public  DelegateCommand         RegisterHub { get; }
+        public  string          IpAddress => Hub.IpAddress;
+        public  string          HubName => Hub.BridgeName;
+        public  bool            IsRegistered => Hub.IsAppRegistered;
 
         public HubViewModel( HubInformation hub ) {
-            mHub = hub;
-
-            RegisterHub = new DelegateCommand( OnRegisterHub, CanRegisterHub );
+            Hub = hub;
         }
-
-        private void OnRegisterHub() { }
-
-        private bool CanRegisterHub() => !IsRegistered;
     }
 }

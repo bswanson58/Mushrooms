@@ -8,9 +8,9 @@ using System.Windows.Media;
 using DynamicData;
 using DynamicData.Binding;
 using HueLighting.Hub;
-using HueLighting.HubSelection;
 using Microsoft.Extensions.Hosting;
 using Mushrooms.Database;
+using Mushrooms.Dialogs;
 using Mushrooms.Entities;
 using Mushrooms.Models;
 using Mushrooms.Support;
@@ -157,7 +157,7 @@ namespace Mushrooms.Services {
 
         public override async Task StartAsync( CancellationToken cancellationToken ) {
             if(! await mHubManager.InitializeConfiguredHub()) {
-                mDialogService.ShowDialog<HubSelectionView>();
+                mDialogService.ShowDialog<HubRegistrationView>();
             }
 
             await base.StartAsync( cancellationToken );

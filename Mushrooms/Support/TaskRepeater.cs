@@ -16,6 +16,22 @@ namespace Mushrooms.Support {
                     action();
                 }
             }, token );
+
+        public static Task<bool> IntervalWhile( TimeSpan pollInterval, Func<Task<bool>> action, CancellationToken token ) =>
+            Task.Run( async () => {
+                var result = false;
+
+                do {
+                    if( token.WaitCancellationRequested( pollInterval )) {
+                        break;
+                    }
+
+                    result = await action();
+                }
+                while( result );
+
+                return result;
+            }, token );
     }
 
     static class CancellationTokenExtensions {

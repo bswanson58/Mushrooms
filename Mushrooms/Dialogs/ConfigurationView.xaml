@@ -8,9 +8,11 @@
              xmlns:models="clr-namespace:Mushrooms.Models"
              xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviours="clr-namespace:ReusableBits.Wpf.Behaviours;assembly=ReusableBits.Wpf"
              d:DataContext="{d:DesignInstance dialogs:ConfigurationViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
-             Height="350" Width="550">
+             Height="310" Width="500">
 
     <dialogService:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -23,7 +25,13 @@
     
     <UserControl.Resources>
         <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfTrue" IsHidden="False" TriggerValue="False"/>
-        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfFalse" IsHidden="False" TriggerValue="True"/>
+
+        <ControlTemplate x:Key="RegistrationNeeded">
+            <Grid>
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Yellow"
+                           Text="'Register Hubs' to get started!"/>
+            </Grid>
+        </ControlTemplate>
 
         <DataTemplate x:Key="ScanningTemplate">
             <Grid>
@@ -48,10 +56,7 @@
                 <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding IpAddress}"/>
                 <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding HubName}"/>
 
-                <Button Grid.Column="2" Margin="5,0" BorderThickness="0" Content="Register" Command="{Binding RegisterHub}" 
-                        Background="Transparent" VerticalAlignment="Center"
-                        Visibility="{Binding IsRegistered, Converter={StaticResource DisplayIfFalse}}"/>
-                <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="(Registered)"
+              <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="(Registered)"
                            Visibility="{Binding IsRegistered, Converter={StaticResource DisplayIfTrue}}"/>
             </Grid>
         </DataTemplate>
@@ -71,18 +76,22 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Available Hue Hubs:"/>
+            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Registered Hue Hubs:"/>
 
-            <ListView Grid.Row="1" ItemsSource="{Binding Hubs}" ItemTemplate="{StaticResource BridgeTemplate}"/>
+            <ListView Grid.Row="1" ItemsSource="{Binding Hubs}" ItemTemplate="{StaticResource BridgeTemplate}">
+                <b:Interaction.Behaviors>
+                    <behaviours:EmptyListBehavior EmptyTemplate="{StaticResource RegistrationNeeded}"/>
+                </b:Interaction.Behaviors>
+            </ListView>
             <ContentPresenter Grid.Row="1" Content="{Binding}" ContentTemplate="{StaticResource ScanningTemplate}"
                               Visibility="{Binding ScanningForHubs, Converter={StaticResource DisplayIfTrue}}"/>
 
             <Button Grid.Row="2" Style="{StaticResource GeneralButtonStyle}" HorizontalAlignment="Right"
-                    Content="Locate All Hubs" Command="{Binding LocateHubs}"/>
+                    Content="Register Hubs" Command="{Binding RegisterHubs}"/>
         </Grid>
 
         <!-- Location -->
-        <Grid Grid.Row="1" Margin="0,12,0,0">
+        <Grid Grid.Row="1" Margin="0,10,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>

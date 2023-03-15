@@ -11,22 +11,24 @@ namespace Mushrooms.Dialogs {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class ConfigurationViewModel : DialogAwareBase {
         private readonly IHubManager        mHubManager;
+        private readonly IDialogService     mDialogService;
         private readonly IPreferences       mPreferences;
 
         private double                      mLatitude;
         private double                      mLongitude;
 
         public  ObservableCollection<HubViewModel>  Hubs { get; }
-        public  bool                        ScanningForHubs { get; private set; }
+        public  bool                                ScanningForHubs { get; private set; }
 
-        public  DelegateCommand             LocateHubs { get; }
+        public  DelegateCommand                     RegisterHubs { get; }
 
-        public ConfigurationViewModel( IPreferences preferences, IHubManager hubManager ) {
+        public ConfigurationViewModel( IPreferences preferences, IHubManager hubManager, IDialogService dialogService ) {
             mPreferences = preferences;
+            mDialogService = dialogService;
             mHubManager = hubManager;
 
             Hubs = new ObservableCollection<HubViewModel>();
-            LocateHubs = new DelegateCommand( OnLocateHubs, CanLocateHubs );
+            RegisterHubs = new DelegateCommand( OnRegisterHubs );
             ScanningForHubs = false;
 
             var uiPreferences = mPreferences.Load<MushroomPreferences>();
@@ -35,18 +37,8 @@ namespace Mushrooms.Dialogs {
             Longitude = uiPreferences.Longitude;
         }
 
-        public override async void OnDialogOpened( IDialogParameters parameters ) {
-            Hubs.Clear();
-
-            var registeredHubs = await mHubManager.GetRegisteredHubs();
-
-            ScanningForHubs = true;
-            RaisePropertyChanged( () => ScanningForHubs );
-
-            Hubs.AddRange( registeredHubs.Select( h => new HubViewModel( h )));
-
-            ScanningForHubs = false;
-            RaisePropertyChanged( () => ScanningForHubs );
+        public override void OnDialogOpened( IDialogParameters parameters ) {
+            LoadRegisteredHubs();
         }
 
         public double Latitude {
@@ -67,22 +59,27 @@ namespace Mushrooms.Dialogs {
             }
         }
 
-        private async void OnLocateHubs() {
+        private void OnRegisterHubs() {
+            mDialogService.ShowDialog<HubRegistrationView>( result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    LoadRegisteredHubs();
+                }
+            });
+        }
+
+        private async void LoadRegisteredHubs() {
             Hubs.Clear();
+
+            var registeredHubs = await mHubManager.GetRegisteredHubs();
 
             ScanningForHubs = true;
             RaisePropertyChanged( () => ScanningForHubs );
-            LocateHubs.RaiseCanExecuteChanged();
 
-            var hubs = await mHubManager.LocateHubs();
-            Hubs.AddRange( hubs.Select( h => new HubViewModel( h )));
+            Hubs.AddRange( registeredHubs.Select( h => new HubViewModel( h )));
 
             ScanningForHubs = false;
             RaisePropertyChanged( () => ScanningForHubs );
-            LocateHubs.RaiseCanExecuteChanged();
         }
-
-        private bool CanLocateHubs() => !ScanningForHubs;
 
         protected override void OnOk() {
             var preferences = mPreferences.Load<MushroomPreferences>();

@@ -20,7 +20,7 @@ namespace HueLighting.Hub {
 
         Task<IEnumerable<HubInformation>>   LocateHubs();
         Task<IList<HubInformation>>         GetRegisteredHubs();
-        Task<String>                        RegisterApp( HubInformation hub, bool setAsConfiguredHub = false );
+        Task<HubInformation ?>              RegisterApp( HubInformation hub, bool setAsConfiguredHub = false );
         void                                SetConfiguredHub( HubInformation hub );
 
         Task<IEnumerable<Bulb>>             GetBulbs();
@@ -119,7 +119,8 @@ namespace HueLighting.Hub {
         public async Task<IEnumerable<HubInformation>> LocateHubs() { 
             var retValue = new List<HubInformation>();
             var installationInfo = mPreferences.Load<HueConfiguration>();
-            var bridges = await HueBridgeDiscovery.FastDiscoveryWithNetworkScanFallbackAsync( TimeSpan.FromSeconds( 15 ), TimeSpan.FromSeconds( 30 ));
+            var bridges = await ( new HueBridgeDiscovery2()).ScanEverythingAsync( TimeSpan.FromSeconds( 20 ));
+//            var bridges = await HueBridgeDiscovery.FastDiscoveryWithNetworkScanFallbackAsync( TimeSpan.FromSeconds( 15 ), TimeSpan.FromSeconds( 30 ));
 
             foreach( var bridge in bridges ) {
                 try {
@@ -146,20 +147,24 @@ namespace HueLighting.Hub {
             return retValue;
         }
 
-        public async Task<String> RegisterApp( HubInformation hub, bool setAsConfiguredHub ) {
-            var retValue = String.Empty;
+        public async Task<HubInformation ?> RegisterApp( HubInformation hub, bool setAsConfiguredHub ) {
+            HubInformation ? retValue = default;
 
             try {
                 var client = new LocalHueClient( hub.IpAddress );
                 var clientKey = await client.RegisterAsync( mApplicationConstants.ApplicationName, mEnvironment.EnvironmentName(), true );
 
-                if(( clientKey != null ) &&
-                   ( setAsConfiguredHub )) {
-                    SetConfiguredHub( new HubInformation( hub, clientKey.Username, clientKey.StreamingClientKey ?? String.Empty ));
+                if( clientKey != null ) {
+                    retValue = new HubInformation( hub, clientKey.Username, clientKey.StreamingClientKey ?? String.Empty );
+
+                    if( setAsConfiguredHub ) {
+                        SetConfiguredHub( retValue );
+                    }
                 }
+
             }
             catch( Exception ex ) {
-                retValue = ex.Message;
+                mLog.LogException( "Attempting to RegisterApp", ex );
             }
 
             return retValue;
