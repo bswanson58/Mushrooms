@@ -10,7 +10,7 @@
              xmlns:models="clr-namespace:Mushrooms.Models"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:HubRegistrationViewModel, IsDesignTimeCreatable=False}"
-             Height="310" Width="520">
+             Height="400" Width="520">
 
     <dialogService:Dialog.WindowStyle>
         <Style TargetType="Window">

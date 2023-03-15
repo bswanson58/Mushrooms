@@ -2,6 +2,7 @@
 using System;
 using Mushrooms.Resources;
 using ReusableBits.Wpf.Platform;
+using System.Windows;
 
 namespace Mushrooms {
     /// <summary>
@@ -11,6 +12,7 @@ namespace Mushrooms {
         public MainWindow() {
             InitializeComponent();
 
+            Loaded += OnLoaded;
             Closing += OnWindowClosing;
         }
 
@@ -23,6 +25,14 @@ namespace Mushrooms {
             base.OnSourceInitialized( e );
 
             this.SetPlacement( Settings.Default.WindowPlacement );
+        }
+
+        private void OnLoaded( object sender, RoutedEventArgs args ) {
+            if( DataContext is MainWindowViewModel vm ) {
+                vm.ShellLoaded( this );
+            }
+
+            Loaded -= OnLoaded;
         }
     }
 }

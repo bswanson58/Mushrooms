@@ -35,6 +35,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
+    <PackageReference Include="TrayIcon" Version="1.0.7.2" />
   </ItemGroup>
 
   <ItemGroup>

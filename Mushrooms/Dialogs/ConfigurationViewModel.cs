@@ -16,6 +16,7 @@ namespace Mushrooms.Dialogs {
 
         private double                      mLatitude;
         private double                      mLongitude;
+        private bool                        mShouldMinimizeToTray;
 
         public  ObservableCollection<HubViewModel>  Hubs { get; }
         public  bool                                ScanningForHubs { get; private set; }
@@ -35,6 +36,7 @@ namespace Mushrooms.Dialogs {
 
             Latitude = uiPreferences.Latitude;
             Longitude = uiPreferences.Longitude;
+            ShouldMinimizeToTray = uiPreferences.ShouldMinimizeToTray;
         }
 
         public override void OnDialogOpened( IDialogParameters parameters ) {
@@ -56,6 +58,15 @@ namespace Mushrooms.Dialogs {
                 mLongitude = value;
 
                 RaisePropertyChanged( () => Longitude );
+            }
+        }
+
+        public bool ShouldMinimizeToTray {
+            get => mShouldMinimizeToTray;
+            set {
+                mShouldMinimizeToTray = value;
+
+                RaisePropertyChanged( () => ShouldMinimizeToTray );
             }
         }
 
@@ -86,6 +97,7 @@ namespace Mushrooms.Dialogs {
 
             preferences.Latitude = mLatitude;
             preferences.Longitude = mLongitude;
+            preferences.ShouldMinimizeToTray = mShouldMinimizeToTray;
 
             mPreferences.Save( preferences );
 

@@ -2,11 +2,14 @@
     internal class MushroomPreferences {
         public  double  Latitude { get; set; }
         public  double  Longitude { get; set; }
+        public  bool    ShouldMinimizeToTray { get; set; }
 
         public MushroomPreferences() {
             // Chicago
             Latitude = 41.997;
             Longitude = -88.458;
+
+            ShouldMinimizeToTray = true;
         }
     }
 }

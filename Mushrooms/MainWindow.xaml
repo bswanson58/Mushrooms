@@ -9,6 +9,8 @@
         xmlns:paletteBuilder="clr-namespace:Mushrooms.PaletteBuilder"
         xmlns:garden="clr-namespace:Mushrooms.Garden"
         xmlns:statusBar="clr-namespace:Mushrooms.StatusBar"
+        xmlns:toolkit="https://github.com/nullsoftware/TrayIcon"
+        xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
         mc:Ignorable="d"
         Title="Mushrooms"
         ResizeMode="CanResizeWithGrip"
@@ -17,6 +19,10 @@
         viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
         d:DataContext="{d:DesignInstance mushrooms:MainWindowViewModel, IsDesignTimeCreatable=False}"
         Height="600" Width="1200">
+
+    <Window.Resources>
+        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfTrue" IsHidden="False" TriggerValue="False"/>
+    </Window.Resources>
 
     <mah:MetroWindow.IconTemplate>
         <DataTemplate>
@@ -33,6 +39,12 @@
                     ToolTip="Configuration"/>
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
+
+    <toolkit:TrayIconHandlers.TrayIcons>
+        <toolkit:TrayIcon Title="Mushrooms For Hue" IconSource="/Resources/Mushroom-Toolbar.ico"
+                          Visibility="{Binding DisplayNotificationIcon, Converter={StaticResource DisplayIfTrue}}"
+                          ClickCommand="{Binding NotificationIcon}"/>
+    </toolkit:TrayIconHandlers.TrayIcons>
 
     <Grid>
         <Grid.RowDefinitions>

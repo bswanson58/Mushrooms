@@ -70,4 +70,8 @@
     <DataTemplate x:Key="HorizontalSeparator">
         <Grid Width="2" Background="{StaticResource ControlTextColor}"/>
     </DataTemplate>
+
+    <DataTemplate x:Key="VerticalSeparator">
+        <Grid Height="2" Background="{StaticResource ControlTextColor}"/>
+    </DataTemplate>
 </ResourceDictionary>

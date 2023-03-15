@@ -94,6 +94,7 @@ Source: "..\Mushrooms\bin\Release\net7.0-windows\Serilog.Sinks.File.dll"; DestDi
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Serilog.Sinks.RollingFile.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\SixLabors.ImageSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\System.Reactive.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Mushrooms\bin\Release\net7.0-windows\TrayIcon.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#ApplicationName}"; Filename: "{app}\{#ExecutableName}"
