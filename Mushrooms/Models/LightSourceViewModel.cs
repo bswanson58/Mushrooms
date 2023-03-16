@@ -3,6 +3,8 @@ using HueLighting.Models;
 using System.Collections.Generic;
 using Mushrooms.Entities;
 using ReusableBits.Wpf.ViewModelSupport;
+using System.Windows.Input;
+using ReusableBits.Wpf.Commands;
 
 namespace Mushrooms.Models {
     internal class LightSourceViewModel : PropertyChangeBase {
@@ -11,6 +13,8 @@ namespace Mushrooms.Models {
 
         public  LightSource     LightSource { get; }
         public  IList<Bulb>     Bulbs { get; }
+
+        public  ICommand        ToggleSelection { get; }
 
         public  string          LightId => $"{LightSource.SourceName}-{LightSource.SourceType}";
         public  string          Name => LightSource.SourceName;
@@ -22,7 +26,11 @@ namespace Mushrooms.Models {
             mOnSelect = onSelect;
 
             mSelected = false;
+
+            ToggleSelection = new DelegateCommand( OnToggleSelection );
         }
+
+        private void OnToggleSelection() => IsSelected = !IsSelected;
 
         public bool IsSelected {
             get => mSelected;
