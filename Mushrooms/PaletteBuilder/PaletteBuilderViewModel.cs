@@ -29,17 +29,28 @@ namespace Mushrooms.PaletteBuilder {
 
     internal class EditablePaletteViewModel : PaletteViewModel {
         private readonly Action<EditablePaletteViewModel> mOnDelete;
+        private readonly Action<EditablePaletteViewModel> mOnRename;
 
         public  ICommand        Delete { get; }
+        public  ICommand        Rename { get; }
 
-        public EditablePaletteViewModel( ScenePalette palette, Action<EditablePaletteViewModel> onDelete )
+        public EditablePaletteViewModel( ScenePalette palette, 
+                                         Action<EditablePaletteViewModel> onDelete,
+                                         Action<EditablePaletteViewModel> onRename )
             : base( palette ) {
-            Delete = new DelegateCommand( OnDelete );
             mOnDelete = onDelete;
+            mOnRename = onRename;
+
+            Delete = new DelegateCommand( OnDelete );
+            Rename = new DelegateCommand( OnRename );
         }
 
         private void OnDelete() {
             mOnDelete.Invoke( this );
+        }
+
+        private void OnRename() {
+            mOnRename.Invoke( this );
         }
     }
 
@@ -88,7 +99,7 @@ namespace Mushrooms.PaletteBuilder {
 
             mPaletteSubscription = mPaletteProvider.Entities
                 .Connect()
-                .Transform( p => new EditablePaletteViewModel( p, OnDeletePalette ))
+                .Transform( p => new EditablePaletteViewModel( p, OnDeletePalette, OnRenamePalette ))
                 .Sort( SortExpressionComparer<EditablePaletteViewModel>.Ascending( p => p.Name ))
                 .Bind( Palettes )
                 .Subscribe();
@@ -256,6 +267,25 @@ namespace Mushrooms.PaletteBuilder {
                 mPaletteName = String.Empty;
                 mPictureFile = String.Empty;
             }
+        }
+
+        private void OnRenamePalette( EditablePaletteViewModel palette ) {
+            var parameters = new DialogParameters {
+                { RenameViewModel.cTitle, "Palette Name" },
+                { RenameViewModel.cName, palette.Name }
+            };
+
+            mDialogService.ShowDialog<RenameView>( parameters, result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    var name = result.Parameters.GetValue<string>( RenameViewModel.cName );
+
+                    if(!String.IsNullOrWhiteSpace( name )) {
+                        palette.Palette.WithName( name );
+
+                        mPaletteProvider.Update( palette.Palette );
+                    }
+                }
+            });
         }
 
         private void OnSavePalette() {

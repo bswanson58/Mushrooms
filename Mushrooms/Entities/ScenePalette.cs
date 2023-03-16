@@ -27,6 +27,10 @@ namespace Mushrooms.Entities {
             Name = palette.Name;
         }
 
+        public void WithName( string name ) {
+            Name = name;
+        }
+
         public ScenePalette Copy() =>
             new ( SourceColors, Palette, Name );
 
