@@ -60,6 +60,10 @@ namespace Mushrooms.Entities {
             IsFavorite = scene.IsFavorite;
         }
 
+        public void SetName( string name ) {
+            SceneName = name;
+        }
+
         public void SetMode( SceneMode mode ) {
             SceneMode = mode;
         }

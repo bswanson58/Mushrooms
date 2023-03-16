@@ -28,6 +28,7 @@ namespace Mushrooms.Garden {
         void    SetParameters( Scene scene );
         void    SetSchedule( Scene scene );
         void    SetFavorite( Scene scene, bool state );
+        void    RenameScene( Scene scene );
 
         void    DeleteScene( Scene scene );
     }
@@ -212,6 +213,25 @@ namespace Mushrooms.Garden {
             scene.SetFavorite( state );
 
             mSceneProvider.Update( scene );
+        }
+
+        public void RenameScene( Scene scene ) {
+            var parameters = new DialogParameters {
+                { RenameViewModel.cTitle, "Scene Name" },
+                { RenameViewModel.cName, scene.SceneName }
+            };
+
+            mDialogService.ShowDialog<RenameView>( parameters, result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    var name = result.Parameters.GetValue<string>( RenameViewModel.cName );
+
+                    if(!String.IsNullOrWhiteSpace( name )) {
+                        scene.SetName( name );
+
+                        mSceneProvider.Update( scene );
+                    }
+                }
+            });
         }
 
         public void DeleteScene( Scene scene ) {
