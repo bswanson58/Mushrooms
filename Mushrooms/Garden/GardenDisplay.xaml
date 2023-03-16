@@ -172,6 +172,7 @@
                     <Setter TargetName="SceneConfiguration" Property="Opacity" Value="0.8"/>
                     <Setter TargetName="SceneControls" Property="Opacity" Value="1.0"/>
                     <Setter TargetName="SceneCommands" Property="Opacity" Value="1.0"/>
+                    <Setter TargetName="SceneContainer" Property="Background" Value="{DynamicResource MahApps.Brushes.Accent3}"/>
                 </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>
@@ -208,11 +209,13 @@
                     Content="{StaticResource Path_StopAll}" Command="{Binding StopAll}"/>
         </StackPanel>
 
-        <ListView Grid.Row="1" ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource GardenSceneTemplate}">
-            <b:Interaction.Behaviors>
-                <behaviours:EmptyListBehavior EmptyTemplate="{StaticResource NoScenesTemplate}"/>
-            </b:Interaction.Behaviors>
-        </ListView>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding SceneList}" ItemTemplate="{StaticResource GardenSceneTemplate}">
+                <b:Interaction.Behaviors>
+                    <behaviours:EmptyListBehavior EmptyTemplate="{StaticResource NoScenesTemplate}"/>
+                </b:Interaction.Behaviors>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 
     <b:Interaction.Behaviors>
