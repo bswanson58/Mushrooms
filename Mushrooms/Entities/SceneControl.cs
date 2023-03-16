@@ -4,7 +4,7 @@
         public  double  RateMultiplier { get; protected set; }
 
         private SceneControl() {
-            Brightness = 0.7D;
+            Brightness = 0.5D;
             RateMultiplier = 1.0D;
         }
 
