@@ -19,12 +19,32 @@
         <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfActive" IsHidden="False" TriggerValue="False"/>
         <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfInactive" IsHidden="False" TriggerValue="True"/>
 
+        <DataTemplate x:Key="ActiveColorTemplate" DataType="{x:Type Color}">
+            <Ellipse Margin="4,2" Height="28" Width="28">
+                <Ellipse.Fill>
+                    <SolidColorBrush Color="{Binding}"/>
+                </Ellipse.Fill>
+            </Ellipse>
+        </DataTemplate>
+
+        <DataTemplate x:Key="InactiveColorTemplate" DataType="{x:Type Color}">
+            <Rectangle Margin="4,2" Height="28" Width="28">
+                <Rectangle.Fill>
+                    <SolidColorBrush Color="{Binding}"/>
+                </Rectangle.Fill>
+            </Rectangle>
+        </DataTemplate>
+
+        <garden:ColorTemplateSelector x:Key="ColorTemplateSelector"
+                                      ActiveTemplate="{StaticResource ActiveColorTemplate}"
+                                      InactiveTemplate="{StaticResource InactiveColorTemplate}"/>
+
         <DataTemplate x:Key="GardenSceneTemplate" DataType="{x:Type models:GardenSceneViewModel}">
             <Grid x:Name="SceneContainer" Background="Transparent">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="230"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -74,8 +94,8 @@
                         </TextBlock.Style>
                     </TextBlock>
 
-                    <ItemsControl Margin="15,3" MinHeight="25" 
-                                  ItemsSource="{Binding SceneColors}" ItemTemplate="{StaticResource ColorTemplate}">
+                    <ItemsControl Margin="15,3" MinHeight="35" MinWidth="260" 
+                                  ItemsSource="{Binding SceneColors}" ItemTemplateSelector="{StaticResource ColorTemplateSelector}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal"/>
