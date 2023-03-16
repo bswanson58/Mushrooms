@@ -138,7 +138,8 @@ namespace Mushrooms.Services {
                 .Where( s => s is {
                     IsActive: false, 
                     Scene.IsFavorite: true
-                });
+                })
+                .ToList();
 
             foreach( var scene in activeScenes ) {
                 await StartScene( scene.Scene );
@@ -156,7 +157,7 @@ namespace Mushrooms.Services {
         }
 
         public async Task StopAll() {
-            var activeScenes = mActiveScenes.Where( s => s.IsActive );
+            var activeScenes = mActiveScenes.Where( s => s.IsActive ).ToList();
 
             foreach( var scene in activeScenes ) {
                 await StopScene( scene.Scene );
@@ -203,7 +204,7 @@ namespace Mushrooms.Services {
         }
 
         protected override Task ExecuteAsync( CancellationToken stoppingToken ) {
-            mLightingTask = Repeat.Interval( TimeSpan.FromMilliseconds( 125 ), LightingTask, mTokenSource.Token );
+            mLightingTask = Repeat.Interval( TimeSpan.FromMilliseconds( 100 ), LightingTask, mTokenSource.Token );
             mSchedulingTask = Repeat.Interval( TimeSpan.FromSeconds( 31 ), SchedulingTask, mTokenSource.Token );
 
             return Task.CompletedTask;
@@ -237,18 +238,23 @@ namespace Mushrooms.Services {
         }
 
         private void LightingTask() {
-            var scenes = mActiveScenes
-                .Where( s => s is { Scene.SceneMode: SceneMode.Animating,
-                                    IsActive: true, 
-                                    Scene.Parameters.AnimationEnabled: true })
-                .ToList();
+            try {
+                var scenes = mActiveScenes
+                    .Where( s => s is { Scene.SceneMode: SceneMode.Animating,
+                        IsActive: true, 
+                        Scene.Parameters.AnimationEnabled: true })
+                    .ToList();
 
-            foreach( var scene in scenes ) {
-                var updateList = mLightingHandler.GetBulbUpdateList( scene );
+                foreach( var scene in scenes ) {
+                    var updateList = mLightingHandler.GetBulbUpdateList( scene );
 
-                if( updateList.Any()) {
-                    UpdateSceneLights( scene, updateList );
+                    if( updateList.Any()) {
+                        UpdateSceneLights( scene, updateList );
+                    }
                 }
+            }
+            catch( Exception ex ) {
+                mLog.LogException( "LightingTask Error", ex );
             }
         }
 
@@ -266,15 +272,20 @@ namespace Mushrooms.Services {
         }
 
         private async void SchedulingTask() {
-            var potentialScenes = mActiveScenes.Where( s => s.Scene.Schedule.Enabled && !s.IsActive );
-            var runningScenes = mActiveScenes.Where( s => s.SceneState.Equals( SceneState.Scheduled ));
+            try {
+                var potentialScenes = mActiveScenes.Where( s => s.Scene.Schedule.Enabled && !s.IsActive ).ToList();
+                var runningScenes = mActiveScenes.Where( s => s.SceneState.Equals( SceneState.Scheduled )).ToList();
 
-            foreach( var scene in potentialScenes ) {
-                await ActivateIfScheduleStart( scene );
+                foreach( var scene in potentialScenes ) {
+                    await ActivateIfScheduleStart( scene );
+                }
+
+                foreach( var scene in runningScenes ) {
+                    await DeactivateIfScheduleEnd( scene );
+                }
             }
-
-            foreach( var scene in runningScenes ) {
-                await DeactivateIfScheduleEnd( scene );
+            catch( Exception ex ) {
+                mLog.LogException( "SchedulingTask", ex );
             }
         }
 
