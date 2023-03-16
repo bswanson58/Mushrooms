@@ -13,10 +13,10 @@ namespace Mushrooms.Dialogs {
         private bool            mEnableAnimation;
         private bool            mSynchronizeLights;
 
-        public  string          DisplayDuration => mDisplayDuration.ToString();
-        public  string          DisplayJitter => mDisplayJitter.ToString();
-        public  string          TransitionDuration => mTransitionDuration.ToString();
-        public  string          TransitionJitter => mTransitionJitter.ToString();
+        public  string          DisplayDuration => $"{mDisplayDuration:mm\\:ss\\.ff}";
+        public  string          DisplayJitter => $"{mDisplayJitter:mm\\:ss\\.ff}";
+        public  string          TransitionDuration => $"{mTransitionDuration:mm\\:ss\\.ff}";
+        public  string          TransitionJitter => $"{mTransitionJitter:mm\\:ss\\.ff}";
 
         public  bool            IsAnimationEnabled => mEnableAnimation;
 
@@ -48,37 +48,37 @@ namespace Mushrooms.Dialogs {
             }
         }
 
-        public int TransitionDurationSeconds {
-            get => (int)mTransitionDuration.TotalSeconds;
+        public int TransitionDurationMilliseconds {
+            get => (int)mTransitionDuration.TotalMilliseconds;
             set { 
-                mTransitionDuration = TimeSpan.FromSeconds( value );
+                mTransitionDuration = TimeSpan.FromMilliseconds( value );
 
                 RaisePropertyChanged( () => TransitionDuration );
             }
         }
 
-        public int TransitionDurationJitterSeconds {
-            get => (int)mTransitionJitter.TotalSeconds;
+        public int TransitionDurationJitterMilliseconds {
+            get => (int)mTransitionJitter.TotalMilliseconds;
             set { 
-                mTransitionJitter = TimeSpan.FromSeconds( value );
+                mTransitionJitter = TimeSpan.FromMilliseconds( value );
 
                 RaisePropertyChanged( () => TransitionJitter );
             }
         }
 
-        public int DisplayDurationSeconds {
-            get => (int)mDisplayDuration.TotalSeconds;
+        public int DisplayDurationMilliseconds {
+            get => (int)mDisplayDuration.TotalMilliseconds;
             set { 
-                mDisplayDuration = TimeSpan.FromSeconds( value );
+                mDisplayDuration = TimeSpan.FromMilliseconds( value );
 
                 RaisePropertyChanged( () => DisplayDuration );
             }
         }
 
-        public int DisplayDurationJitterSeconds {
-            get => (int)mDisplayJitter.TotalSeconds;
+        public int DisplayDurationJitterMilliseconds {
+            get => (int)mDisplayJitter.TotalMilliseconds;
             set { 
-                mDisplayJitter = TimeSpan.FromSeconds( value );
+                mDisplayJitter = TimeSpan.FromMilliseconds( value );
 
                 RaisePropertyChanged( () => DisplayJitter );
             }

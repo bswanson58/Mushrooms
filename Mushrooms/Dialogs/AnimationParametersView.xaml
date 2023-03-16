@@ -50,29 +50,33 @@
 
             <Label Grid.Column="0" Grid.Row="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
                            Content="Base Transition Duration:"/>
-            <Slider Grid.Column="1" Grid.Row="0" Minimum="1" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
-                            Value="{Binding TransitionDurationSeconds}"/>
+            <Slider Grid.Column="1" Grid.Row="0" Minimum="250" Maximum="30000" SmallChange="250" LargeChange="1000" TickFrequency="250" 
+                    IsSnapToTickEnabled="True" Style="{DynamicResource MahApps.Styles.Slider}"
+                    Value="{Binding TransitionDurationMilliseconds}"/>
             <Label Grid.Column="2" Grid.Row="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
                            Content="{Binding TransitionDuration}"/>
 
             <Label Grid.Column="0" Grid.Row="2" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
                            Content="Transition Duration Jitter:"/>
-            <Slider Grid.Column="1" Grid.Row="2" Minimum="0" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
-                            Value="{Binding TransitionDurationJitterSeconds}"/>
+            <Slider Grid.Column="1" Grid.Row="2" Minimum="0" Maximum="30000" SmallChange="250" LargeChange="1000" TickFrequency="250" 
+                    IsSnapToTickEnabled="True" Style="{DynamicResource MahApps.Styles.Slider}"
+                    Value="{Binding TransitionDurationJitterMilliseconds}"/>
             <Label Grid.Column="2" Grid.Row="2" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
                            Content="{Binding TransitionJitter}"/>
 
             <Label Grid.Column="0" Grid.Row="4" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
                            Content="Base Display Duration:"/>
-            <Slider Grid.Column="1" Grid.Row="4" Minimum="0" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
-                            Value="{Binding DisplayDurationSeconds}"/>
+            <Slider Grid.Column="1" Grid.Row="4" Minimum="250" Maximum="60000" SmallChange="250" LargeChange="1000" TickFrequency="250"
+                    IsSnapToTickEnabled="True" Style="{DynamicResource MahApps.Styles.Slider}"
+                    Value="{Binding DisplayDurationMilliseconds}"/>
             <Label Grid.Column="2" Grid.Row="4" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
                            Content="{Binding DisplayDuration}"/>
 
             <Label Grid.Column="0" Grid.Row="6" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
                            Content="Display Duration Jitter:"/>
-            <Slider Grid.Column="1" Grid.Row="6" Minimum="0" Maximum="60" Style="{DynamicResource MahApps.Styles.Slider}"
-                            Value="{Binding DisplayDurationJitterSeconds}"/>
+            <Slider Grid.Column="1" Grid.Row="6" Minimum="0" Maximum="60000" SmallChange="250" LargeChange="1000" TickFrequency="250" 
+                    IsSnapToTickEnabled="True" Style="{DynamicResource MahApps.Styles.Slider}"
+                    Value="{Binding DisplayDurationJitterMilliseconds}"/>
             <Label Grid.Column="2" Grid.Row="6" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
                            Content="{Binding DisplayJitter}"/>
         </Grid>

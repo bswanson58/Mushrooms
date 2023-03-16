@@ -96,9 +96,9 @@ namespace Mushrooms.Services {
 
         public IList<ActiveBulb> UpdateBulbs( IList<ActiveBulb> bulbs, Scene inScene, SceneControl control ) {
             var color = inScene.Palette.Palette[ mLimitedRandom.Next( inScene.Palette.Palette.Count )];
-            var transitionJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Parameters.TransitionJitter.TotalSeconds ));
+            var transitionJitter = TimeSpan.FromMilliseconds( mRandom.Next((int)inScene.Parameters.TransitionJitter.TotalMilliseconds ));
             var transitionTime = inScene.Parameters.BaseTransitionTime + transitionJitter;
-            var displayJitter = TimeSpan.FromSeconds( mRandom.Next((int)inScene.Parameters.DisplayTimeJitter.TotalSeconds ));
+            var displayJitter = TimeSpan.FromMilliseconds( mRandom.Next((int)inScene.Parameters.DisplayTimeJitter.TotalMilliseconds ));
             var displayTime = inScene.Parameters.BaseDisplayTime + displayJitter;
             var nextUpdateTime = DateTime.Now + transitionTime + displayTime;
 

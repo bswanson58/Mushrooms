@@ -21,7 +21,7 @@ namespace Mushrooms.Entities {
         }
 
         public static SceneParameters Default =>
-            new( TimeSpan.FromSeconds( 10 ), TimeSpan.FromSeconds( 3 ), 
+            new( TimeSpan.FromSeconds( 1 ), TimeSpan.FromSeconds( 3 ), 
                  TimeSpan.FromSeconds( 10 ), TimeSpan.FromSeconds( 3 ),
                  true, false );
     }
