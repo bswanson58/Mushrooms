@@ -81,8 +81,27 @@ namespace Mushrooms.Services {
 
                 UpdateSceneColors( scene.Scene );
 
-                scene.Activate();
+                scene.SetActiveState( DetermineActivationState( scene.Scene ));
             }
+        }
+
+        private SceneState DetermineActivationState( Scene forScene ) {
+            var retValue = SceneState.Active;
+
+            if( forScene.Schedule.Enabled ) {
+                var preferences = mPreferences.Load<MushroomPreferences>();
+
+                var startTime = forScene.Schedule.StartTimeForToday( preferences.Latitude, preferences.Longitude );
+                var stopTime = forScene.Schedule.StopTimeForToday( preferences.Latitude, preferences.Longitude );
+                var now = DateTime.Now;
+
+                if(( startTime < now ) &&
+                   ( stopTime > now )) {
+                    retValue = SceneState.Scheduled;
+                }
+            }
+
+            return retValue;
         }
 
         public void UpdateSceneColors( Scene forScene ) {
@@ -269,8 +288,6 @@ namespace Mushrooms.Services {
                ( now < stopTime ) &&
                ( now < startTime.AddMinutes( 2 ))) {
                 await StartScene( scene.Scene );
-
-                scene.ActiveBySchedule();
 
                 mLog.LogMessage( $"Started scheduled scene '{scene.Scene.SceneName}' at {DateTime.Now.ToShortTimeString()}" );
                 mEventAggregator.Publish( 

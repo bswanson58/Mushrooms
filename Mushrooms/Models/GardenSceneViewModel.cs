@@ -22,8 +22,9 @@ namespace Mushrooms.Models {
 
         public  string                      Name => Scene.SceneName;
         public  bool                        IsSceneActive => ActiveScene.SceneState.Equals( SceneState.Active );
-        public  bool                        IsScheduled => Scene.Schedule.Enabled;
         public  bool                        IsScheduleActive => ActiveScene.SceneState.Equals( SceneState.Scheduled );
+        public  bool                        IsSceneOn => IsSceneActive || IsScheduleActive;
+        public  bool                        IsScheduled => Scene.Schedule.Enabled;
         public  bool                        CanRecolorScene => ActiveScene.IsActive && !Scene.Parameters.AnimationEnabled;
 
         public  ICommand                    StartSceneAnimated { get; }

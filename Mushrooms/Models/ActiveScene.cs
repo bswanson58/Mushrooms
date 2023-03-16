@@ -71,14 +71,24 @@ namespace Mushrooms.Models {
             return retValue;
         }
 
-        public void Activate() {
+        public void SetActiveState( SceneState state ) {
+            if( state == SceneState.Active ) {
+                Activate();
+            }
+
+            if(state == SceneState.Scheduled ) {
+                ActiveBySchedule();
+            }
+        }
+
+        private void Activate() {
             IsActive = true;
             SceneState = SceneState.Active;
 
             mChangeSubject.OnNext( this );
         }
 
-        public void ActiveBySchedule() {
+        private void ActiveBySchedule() {
             IsActive = true;
             SceneState = SceneState.Scheduled;
 

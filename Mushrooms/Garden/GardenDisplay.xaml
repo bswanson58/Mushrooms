@@ -16,8 +16,8 @@
 
     <UserControl.Resources>
         <valueConverters:BooleanVisibilityConverter x:Key="CollapseIfFalse" IsHidden="False" TriggerValue="False"/>
-        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfActive" IsHidden="False" TriggerValue="True"/>
-        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfInactive" IsHidden="False" TriggerValue="False"/>
+        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfActive" IsHidden="False" TriggerValue="False"/>
+        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfInactive" IsHidden="False" TriggerValue="True"/>
 
         <DataTemplate x:Key="GardenSceneTemplate" DataType="{x:Type models:GardenSceneViewModel}">
             <Grid x:Name="SceneContainer" Background="Transparent">
@@ -43,12 +43,12 @@
                     <Grid x:Name="PowerControls" Background="Transparent" Opacity="0">
                         <Button Height="32" Width="32" VerticalAlignment="Center" Margin="5,0"
                                 Style="{StaticResource PathButtonStyle}" 
-                                Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfActive}}"
+                                Visibility="{Binding IsSceneOn, Converter={StaticResource DisplayIfInactive}}"
                                 Command="{Binding ActivateScene}" Content="{StaticResource Path_Power}"/>
 
                         <Button Height="32" Width="32" VerticalAlignment="Center" Margin="5,0"
                                 Style="{StaticResource PathButtonStyle}" 
-                                Visibility="{Binding IsSceneActive, Converter={StaticResource DisplayIfInactive}}"
+                                Visibility="{Binding IsSceneOn, Converter={StaticResource DisplayIfActive}}"
                                 Command="{Binding DeactivateScene}" Content="{StaticResource Path_Power}"/>
                     </Grid>
                 </Grid>
