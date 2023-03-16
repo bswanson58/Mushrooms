@@ -16,30 +16,59 @@ namespace Mushrooms.Models {
 
     internal class ActiveScene {
         private readonly Subject<ActiveScene>   mChangeSubject;
+        private readonly IList<Bulb>            mSceneBulbs;
+        private readonly IList<ActiveBulb>      mActiveBulbs;
+        private readonly IList<LightSource>     mOriginalLights;
+        private readonly Object                 mSceneLock;
 
         public  Scene                           Scene { get; private set; }
-        public  IList<LightSource>              OriginalLights { get; private set; }
-        public  IList<Bulb>                     SceneBulbs { get; }
-        public  IList<ActiveBulb>               ActiveBulbs { get; }
-
         public  SceneState                      SceneState { get; private set; }
         public  bool                            IsActive { get; private set; }
         public  SceneControl                    Control { get; private set; }
-        public  Object                          SceneLock { get; }
 
         public  IObservable<ActiveScene>        OnSceneChanged => mChangeSubject.AsObservable();
 
         public ActiveScene( Scene scene ) {
             Scene = scene;
-            OriginalLights = new List<LightSource>( scene.Lights );
-            SceneBulbs = new List<Bulb>();
-            ActiveBulbs = new List<ActiveBulb>();
+            mOriginalLights = new List<LightSource>( scene.Lights );
+            mSceneBulbs = new List<Bulb>();
+            mActiveBulbs = new List<ActiveBulb>();
             Control = new SceneControl( Scene.Control.Brightness, Scene.Control.RateMultiplier );
             SceneState = SceneState.Inactive;
             IsActive = false;
-            SceneLock = new ();
+            mSceneLock = new ();
 
             mChangeSubject = new Subject<ActiveScene>();
+        }
+
+        public IList<Bulb> GetSceneBulbs() {
+            var retValue = new List<Bulb>();
+
+            lock ( mSceneLock ) {
+                retValue.AddRange( mSceneBulbs );    
+            }
+
+            return retValue;
+        }
+
+        public IList<ActiveBulb> GetActiveBulbs() {
+            var retValue = new List<ActiveBulb>();
+
+            lock ( mSceneLock ) {
+                retValue.AddRange( mActiveBulbs );    
+            }
+
+            return retValue;
+        }
+
+        public IList<LightSource> GetOriginalLights() {
+            var retValue = new List<LightSource>();
+
+            lock ( mSceneLock ) {
+                retValue.AddRange( mOriginalLights );    
+            }
+
+            return retValue;
         }
 
         public void Activate() {
@@ -79,33 +108,34 @@ namespace Mushrooms.Models {
         }
 
         public void Update( IEnumerable<Bulb> bulbs ) {
-            lock( SceneLock ) {
-                SceneBulbs.Clear();
-                SceneBulbs.AddRange( bulbs );
+            lock( mSceneLock ) {
+                mSceneBulbs.Clear();
+                mSceneBulbs.AddRange( bulbs );
             }
         }
 
         public void Update( IList<LightSource> originalLights ) {
-            lock( SceneLock ) {
-                OriginalLights = originalLights;
+            lock( mSceneLock ) {
+                mOriginalLights.Clear();
+                mOriginalLights.AddRange( originalLights );
             }
         }
 
         public void ClearActiveBulbs() {
-            lock( SceneLock ) {
-                ActiveBulbs.Clear();
+            lock( mSceneLock ) {
+                mActiveBulbs.Clear();
             }
         }
 
         public void Update( ActiveBulb bulb ) {
-            lock( SceneLock ) {
-                var existing = ActiveBulbs.FirstOrDefault( b => b.Bulb.Id.Equals( bulb.Bulb.Id ));
+            lock( mSceneLock ) {
+                var existing = mActiveBulbs.FirstOrDefault( b => b.Bulb.Id.Equals( bulb.Bulb.Id ));
 
                 if( existing != null ) {
-                    ActiveBulbs.Remove( existing );
+                    mActiveBulbs.Remove( existing );
                 }
 
-                ActiveBulbs.Add( bulb );
+                mActiveBulbs.Add( bulb );
 
                 mChangeSubject.OnNext( this );
             }

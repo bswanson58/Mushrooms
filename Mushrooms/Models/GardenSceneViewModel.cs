@@ -63,7 +63,7 @@ namespace Mushrooms.Models {
         public IEnumerable<Color> SceneColors {
             get {
                 if( ActiveScene.IsActive ) {
-                    return ActiveScene.ActiveBulbs.OrderBy( b => b.Bulb.Name ).Select( s => s.ActiveColor );
+                    return ActiveScene.GetActiveBulbs().OrderBy( b => b.Bulb.Name ).Select( s => s.ActiveColor );
                 }
 
                 if( ActiveScene.Scene.SceneMode.Equals( SceneMode.Animating )) {

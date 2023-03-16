@@ -34,19 +34,19 @@ namespace Mushrooms.Services {
         }
 
         public async Task ActivateScene( ActiveScene scene ) {
-            foreach( var bulb in scene.SceneBulbs ) {
+            foreach( var bulb in scene.GetSceneBulbs()) {
                 await mHubManager.SetBulbState( bulb, true );
             }
         }
 
         public async Task UpdateSceneBrightness( ActiveScene scene ) {
-            foreach ( var bulb in scene.SceneBulbs ) {
+            foreach ( var bulb in scene.GetSceneBulbs()) {
                 await mHubManager.SetBulbState( bulb, scene.Control.Brightness );
             }
         }
 
         public async Task DeactivateScene( ActiveScene scene ) {
-            foreach( var bulb in scene.SceneBulbs ) {
+            foreach( var bulb in scene.GetSceneBulbs()) {
                 await mHubManager.SetBulbState( bulb, false );
             }
         }
@@ -80,9 +80,10 @@ namespace Mushrooms.Services {
 
         public IList<ActiveBulb> GetBulbUpdateList( ActiveScene forScene ) {
             var activity = new List<ActiveBulb>();
+            var activeBulbs = forScene.GetActiveBulbs();
 
-            foreach( var bulb in forScene.SceneBulbs ) {
-                activity.Add( forScene.ActiveBulbs.FirstOrDefault( b => b.Bulb.Id.Equals( bulb.Id ), new ActiveBulb( bulb )));
+            foreach( var bulb in forScene.GetSceneBulbs()) {
+                activity.Add( activeBulbs.FirstOrDefault( b => b.Bulb.Id.Equals( bulb.Id ), new ActiveBulb( bulb )));
             }
 
             var now = DateTime.Now;

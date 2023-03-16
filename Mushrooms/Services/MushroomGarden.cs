@@ -89,7 +89,7 @@ namespace Mushrooms.Services {
             var scene = mActiveScenes.FirstOrDefault( s => s.Scene.Id.Equals( forScene.Id ));
 
             if( scene != null ) {
-                var bulbs = scene.SceneBulbs.Select( b => new ActiveBulb( b )).ToList();
+                var bulbs = scene.GetSceneBulbs().Select( b => new ActiveBulb( b )).ToList();
 
                 if( scene.Scene.SceneMode.Equals( SceneMode.Stationary )) {
                     var sceneColor = scene.Scene.Palette.Palette.FirstOrDefault( Colors.AntiqueWhite );
@@ -174,9 +174,10 @@ namespace Mushrooms.Services {
 
         private async Task StopConflictingScenes( ActiveScene scene ) {
             var activeScenes = mActiveScenes.Where( s => s.IsActive ).ToList();
+            var sceneBulbs = scene.GetSceneBulbs();
 
             foreach( var activeScene in activeScenes.Where( s => !s.Scene.Id.Equals( scene.Scene.Id ))) {
-                if( activeScene.SceneBulbs.Any( bulb => scene.SceneBulbs.Any( b => b.Id.Equals( bulb.Id )))) {
+                if( activeScene.GetSceneBulbs().Any( bulb => sceneBulbs.Any( b => b.Id.Equals( bulb.Id )))) {
                     await StopScene( activeScene.Scene );
                 }
             }
@@ -198,7 +199,7 @@ namespace Mushrooms.Services {
         }
 
         private async void SwitchSceneLighting( ActiveScene activeScene, Scene scene ) {
-            var originalLights = activeScene.OriginalLights;
+            var originalLights = activeScene.GetOriginalLights();
             var currentLights = scene.Lights;
 
             // if the lighting list has changed, clear the current list and start over.
@@ -234,7 +235,7 @@ namespace Mushrooms.Services {
 
         private void UpdateSceneLights( ActiveScene scene, IList<ActiveBulb> updateList ) {
             if( scene.Scene.Parameters.SynchronizeLights ) {
-                var updates = mLightingHandler.UpdateBulbs( scene.ActiveBulbs, scene.Scene, scene.Control );
+                var updates = mLightingHandler.UpdateBulbs( scene.GetActiveBulbs(), scene.Scene, scene.Control );
 
                 foreach( var update in updates ) {
                     scene.Update( update );
