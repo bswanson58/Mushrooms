@@ -10,7 +10,7 @@
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance dialogs:AnimationParametersViewModel, IsDesignTimeCreatable=False}"
-             Height="300" Width="450">
+             Height="320" Width="450">
 
     <dialogService:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -46,6 +46,8 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="10"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Label Grid.Column="0" Grid.Row="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
@@ -73,12 +75,20 @@
                            Content="{Binding DisplayDuration}"/>
 
             <Label Grid.Column="0" Grid.Row="6" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
-                           Content="Display Duration Jitter:"/>
+                   Content="Display Duration Jitter:"/>
             <Slider Grid.Column="1" Grid.Row="6" Minimum="0" Maximum="60000" SmallChange="250" LargeChange="1000" TickFrequency="250" 
                     IsSnapToTickEnabled="True" Style="{DynamicResource MahApps.Styles.Slider}"
                     Value="{Binding DisplayDurationJitterMilliseconds}"/>
             <Label Grid.Column="2" Grid.Row="6" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
-                           Content="{Binding DisplayJitter}"/>
+                   Content="{Binding DisplayJitter}"/>
+
+            <Label Grid.Column="0" Grid.Row="8" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                   Content="Brightness Variation:"/>
+            <Slider Grid.Column="1" Grid.Row="8" Minimum="0" Maximum="35" SmallChange="1" LargeChange="1" TickFrequency="1" 
+                    IsSnapToTickEnabled="True" Style="{DynamicResource MahApps.Styles.Slider}"
+                    Value="{Binding BrightnessVariation}"/>
+            <Label Grid.Column="2" Grid.Row="8" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
+                   Content="{Binding BrightnessVariationPercent}"/>
         </Grid>
 
         <CheckBox Grid.Row="2" Margin="5,0" IsChecked="{Binding SynchronizeLights}" Content="Synchronize Lighting"/>

@@ -101,8 +101,16 @@ namespace Mushrooms.Services {
             var displayJitter = TimeSpan.FromMilliseconds( mRandom.Next((int)inScene.Parameters.DisplayTimeJitter.TotalMilliseconds ));
             var displayTime = inScene.Parameters.BaseDisplayTime + displayJitter;
             var nextUpdateTime = DateTime.Now + transitionTime + displayTime;
+            var brightness = control.Brightness;
 
-            mHubManager.SetBulbState( bulbs.Select( b => b.Bulb ), color, control.Brightness, transitionTime );
+            if( inScene.Parameters.BrightnessVariation > 0.01D ) {
+                var brightnessVariation = mRandom.Next((int)( inScene.Parameters.BrightnessVariation * 100 ));
+                var brightnessPercent = (( 1.0 - ( inScene.Parameters.BrightnessVariation )) + ( brightnessVariation / 50.0D ));
+
+                brightness = Math.Max( 0.01D, Math.Min( 1.0, control.Brightness * brightnessPercent ));
+            }
+
+            mHubManager.SetBulbState( bulbs.Select( b => b.Bulb ), color, brightness, transitionTime );
 
             return bulbs.Select( b => new ActiveBulb( b.Bulb, color, nextUpdateTime )).ToList();
         }
