@@ -1,4 +1,4 @@
-﻿namespace Mushrooms.SceneBuilder {
+﻿namespace Mushrooms.Dialogs {
     /// <summary>
     /// Interaction logic for NewSceneView.xaml
     /// </summary>

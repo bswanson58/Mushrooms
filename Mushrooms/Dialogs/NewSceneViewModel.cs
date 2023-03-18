@@ -6,7 +6,7 @@ using Mushrooms.Models;
 using ReusableBits.Wpf.DialogService;
 using ReusableBits.Wpf.Platform;
 
-namespace Mushrooms.SceneBuilder {
+namespace Mushrooms.Dialogs {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class NewSceneViewModel : DialogAwareBase {
         public  const string                cLightingList = "lighting list";
