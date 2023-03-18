@@ -64,8 +64,10 @@
 
         <ControlTemplate x:Key="NoImageTemplate">
             <Border BorderThickness="1" BorderBrush="{StaticResource TrimColor}">
-                <TextBlock Style="{StaticResource EmptyListTextStyle}" VerticalAlignment="Center"
-                           Text="'Select Image' to display it's palette!"/>
+                <StackPanel Margin="0,0,0,25" Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource EmptyListTextStyle}" Text="Select a Palette or an Image"/>
+                    <TextBlock Style="{StaticResource EmptyListTextStyle}" Text="to display it's colors!"/>
+                </StackPanel>
             </Border>
         </ControlTemplate>
     </UserControl.Resources>
