@@ -47,7 +47,7 @@ namespace Mushrooms.Dialogs {
             if( mPalette.Palette.Any()) {
                 SelectedColor = mPalette.Palette.First();
 
-                Swatches.AddRange( mPalette.Palette.Select( c => new ColorViewModel( c, OnSwatchSelected )));
+                Swatches.AddRange( mPalette.Palette.Select( c => new ColorViewModel( c, OnSwatchSelected, _ => { })));
 
                 Swatches.First().IsSelected = true;
             }

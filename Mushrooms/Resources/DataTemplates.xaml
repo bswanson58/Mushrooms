@@ -25,6 +25,7 @@
                 </Rectangle.Fill>
                 <Rectangle.InputBindings>
                     <MouseBinding Gesture="LeftClick" Command="{Binding SelectSwatch}"/>
+                    <MouseBinding Gesture="RightClick" Command="{Binding EditColor}"/>
                 </Rectangle.InputBindings>
             </Rectangle>
         </Border>

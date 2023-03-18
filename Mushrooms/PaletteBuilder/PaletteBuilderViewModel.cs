@@ -241,11 +241,28 @@ namespace Mushrooms.PaletteBuilder {
                             new ColorViewModel( Color.FromRgb( color.Color.R, color.Color.G, color.Color.B ),
                                 color.Population,
                                 swatchLimit > 0,
-                                OnSwatchSelectionChanged ));
+                                OnSwatchSelectionChanged, OnSwatchColorEditRequest ));
                         swatchLimit--;
                     }
                 }
             }
+        }
+
+        private void OnSwatchColorEditRequest( ColorViewModel color ) {
+            var colorPalette = new ScenePalette( new []{ color.SwatchColor }, new []{ color.SwatchColor }, String.Empty );
+            var parameters = new DialogParameters {
+                { ColorSelectionViewModel.cColorPalette, colorPalette }
+            };
+
+            mDialogService.ShowDialog<ColorSelectionView>( parameters, result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
+                    var palette = result.Parameters.GetValue<ScenePalette>( ColorSelectionViewModel.cColorPalette );
+
+                    if( palette?.Palette.Any() == true ) {
+                        color.UpdateSwatch( palette.Palette.First());
+                    }
+                }
+            });
         }
 
         private void OnDeletePalette( EditablePaletteViewModel palette ) {
