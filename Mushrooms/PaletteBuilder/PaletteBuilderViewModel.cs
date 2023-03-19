@@ -232,6 +232,7 @@ namespace Mushrooms.PaletteBuilder {
         private void OnSwatchSelectionChanged( ColorViewModel _ ) { 
             RaisePropertyChanged( () => SwatchList );
             RaisePropertyChanged( () => SelectedSwatchCount );
+            SavePalette.RaiseCanExecuteChanged();
         }
 
 
