@@ -115,6 +115,7 @@ namespace Mushrooms.Garden {
             if( mGarden.IsSceneActive( scene )) {
                 void SceneUpdate( ScenePalette palette ) => UpdateSceneColor( scene, palette );
 
+                #pragma warning disable CS8974
                 parameters.Add( ColorSelectionViewModel.cUpdateCallback, SceneUpdate );
             }
 
