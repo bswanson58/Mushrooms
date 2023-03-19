@@ -81,9 +81,9 @@ namespace Mushrooms.Dialogs {
          
         public LinearGradientBrush LuminosityBrush {
             get {
-                var startColor = new HslColor( FinalColor ) { L = 0.0, S = 1.0 };
-                var midColor = new HslColor( FinalColor ) { L = 0.5, S = 1.0 };
-                var endColor = new HslColor( FinalColor ) { L = 1.0, S = 1.0 };
+                var startColor = new HslColor( HueColor ) { L = 0.0, S = 1.0 };
+                var midColor = new HslColor( HueColor ) { L = 0.5, S = 1.0 };
+                var endColor = new HslColor( HueColor ) { L = 1.0, S = 1.0 };
 
                 var brush = new LinearGradientBrush( endColor.ToRgb(), startColor.ToRgb(), 90 );
                 brush.GradientStops.Add( new GradientStop( endColor.ToRgb(), 0.14 ));
@@ -103,7 +103,7 @@ namespace Mushrooms.Dialogs {
             set {
                 mSelectorLeft = value;
 
-                UpdateSelectedColor();
+                UpdateHueColor();
                 UpdateFinalColor();
             }
         }
@@ -113,7 +113,7 @@ namespace Mushrooms.Dialogs {
             set {
                 mSelectorTop = value;
 
-                UpdateSelectedColor();
+                UpdateHueColor();
                 UpdateFinalColor();
             }
         }
@@ -165,7 +165,7 @@ namespace Mushrooms.Dialogs {
             RaisePropertyChanged( () => LuminosityBrush );
         }
 
-        private void UpdateSelectedColor() {
+        private void UpdateHueColor() {
             var angle = CalculateAngle( new Point( cCenterPoint, cCenterPoint ), 
                                         new Point( SelectorTop + cSelectorRadius, SelectorLeft + cSelectorRadius ));
             var hsl = new HslColor { A = 1.0, H = angle, S = 1.0, L = 0.5 };
