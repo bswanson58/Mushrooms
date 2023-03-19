@@ -20,7 +20,7 @@ namespace Mushrooms.Entities {
             DisplayTimeJitter = displayTimeJitter;
             AnimationEnabled = animationEnabled;
             SynchronizeLights = synchronizeLights;
-            BrightnessVariation = Math.Max( 0.0D, Math.Min( 0.35D, brightnessVariation ));
+            BrightnessVariation = Math.Max( 0.0D, Math.Min( 0.5D, brightnessVariation ));
         }
 
         public static SceneParameters Default =>

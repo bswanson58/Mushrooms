@@ -105,7 +105,7 @@ namespace Mushrooms.Services {
 
             if( inScene.Parameters.BrightnessVariation > 0.01D ) {
                 var brightnessVariation = mRandom.Next((int)( inScene.Parameters.BrightnessVariation * 100 ));
-                var brightnessPercent = (( 1.0 - ( inScene.Parameters.BrightnessVariation )) + ( brightnessVariation / 50.0D ));
+                var brightnessPercent = 1.0 - ( brightnessVariation / 100.0D );
 
                 brightness = Math.Max( 0.01D, Math.Min( 1.0, control.Brightness * brightnessPercent ));
             }
