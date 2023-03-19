@@ -2,9 +2,11 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using Mushrooms.Entities;
 using Mushrooms.Models;
+using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.DialogService;
 using ReusableBits.Wpf.Platform;
 using ReusableBits.Wpf.Utility;
@@ -24,8 +26,16 @@ namespace Mushrooms.Dialogs {
         private ScenePalette    mPalette;
         private float           mSelectorLeft;
         private float           mSelectorTop;
+        private float           mSaturationLevel;
+        private float           mLuminosityLevel;
 
-        public  Color           SelectedColor { get; private set; }
+        public  Color           HueColor { get; private set; }
+        public  Color           SaturationColor { get; private set; }
+        public  Color           LuminosityColor {  get; private set; }
+        public  Color           FinalColor {  get; private set; }
+
+        public  ICommand        BalancedLuminosity { get; }
+        public  ICommand        FullSaturation { get; }
 
         public  ObservableCollection<ColorViewModel>  Swatches { get; }
 
@@ -35,8 +45,12 @@ namespace Mushrooms.Dialogs {
             mPalette = ScenePalette.Default;
             Swatches = new ObservableCollection<ColorViewModel>();
 
+            BalancedLuminosity = new DelegateCommand( OnBalancedLuminosity );
+            FullSaturation = new DelegateCommand( OnFullSaturation );
+
             mSelectorTop = 0;
             mSelectorLeft = 425;
+            mSaturationLevel = 100;
         }
 
         public override void OnDialogOpened( IDialogParameters parameters ) {
@@ -45,22 +59,43 @@ namespace Mushrooms.Dialogs {
             Swatches.Clear();
 
             if( mPalette.Palette.Any()) {
-                SelectedColor = mPalette.Palette.First();
+                InitializeColor( mPalette.Palette.First());
 
                 Swatches.AddRange( mPalette.Palette.Select( c => new ColorViewModel( c, OnSwatchSelected, _ => { })));
-
                 Swatches.First().IsSelected = true;
             }
+        }
 
-            UpdateSelectorPosition();
-            RaisePropertyChanged( () => SelectedColor );
+        public LinearGradientBrush SaturationBrush {
+            get {
+                var startColor = new HslColor( HueColor ) { S = 0.0 };
+                var endColor = new HslColor( HueColor ) { S = 1.0 };
+
+                var brush = new LinearGradientBrush( endColor.ToRgb(), startColor.ToRgb(), 90 );
+                brush.GradientStops.Add( new GradientStop( endColor.ToRgb(), 0.14 ));
+                brush.GradientStops.Add( new GradientStop( startColor.ToRgb(), 0.86 ));
+
+                return brush;
+            }
+        }
+         
+        public LinearGradientBrush LuminosityBrush {
+            get {
+                var startColor = new HslColor( FinalColor ) { L = 0.0, S = 1.0 };
+                var midColor = new HslColor( FinalColor ) { L = 0.5, S = 1.0 };
+                var endColor = new HslColor( FinalColor ) { L = 1.0, S = 1.0 };
+
+                var brush = new LinearGradientBrush( endColor.ToRgb(), startColor.ToRgb(), 90 );
+                brush.GradientStops.Add( new GradientStop( endColor.ToRgb(), 0.14 ));
+                brush.GradientStops.Add( new GradientStop( midColor.ToRgb(), 0.5 ));
+                brush.GradientStops.Add( new GradientStop( startColor.ToRgb(), 0.86 ));
+
+                return brush;
+            }
         }
 
         private void OnSwatchSelected( ColorViewModel color ) {
-            SelectedColor = color.SwatchColor;
-
-            UpdateSelectorPosition();
-            RaisePropertyChanged( () => SelectedColor );
+            InitializeColor( mPalette.Palette.First());
         }
 
         public float SelectorLeft {
@@ -69,6 +104,7 @@ namespace Mushrooms.Dialogs {
                 mSelectorLeft = value;
 
                 UpdateSelectedColor();
+                UpdateFinalColor();
             }
         }
 
@@ -78,7 +114,55 @@ namespace Mushrooms.Dialogs {
                 mSelectorTop = value;
 
                 UpdateSelectedColor();
+                UpdateFinalColor();
             }
+        }
+
+        private void OnFullSaturation() {
+            SaturationLevel = 0;
+
+            RaisePropertyChanged( () => SaturationLevel );
+        }
+
+        public float SaturationLevel {
+            get => mSaturationLevel;
+            set {
+                mSaturationLevel = Math.Max( 1, Math.Min( 100, value ));
+
+                UpdateSaturationColor();
+                UpdateFinalColor();
+            }
+        }
+
+        private void OnBalancedLuminosity() {
+            LuminosityLevel = 50;
+
+            RaisePropertyChanged( () => LuminosityLevel );
+        }
+
+        public float LuminosityLevel {
+            get => mLuminosityLevel;
+            set {
+                mLuminosityLevel = Math.Max( 1, Math.Min( 100, value ));
+
+                UpdateLuminosityColor();
+                UpdateFinalColor();
+            }
+        }
+
+        private void InitializeColor( Color color ) {
+            var hsl = new HslColor( color ) { A = 1.0, S = 1.0, L = 0.5 };
+
+            HueColor = hsl.ToRgb();
+
+            UpdateSelectorPosition();
+            UpdateSaturationLevel( color );
+            UpdateLuminosityLevel( color );
+            UpdateFinalColor();
+
+            RaisePropertyChanged( () => HueColor );
+            RaisePropertyChanged( () => SaturationBrush );
+            RaisePropertyChanged( () => LuminosityBrush );
         }
 
         private void UpdateSelectedColor() {
@@ -86,20 +170,41 @@ namespace Mushrooms.Dialogs {
                                         new Point( SelectorTop + cSelectorRadius, SelectorLeft + cSelectorRadius ));
             var hsl = new HslColor { A = 1.0, H = angle, S = 1.0, L = 0.5 };
 
-            SelectedColor = hsl.ToRgb();
+            HueColor = hsl.ToRgb();
 
             UpdateSwatchSelection();
-            RaisePropertyChanged( () => SelectedColor );
+            UpdateSaturationColor();
+            UpdateLuminosityColor();
+            UpdateFinalColor();
+            RaisePropertyChanged( () => HueColor );
+            RaisePropertyChanged( () => SaturationBrush );
+            RaisePropertyChanged( () => LuminosityBrush );
         }
 
         private void UpdateSwatchSelection() {
             foreach( var swatch in Swatches ) {
-                swatch.SetSelection( swatch.SwatchColor.Equals( SelectedColor ));
+                swatch.SetSelection( swatch.SwatchColor.Equals( HueColor ));
             }
         }
 
+        private void UpdateSaturationColor() {
+            var hsl = new HslColor( HueColor ) { S = ( 100 - SaturationLevel ) / 100.0 };
+
+            SaturationColor = hsl.ToRgb();
+
+            RaisePropertyChanged( () => SaturationColor );
+        }
+
+        private void UpdateLuminosityColor() {
+            var hsl = new HslColor( HueColor ) { L = ( 100 - LuminosityLevel ) / 100.0 };
+
+            LuminosityColor = hsl.ToRgb();
+
+            RaisePropertyChanged( () => LuminosityColor );
+        }
+
         private void UpdateSelectorPosition() {
-            var hsl = new HslColor( SelectedColor );
+            var hsl = new HslColor( HueColor );
             var selectorPoint = CalculatePoint( new Point( cCenterPoint, cCenterPoint ), cColorWheelRadius, hsl.H );
 
             mSelectorLeft = (float)( selectorPoint.X - cSelectorRadius );
@@ -109,6 +214,37 @@ namespace Mushrooms.Dialogs {
             RaisePropertyChanged( () => SelectorTop );
         }
 
+        private void UpdateSaturationLevel( Color color ) {
+            var hsl = new HslColor( color );
+
+            SaturationLevel = (int)( 100 - ( hsl.S * 100 ));
+
+            RaisePropertyChanged( () => SaturationLevel );
+            UpdateSaturationColor();
+        }
+
+        private void UpdateLuminosityLevel( Color color ) {
+            var hsl = new HslColor( color );
+
+            LuminosityLevel = (int)( 100 - ( hsl.L * 100 ));
+
+            RaisePropertyChanged( () => LuminosityLevel );
+            UpdateLuminosityColor();
+        }
+
+        private void UpdateFinalColor() {
+            var hueColor = new HslColor( HueColor );
+            var hsl = new HslColor() {
+                A = 1.0,
+                H = hueColor.H,
+                S = ( 100 - SaturationLevel ) / 100.0,
+                L = ( 100 - LuminosityLevel ) / 100.0
+            };
+
+            FinalColor = hsl.ToRgb();
+
+            RaisePropertyChanged( () => FinalColor );
+        }
 
         private double CalculateAngle( Point origin, Point visitor ) {
             var radian = Math.Atan2( visitor.Y - origin.Y, visitor.X - origin.X );
@@ -128,7 +264,7 @@ namespace Mushrooms.Dialogs {
         }
 
         protected override DialogParameters CreateClosingParameters() {
-            mPalette.InsertPaletteColor( SelectedColor );
+            mPalette.InsertPaletteColor( FinalColor );
 
             return new () { { cColorPalette, mPalette } };
         }

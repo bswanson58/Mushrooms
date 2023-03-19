@@ -11,7 +11,7 @@
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance dialogs:ColorSelectionViewModel, IsDesignTimeCreatable=False}"
-             Height="550" Width="675">
+             Height="550" Width="750">
 
     <dialogService:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -23,13 +23,24 @@
     </dialogService:Dialog.WindowStyle>
 
     <UserControl.Resources>
-        <ControlTemplate x:Key="MoveThumbTemplate" TargetType="{x:Type controls:CircularSelectionThumb}">
+        <ControlTemplate x:Key="CircularThumbTemplate" TargetType="{x:Type controls:CircularSelectionThumb}">
             <Rectangle Fill="Transparent"/>
         </ControlTemplate>
 
-        <ControlTemplate x:Key="DraggableItemTemplate" TargetType="ContentControl">
+        <ControlTemplate x:Key="VerticalThumbTemplate" TargetType="{x:Type controls:VerticalSelectionThumb}">
+            <Rectangle Fill="Transparent"/>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="DraggableHueTemplate" TargetType="ContentControl">
             <Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
-                <controls:CircularSelectionThumb EllipseSize="1000" ThumbSize="150" Template="{StaticResource MoveThumbTemplate}" Cursor="Hand"/>
+                <controls:CircularSelectionThumb EllipseSize="1000" ThumbSize="150" Template="{StaticResource CircularThumbTemplate}" Cursor="Hand"/>
+                <ContentPresenter Content="{TemplateBinding ContentControl.Content}"/>
+            </Grid>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="DraggableSaturationTemplate" TargetType="ContentControl">
+            <Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+                <controls:VerticalSelectionThumb CanvasSize="130" ThumbSize="30" Template="{StaticResource VerticalThumbTemplate}" Cursor="Hand"/>
                 <ContentPresenter Content="{TemplateBinding ContentControl.Content}"/>
             </Grid>
         </ControlTemplate>
@@ -44,23 +55,82 @@
 
         <Viewbox Grid.Row="0" Margin="0,10,0,15" Stretch="Uniform">
             <Grid>
-                <Ellipse Height="1000" Width="1000" Fill="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <Ellipse Grid.Column="2" Height="620" Width="620">
+                    <Ellipse.Fill>
+                        <SolidColorBrush Color="{Binding FinalColor}"/>
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <Ellipse Grid.Column="2" Height="1000" Width="1000" Fill="Transparent">
                     <Ellipse.Effect>
-                        <effects:HslWheelEffect InnerRadius="0.7" InnerSaturation="1" />
+                        <effects:HslWheelEffect InnerRadius="0.7" InnerSaturation="1.0" />
                     </Ellipse.Effect>
                 </Ellipse>
 
-                <Canvas>
+                <Canvas Grid.Column="2">
                     <ContentControl Width="150" Height="150" 
                                     Canvas.Top="{Binding SelectorTop, Mode=TwoWay}" Canvas.Left="{Binding SelectorLeft, Mode=TwoWay}"
-                                    Template="{StaticResource DraggableItemTemplate}" >
+                                    Template="{StaticResource DraggableHueTemplate}" >
                         <Ellipse Stroke="#80000000" StrokeThickness="16" IsHitTestVisible="False" Margin="20">
                             <Ellipse.Fill>
-                                <SolidColorBrush Color="{Binding SelectedColor}"/>
+                                <SolidColorBrush Color="{Binding HueColor}"/>
                             </Ellipse.Fill>
                         </Ellipse>
                     </ContentControl>
+
                 </Canvas>
+
+                <Label Grid.Column="0" Margin="0,70,0,0" HorizontalAlignment="Center" FontSize="28" Cursor="Hand"
+                       Style="{StaticResource LabelStyle}" Content="Saturation">
+                    <Label.InputBindings>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding FullSaturation}"/>
+                    </Label.InputBindings>
+                </Label>
+                <Viewbox Grid.Column="0" Height="850" Width="150" Stretch="Uniform">
+                    <Border Height="140" Width="30" CornerRadius="15" Background="{Binding SaturationBrush}">
+                        <Canvas Height="140" Width="30">
+                            <ContentControl Height="22" Width="22" Margin="4"
+                                            Canvas.Top="{Binding SaturationLevel, Mode=TwoWay}" Canvas.Left="0"
+                                            Template="{StaticResource DraggableSaturationTemplate}" >
+                                <Ellipse Stroke="#80000000" StrokeThickness="3" IsHitTestVisible="False">
+                                    <Ellipse.Fill>
+                                        <SolidColorBrush Color="{Binding SaturationColor}"/>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                            </ContentControl>
+                        </Canvas>
+                    </Border>
+                </Viewbox>
+
+                <Label Grid.Column="4" Margin="0,70,0,0" HorizontalAlignment="Center" FontSize="28" Cursor="Hand"
+                       Style="{StaticResource LabelStyle}" Content="Luminosity">
+                    <Label.InputBindings>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding BalancedLuminosity}"/>
+                    </Label.InputBindings>
+                </Label>
+                <Viewbox Grid.Column="4" Height="850" Width="150" Stretch="Uniform">
+                    <Border Height="140" Width="30" CornerRadius="15" Background="{Binding LuminosityBrush}">
+                        <Canvas Height="140" Width="40">
+                            <ContentControl Height="22" Width="22" Margin="4"
+                                            Canvas.Top="{Binding LuminosityLevel, Mode=TwoWay}" Canvas.Left="0"
+                                            Template="{StaticResource DraggableSaturationTemplate}" >
+                                <Ellipse Stroke="#80000000" StrokeThickness="3" IsHitTestVisible="False">
+                                    <Ellipse.Fill>
+                                        <SolidColorBrush Color="{Binding LuminosityColor}"/>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                            </ContentControl>
+                        </Canvas>
+                    </Border>
+                </Viewbox>
             </Grid>
         </Viewbox>
 
