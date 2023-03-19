@@ -23,6 +23,7 @@ namespace Mushrooms.Services {
     internal interface IMushroomGarden : IDisposable {
         Task    StartScene( Scene forScene );
         Task    StopScene( Scene forScene );
+        bool    IsSceneActive( Scene scene );
 
         Task    StartAll();
         Task    StopAll();
@@ -102,6 +103,12 @@ namespace Mushrooms.Services {
             }
 
             return retValue;
+        }
+
+        public bool IsSceneActive( Scene scene ) {
+            var activeScene = mActiveScenes.FirstOrDefault( s => s.Scene.Id.Equals( scene.Id ));
+
+            return activeScene?.IsActive == true;
         }
 
         public void UpdateSceneColors( Scene forScene ) {

@@ -112,6 +112,12 @@ namespace Mushrooms.Garden {
                 { ColorSelectionViewModel.cColorPalette, scene.StationaryPalette.Copy() }
             };
 
+            if( mGarden.IsSceneActive( scene )) {
+                void SceneUpdate( ScenePalette palette ) => UpdateSceneColor( scene, palette );
+
+                parameters.Add( ColorSelectionViewModel.cUpdateCallback, SceneUpdate );
+            }
+
             mDialogService.ShowDialog<ColorSelectionView>( parameters, result => {
                 if( result.Result.Equals( ButtonResult.Ok )) {
                     var palette = result.Parameters.GetValue<ScenePalette>( ColorSelectionViewModel.cColorPalette );
@@ -126,6 +132,13 @@ namespace Mushrooms.Garden {
                     }
                 }
             });
+        }
+
+        private void UpdateSceneColor( Scene scene, ScenePalette palette ) {
+            scene.StationaryPalette.UpdateFrom( palette );
+
+            mSceneProvider.Update( scene );
+            mGarden.UpdateSceneColors( scene );
         }
 
         public async void SetLighting( Scene scene ) {

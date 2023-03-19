@@ -15,6 +15,9 @@ namespace Mushrooms.Dialogs {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class ColorSelectionViewModel : DialogAwareBase {
         public  const string    cColorPalette = "color palette";
+        public  const string    cUpdateCallback = "update callback";
+
+        private Action<ScenePalette>    mUpdateCallback;
 
         // the center point of the color wheel
         private const double    cCenterPoint = 500;
@@ -51,10 +54,17 @@ namespace Mushrooms.Dialogs {
             mSelectorTop = 0;
             mSelectorLeft = 425;
             mSaturationLevel = 100;
+
+            mUpdateCallback = _ => { };
         }
 
         public override void OnDialogOpened( IDialogParameters parameters ) {
             mPalette = parameters.GetValue<ScenePalette>( cColorPalette ) ?? ScenePalette.Default;
+            var callback = parameters.GetValue<Action<ScenePalette>>( cUpdateCallback );
+
+            if( callback != null ) {
+                mUpdateCallback = callback;
+            }
 
             Swatches.Clear();
 
@@ -244,6 +254,15 @@ namespace Mushrooms.Dialogs {
             FinalColor = hsl.ToRgb();
 
             RaisePropertyChanged( () => FinalColor );
+            UpdateCallback();
+        }
+
+        private void UpdateCallback() {
+            var palette = mPalette.Copy();
+
+            palette.InsertPaletteColor( FinalColor );
+
+            mUpdateCallback.Invoke( palette );
         }
 
         private double CalculateAngle( Point origin, Point visitor ) {
