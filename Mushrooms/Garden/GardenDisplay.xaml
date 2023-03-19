@@ -113,7 +113,7 @@
                         <ContentPresenter Margin="5,10" ContentTemplate="{StaticResource HorizontalSeparator}" Opacity="0.8"/>
 
                         <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Focusable="False"
-                                Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_StartAll}"
+                                Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_Start}"
                                 Command="{Binding StartSceneAnimated}" ToolTip="Start Scene Animation"/>
                         <Button Height="28" Width="28" VerticalAlignment="Center" Margin="5,0" Focusable="False"
                                 Style="{StaticResource PathButtonStyle}" Content="{StaticResource Path_SelectColor}"
@@ -201,11 +201,11 @@
                     Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Create a new scene"
                     Content="{StaticResource Path_Add}" Command="{Binding CreateScene}"/>
 
-            <Button HorizontalAlignment="Right" Margin="15,0,0,0" Height="32" Width="32" Padding="9,7,6,7" Opacity="0.6"
+            <Button HorizontalAlignment="Right" Margin="15,0,0,0" Height="32" Width="32" Padding="6,5,6,7" Opacity="0.6"
                     Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Start all favorite scenes"
-                    Content="{StaticResource Path_StartAll}" Command="{Binding StartAll}"/>
+                    Content="{StaticResource Path_StartFavorites}" Command="{Binding StartAll}"/>
             <Button HorizontalAlignment="Right" Margin="5,0,0,0" Height="32" Width="32" Padding="5,6,7,6" Opacity="0.6"
-                    Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Stop all scenes"
+                    Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Stop all favorite scenes"
                     Content="{StaticResource Path_StopAll}" Command="{Binding StopAll}"/>
         </StackPanel>
 

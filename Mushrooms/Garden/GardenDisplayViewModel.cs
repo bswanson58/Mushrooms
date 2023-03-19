@@ -282,11 +282,11 @@ namespace Mushrooms.Garden {
         }
 
         private void OnStartAll() {
-            mGarden.StartAll();
+            mGarden.StartAllFavorites();
         }
 
         private void OnStopAll() {
-            mGarden.StopAll();
+            mGarden.StopAllFavorites();
         }
 
         public void Dispose() {

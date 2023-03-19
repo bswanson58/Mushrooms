@@ -25,8 +25,8 @@ namespace Mushrooms.Services {
         Task    StopScene( Scene forScene );
         bool    IsSceneActive( Scene scene );
 
-        Task    StartAll();
-        Task    StopAll();
+        Task    StartAllFavorites();
+        Task    StopAllFavorites();
 
         Task    UpdateSceneControl( Scene forScene, SceneControl control );
         void    UpdateSceneColors( Scene forScene );
@@ -140,7 +140,7 @@ namespace Mushrooms.Services {
             }
         }
 
-        public async Task StartAll() {
+        public async Task StartAllFavorites() {
             var activeScenes = mActiveScenes
                 .Where( s => s is {
                     IsActive: false, 
@@ -163,8 +163,13 @@ namespace Mushrooms.Services {
             }
         }
 
-        public async Task StopAll() {
-            var activeScenes = mActiveScenes.Where( s => s.IsActive ).ToList();
+        public async Task StopAllFavorites() {
+            var activeScenes = mActiveScenes
+                .Where( s => s is {
+                    IsActive: true,
+                    Scene.IsFavorite: true
+                })
+                .ToList();
 
             foreach( var scene in activeScenes ) {
                 await StopScene( scene.Scene );
@@ -191,7 +196,7 @@ namespace Mushrooms.Services {
         }
 
         public override async Task StopAsync( CancellationToken cancellationToken ) {
-            await StopAll();
+            await StopAllFavorites();
 
             // wait for light commands to stream out.
             await Task.Delay( 1000, cancellationToken );
