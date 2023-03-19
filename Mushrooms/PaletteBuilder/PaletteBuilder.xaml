@@ -136,10 +136,22 @@
                         </b:Interaction.Behaviors>
                     </ItemsControl>
 
-                    <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
-                        <Label Style="{StaticResource LabelStyle}" Content="{Binding SelectedSwatchCount}"/>
-                        <Label Style="{StaticResource LabelStyle}" Content="swatches selected."/>
-                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="15,0,0,0">
+                            <Label Style="{StaticResource LabelStyle}" Content="{Binding SelectedSwatchCount}"/>
+                            <Label Style="{StaticResource LabelStyle}" Content="swatches selected."/>
+                        </StackPanel>
+
+                        <Button Grid.Column="2" Height="18" Width="18" Padding="5"
+                                Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Add a new color"
+                                Content="{StaticResource Path_Add}" Command="{Binding AddSwatch}"/>
+                    </Grid>
 
                     <StackPanel Orientation="Vertical" Margin="40,0,0,0">
                         <Label Padding="1" Style="{StaticResource LabelStyle}" Content="-Click swatches to select/deselect"/>

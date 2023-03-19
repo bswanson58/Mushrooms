@@ -75,6 +75,7 @@ namespace Mushrooms.PaletteBuilder {
         public  DelegateCommand                 NewPalette { get; }
         public  DelegateCommand                 SavePalette { get; }
         public  DelegateCommand                 SelectImage { get; }
+        public  ICommand                        AddSwatch { get; }
         public  ImageSource ?                   PatternImage { get; private set; }
 
         public PaletteBuilderViewModel( IPaletteProvider paletteProvider, IPictureCache pictureCache,
@@ -107,6 +108,7 @@ namespace Mushrooms.PaletteBuilder {
             NewPalette = new DelegateCommand( OnNewPalette );
             SavePalette = new DelegateCommand( OnSavePalette, CanSavePalette );
             SelectImage = new DelegateCommand( OnSelectFile );
+            AddSwatch = new DelegateCommand( OnAddSwatch );
         }
 
         public EditablePaletteViewModel ? SelectedPalette {
@@ -188,6 +190,12 @@ namespace Mushrooms.PaletteBuilder {
                     SelectImageFile( result.Parameters.GetValue<string>( NewPaletteViewModel.cImageFile ) ?? String.Empty );
                 }
             });
+        }
+
+        private void OnAddSwatch() {
+            mSwatchList.Add( new ColorViewModel( Colors.White, OnSwatchSelectionChanged, OnSwatchColorEditRequest ));
+
+            UpdateColorSwatches();
         }
 
         private void UpdateAllProperties() {
