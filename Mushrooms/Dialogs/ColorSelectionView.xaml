@@ -40,7 +40,7 @@
 
         <ControlTemplate x:Key="DraggableSaturationTemplate" TargetType="ContentControl">
             <Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
-                <controls:VerticalSelectionThumb CanvasSize="130" ThumbSize="30" Template="{StaticResource VerticalThumbTemplate}" Cursor="Hand"/>
+                <controls:VerticalSelectionThumb CanvasSize="140" ThumbSize="30" Template="{StaticResource VerticalThumbTemplate}" Cursor="Hand"/>
                 <ContentPresenter Content="{TemplateBinding ContentControl.Content}"/>
             </Grid>
         </ControlTemplate>
@@ -95,8 +95,8 @@
                     </Label.InputBindings>
                 </Label>
                 <Viewbox Grid.Column="0" Height="850" Width="150" Stretch="Uniform">
-                    <Border Height="140" Width="30" CornerRadius="15" Background="{Binding SaturationBrush}">
-                        <Canvas Height="140" Width="30">
+                    <Border Height="130" Width="30" CornerRadius="15" Background="{Binding SaturationBrush}">
+                        <Canvas Height="130" Width="30">
                             <ContentControl Height="22" Width="22" Margin="4"
                                             Canvas.Top="{Binding SaturationLevel, Mode=TwoWay}" Canvas.Left="0"
                                             Template="{StaticResource DraggableSaturationTemplate}" >
@@ -117,12 +117,12 @@
                     </Label.InputBindings>
                 </Label>
                 <Viewbox Grid.Column="4" Height="850" Width="150" Stretch="Uniform">
-                    <Border Height="140" Width="30" CornerRadius="15" Background="{Binding LuminosityBrush}">
-                        <Canvas Height="140" Width="40">
+                    <Border Height="130" Width="30" CornerRadius="15" Background="{Binding LuminosityBrush}">
+                        <Canvas Height="130" Width="30">
                             <ContentControl Height="22" Width="22" Margin="4"
                                             Canvas.Top="{Binding LuminosityLevel, Mode=TwoWay}" Canvas.Left="0"
                                             Template="{StaticResource DraggableSaturationTemplate}" >
-                                <Ellipse Stroke="#80000000" StrokeThickness="3" IsHitTestVisible="False">
+                                <Ellipse Stroke="#FF808080" StrokeThickness="3" IsHitTestVisible="False">
                                     <Ellipse.Fill>
                                         <SolidColorBrush Color="{Binding LuminosityColor}"/>
                                     </Ellipse.Fill>
