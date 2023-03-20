@@ -230,7 +230,7 @@ namespace HueLighting.Hub {
             var bulbList = await GetBulbs();
 
             foreach( var g in fromList ) {
-                retValue.Add( new BulbGroup( g.Id, g.Name, g.Type, g.Class, 
+                retValue.Add( new BulbGroup( g.Id, g.Name, g.Type ?? GroupType.LightGroup, g.Class, 
                     from bulb in g.Lights select bulbList.FirstOrDefault( b => b.Id.Equals( bulb ))));
             }
 

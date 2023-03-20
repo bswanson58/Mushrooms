@@ -8,10 +8,10 @@ namespace HueLighting.Models {
         public  string      Id { get; }
         public  string      Name { get; }
         public  RoomClass ? RoomClass { get; }
-        public  GroupType ? GroupType { get; }
+        public  GroupType   GroupType { get; }
         public  List<Bulb>  Bulbs { get; }
 
-        public BulbGroup( string id, string name, GroupType ? groupType, RoomClass ? roomClass, IEnumerable<Bulb> bulbs ) {
+        public BulbGroup( string id, string name, GroupType groupType, RoomClass ? roomClass, IEnumerable<Bulb> bulbs ) {
             Id = id;
             Name = name;
             GroupType = groupType;

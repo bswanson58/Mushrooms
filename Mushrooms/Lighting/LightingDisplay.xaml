@@ -10,6 +10,40 @@
              d:DataContext="{d:DesignInstance lighting:LightingDisplayViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
 
+    <UserControl.Resources>
+        <DataTemplate x:Key="EditableLightingTemplate" DataType="{x:Type lighting:LightingViewModel}">
+            <Grid x:Name="GroupContainer" Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ContentPresenter Grid.Column="0" Height="26" Width="26" Margin="0,3,4,0" VerticalAlignment="Center"
+                                  Content="{StaticResource Path_Bulb_On}"/>
+                <TextBlock Grid.Column="1" Margin="0,0,0,3" VerticalAlignment="Center" Text="{Binding GroupName}"/>
+
+                <StackPanel x:Name="GroupControls" Grid.Column="3" Margin="3,0" Orientation="Horizontal" 
+                            Opacity="0" HorizontalAlignment="Right" ZIndex="10">
+                    <Button Padding="4" BorderThickness="0" Height="30" Width="30" Background="Transparent" Focusable="False"
+                            Content="{StaticResource Path_Edit}" ToolTip="Edit Lighting Group" CommandParameter="{Binding}"
+                            Command="{Binding DataContext.EditGroup, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                    <Button Padding="4" BorderThickness="0" Height="30" Width="30" Background="Transparent" Focusable="False"
+                            Content="{StaticResource Path_Delete}" ToolTip="Delete Lighting Group" CommandParameter="{Binding}"
+                            Command="{Binding DataContext.DeleteGroup, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                </StackPanel>
+            </Grid>
+
+            <DataTemplate.Triggers>
+                <Trigger SourceName="GroupContainer" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="GroupControls" Property="Opacity" Value="0.7"/>
+                    <Setter TargetName="GroupContainer" Property="Background" Value="{DynamicResource MahApps.Brushes.Accent3}"/>
+                </Trigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </UserControl.Resources>
+
     <Grid Margin="15">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -24,7 +58,7 @@
 
             <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Bulbs:"/>
 
-            <ListView Grid.Row="1" ItemsSource="{Binding Bulbs}" ItemTemplate="{StaticResource LightingTemplate}"/>
+            <ListView Grid.Row="1" Margin="0,5,10,0" ItemsSource="{Binding Bulbs}" ItemTemplate="{StaticResource LightingTemplate}"/>
         </Grid>
 
         <Grid Grid.Column="1">
@@ -33,9 +67,15 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Lighting Groups:"/>
+            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Bottom" Content="Lighting Groups:"/>
+            <Button Grid.Row="0" HorizontalAlignment="Right" Height="25" Width="25" Margin="0,0,5,0" Padding="6" Opacity="0.7"
+                    Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Create a new lighting group"
+                    Content="{StaticResource Path_Add}" Command="{Binding CreateGroup}"/>
 
-            <ListView Grid.Row="1" ItemsSource="{Binding Groups}" ItemTemplate="{StaticResource LightingTemplate}"/>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding Groups}" 
+                              ItemTemplate="{StaticResource EditableLightingTemplate}"/>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </UserControl>

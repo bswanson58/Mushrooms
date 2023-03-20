@@ -103,7 +103,7 @@ namespace HueLighting.Hub {
             var bulbList = await GetBulbs();
 
             foreach( var g in fromList ) {
-                retValue.Add( new BulbGroup( g.Id, g.Name, g.Type, g.Class,
+                retValue.Add( new BulbGroup( g.Id, g.Name, g.Type ?? GroupType.LightGroup, g.Class,
                     from bulb in g.Lights select bulbList.FirstOrDefault( b => b.Id.Equals( bulb ))));
             }
 
@@ -143,7 +143,13 @@ namespace HueLighting.Hub {
                 if( mClient != null ) {
                     var results = await mClient.DeleteGroupAsync( groupId );
 
-//                    if( results.Any( r => !r.Error )) { }
+                    if( results.Any( r => r.Error != null )) {
+                        var firstError = results.FirstOrDefault( e => e.Error != null );
+
+                        if( firstError != null ) {
+                            mLog.LogMessage( $"Deleting hue group '{groupId}': {firstError.Error.Description}" );
+                        }
+                    }
                 }
             }
             catch( Exception ex ) {
