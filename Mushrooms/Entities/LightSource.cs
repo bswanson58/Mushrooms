@@ -17,7 +17,7 @@ namespace Mushrooms.Entities {
             SourceType = type;
         }
 
-        public LightSource( string name, GroupType groupType ) {
+        public LightSource( string name, GroupType ? groupType ) {
             SourceName = name;
 
             switch ( groupType ) {

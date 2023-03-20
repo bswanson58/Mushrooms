@@ -94,6 +94,7 @@ namespace Mushrooms {
             services.AddScoped<IDialogServiceContainer, DialogServiceResolver>();
 
             services.AddSingleton<IHubManager, HubManager>();
+            services.AddScoped<ILightingGroupManager, LightingGroupManager>();
 
             services.AddScoped<IEventAggregator, EventAggregator>();
             services.AddScoped<IVersionFormatter, VersionSpinnerViewModel>();

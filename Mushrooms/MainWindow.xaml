@@ -11,6 +11,7 @@
         xmlns:statusBar="clr-namespace:Mushrooms.StatusBar"
         xmlns:toolkit="https://github.com/nullsoftware/TrayIcon"
         xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
+        xmlns:lighting="clr-namespace:Mushrooms.Lighting"
         mc:Ignorable="d"
         Title="Mushrooms"
         ResizeMode="CanResizeWithGrip"
@@ -55,6 +56,9 @@
         <TabControl Grid.Row="0" Margin="15,0" Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
             <TabItem Header="palettes">
                 <paletteBuilder:PaletteBuilder/>
+            </TabItem>
+            <TabItem Header="lighting">
+                <lighting:LightingDisplay/>
             </TabItem>
             <TabItem Header="garden">
                 <garden:GardenDisplay/>
