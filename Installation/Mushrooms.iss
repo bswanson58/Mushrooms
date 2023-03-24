@@ -95,6 +95,9 @@ Source: "..\Mushrooms\bin\Release\net7.0-windows\Serilog.Sinks.RollingFile.dll";
 Source: "..\Mushrooms\bin\Release\net7.0-windows\SixLabors.ImageSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\System.Reactive.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\TrayIcon.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Mushrooms\bin\Release\net7.0-windows\HueApi.ColorConverters.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Mushrooms\bin\Release\net7.0-windows\HueApi.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Mushrooms\bin\Release\net7.0-windows\Q42.HueApi.ColorConverters.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#ApplicationName}"; Filename: "{app}\{#ExecutableName}"
