@@ -91,7 +91,7 @@ namespace Mushrooms.Dialogs {
         public double BrightnessVariation {
             get => mBrightnessVariation * 100.0D;
             set {
-                mBrightnessVariation = Math.Max( 0.0D, Math.Min( 0.5D, value / 100.0D ));
+                mBrightnessVariation = Math.Max( 0.0D, Math.Min( 0.75D, value / 100.0D ));
 
                 RaisePropertyChanged( () => BrightnessVariationPercent );
             }

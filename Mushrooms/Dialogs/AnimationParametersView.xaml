@@ -84,7 +84,7 @@
 
             <Label Grid.Column="0" Grid.Row="8" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right" VerticalAlignment="Center"
                    Content="Brightness Variation:"/>
-            <Slider Grid.Column="1" Grid.Row="8" Minimum="0" Maximum="50" SmallChange="1" LargeChange="1" TickFrequency="1" 
+            <Slider Grid.Column="1" Grid.Row="8" Minimum="0" Maximum="75" SmallChange="1" LargeChange="1" TickFrequency="1" 
                     IsSnapToTickEnabled="True" Style="{DynamicResource MahApps.Styles.Slider}"
                     Value="{Binding BrightnessVariation}"/>
             <Label Grid.Column="2" Grid.Row="8" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" Margin="5,0"
