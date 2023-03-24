@@ -24,7 +24,7 @@
 
     <Style x:Key="LabelStyle" TargetType="Label">
         <Setter Property="FontFamily" Value="Segoe UI"/>
-        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontSize" Value="14"/>
         <Setter Property="Foreground" Value="{StaticResource BorderTextColor}"/>
     </Style>
 
@@ -41,7 +41,7 @@
     </Style>
 
     <Style x:Key="ListViewSubTextStyle" TargetType="TextBlock" BasedOn="{StaticResource ListViewTextStyle}">
-        <Setter Property="FontSize" Value="13"></Setter>
+        <Setter Property="FontSize" Value="12"></Setter>
     </Style>
 
     <Style x:Key="ListViewItemStretch" TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MahApps.Styles.ListViewItem}">
