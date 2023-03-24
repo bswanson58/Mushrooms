@@ -30,7 +30,7 @@
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                         <TextBlock.Style>
-                            <Style TargetType="TextBlock">
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource ListViewTextStyle}">
                                 <Style.Triggers>
                                     <Trigger Property="TextBlock.IsMouseOver" Value="true">
                                         <Setter Property="TextBlock.Foreground" Value="CornflowerBlue" />
@@ -72,7 +72,7 @@
         </ControlTemplate>
     </UserControl.Resources>
 
-    <Grid Margin="0,0,0,10">
+    <Grid Margin="0,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>

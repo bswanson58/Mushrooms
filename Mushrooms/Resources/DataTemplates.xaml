@@ -33,7 +33,7 @@
 
     <DataTemplate x:Key="PaletteTemplate" DataType="{x:Type models:PaletteViewModel}">
         <StackPanel Orientation="Vertical">
-            <TextBlock Text="{Binding Name}"/>
+            <TextBlock Style="{StaticResource ListViewTextStyle}" Text="{Binding Name}"/>
             <ItemsControl Margin="15,3" ItemsSource="{Binding ExampleColors}" ItemTemplate="{StaticResource ColorTemplate}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -46,7 +46,7 @@
 
     <DataTemplate x:Key="SceneTemplate" DataType="{x:Type models:SceneViewModel}">
         <StackPanel Orientation="Vertical">
-            <TextBlock Text="{Binding Name}"/>
+            <TextBlock Style="{StaticResource ListViewTextStyle}" Text="{Binding Name}"/>
             <ItemsControl Margin="15,3" ItemsSource="{Binding ExampleColors}" ItemTemplate="{StaticResource ColorTemplate}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -64,8 +64,9 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <CheckBox Grid.Column="0" Style="{StaticResource LampCheckBoxStyle}" IsChecked="{Binding IsSelected}"/>
-            <TextBlock Grid.Column="1" Margin="0,0,0,3" VerticalAlignment="Center" Text="{Binding Name}"/>
+            <CheckBox Grid.Column="0" Style="{StaticResource LampCheckBoxStyle}" Margin="3,5" IsChecked="{Binding IsSelected}"/>
+            <TextBlock Style="{StaticResource ListViewTextStyle}" Grid.Column="1" Margin="0,0,0,3" VerticalAlignment="Center" 
+                       Text="{Binding Name}"/>
 
             <b:Interaction.Triggers>
                 <b:EventTrigger EventName="MouseDown">

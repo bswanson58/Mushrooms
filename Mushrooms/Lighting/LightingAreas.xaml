@@ -29,8 +29,9 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="{Binding GroupName}"/>
-                    <TextBlock Grid.Row="1" Margin="10,0,0,0" FontSize="12" Opacity="0.5" Text="{Binding LightList}"/>
+                    <TextBlock Grid.Row="0" Style="{StaticResource ListViewTextStyle}" Text="{Binding GroupName}"/>
+                    <TextBlock Grid.Row="1" Style="{StaticResource ListViewSubTextStyle}" Margin="10,0,0,0" Opacity="0.5" 
+                               Text="{Binding LightList}"/>
                 </Grid>
 
                 <StackPanel x:Name="GroupControls" Grid.Column="3" Margin="3,0" Orientation="Horizontal" 
