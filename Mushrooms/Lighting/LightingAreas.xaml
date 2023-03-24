@@ -30,7 +30,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Style="{StaticResource ListViewTextStyle}" Text="{Binding GroupName}"/>
-                    <TextBlock Grid.Row="1" Style="{StaticResource ListViewSubTextStyle}" Margin="10,0,0,0" Opacity="0.5" 
+                    <TextBlock Grid.Row="1" Style="{StaticResource ListViewSubTextStyle}" Margin="6,0,0,0" Opacity="0.5" 
                                Text="{Binding LightList}"/>
                 </Grid>
 
