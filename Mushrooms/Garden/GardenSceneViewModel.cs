@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ReusableBits.Wpf.Commands;
-using ReusableBits.Wpf.ViewModelSupport;
 using System.Windows.Input;
 using System.Windows.Media;
 using Mushrooms.Entities;
-using Mushrooms.Garden;
+using Mushrooms.Models;
 using Mushrooms.Services;
 using ReusableBits.Platform.Preferences;
+using ReusableBits.Wpf.Commands;
+using ReusableBits.Wpf.ViewModelSupport;
 
-namespace Mushrooms.Models {
+namespace Mushrooms.Garden {
     internal class GardenSceneViewModel : PropertyChangeBase, IDisposable {
         private readonly IMushroomGarden    mGarden;
         private readonly IPreferences       mPreferences;
@@ -26,6 +26,7 @@ namespace Mushrooms.Models {
         public  bool                        IsSceneOn => IsSceneActive || IsScheduleActive;
         public  bool                        IsScheduled => Scene.Schedule.Enabled;
         public  bool                        CanRecolorScene => ActiveScene.IsActive && !Scene.Parameters.AnimationEnabled;
+        public  string                      SceneLights => String.Join( ", ", ActiveScene.Scene.Lights.Select( l => l.SourceName ));
 
         public  ICommand                    StartSceneAnimated { get; }
         public  ICommand                    StartSceneStationary { get; }
