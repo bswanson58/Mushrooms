@@ -25,6 +25,8 @@ namespace HueLighting.Hub {
 
         Task<IEnumerable<Bulb>>             GetBulbs();
         Task<IEnumerable<BulbGroup>>        GetBulbGroups();
+        Task<IEnumerable<BulbGroup>>        GetZones();
+        Task<IEnumerable<BulbGroup>>        GetRooms();
         
         void                                EmulateHub();
 
@@ -216,6 +218,33 @@ namespace HueLighting.Hub {
 
                 if( mClient != null ) {
                     retValue = await ToBulbGroup( await mClient.GetGroupsAsync());
+                }
+            }
+            catch( Exception ex ) {
+                mLog.LogException( "GetBulbGroups", ex );
+            }
+
+            return retValue;
+        }
+
+        public async Task<IEnumerable<BulbGroup>> GetZones() =>
+            await GetGroup( GroupType.Zone );
+
+        public async Task<IEnumerable<BulbGroup>> GetRooms() =>
+            await GetGroup( GroupType.Room );
+
+        private async Task<IEnumerable<BulbGroup>> GetGroup( GroupType groupType ) {
+            var retValue = Enumerable.Empty<BulbGroup>();
+
+            try {
+                if( mClient == null ) {
+                    await InitializeConfiguredHub();
+                }
+
+                if( mClient != null ) {
+                    var groups = await mClient.GetGroupsAsync();
+
+                    retValue = await ToBulbGroup( groups.Where( g => g.Type.Equals( groupType )));
                 }
             }
             catch( Exception ex ) {

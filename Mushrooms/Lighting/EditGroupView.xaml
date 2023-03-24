@@ -6,9 +6,12 @@
              xmlns:local="clr-namespace:Mushrooms.Lighting"
              xmlns:dialogService="clr-namespace:ReusableBits.Wpf.DialogService;assembly=ReusableBits.Wpf"
              xmlns:models="clr-namespace:HueLighting.Models;assembly=HueLighting"
+             xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviours="clr-namespace:ReusableBits.Wpf.Behaviours;assembly=ReusableBits.Wpf"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:EditGroupViewModel, IsDesignTimeCreatable=False}"
-             Height="250" Width="500">
+             Height="350" Width="500">
 
     <dialogService:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -20,6 +23,8 @@
     </dialogService:Dialog.WindowStyle>
 
     <UserControl.Resources>
+        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfTrue" IsHidden="True" TriggerValue="False"/>
+
         <DataTemplate x:Key="GroupTypeTemplate" DataType="{x:Type models:GroupTypeItem}">
             <TextBlock Text="{Binding DisplayName}"/>
         </DataTemplate>
@@ -31,44 +36,65 @@
 
     <Grid Margin="15">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="90"/>
                 <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="25"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-            </Grid.RowDefinitions>
 
-            <Label Grid.Column="0" Grid.Row="0" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right"
-                   Content="Group Name:"/>
-            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding GroupName, UpdateSourceTrigger=PropertyChanged}"/>
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <Label Grid.Column="0" Grid.Row="2" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right"
-                   Content="Group Type:"/>
-            <ComboBox Grid.Column="1" Grid.Row="2" ItemTemplate="{StaticResource GroupTypeTemplate}"
-                      ItemsSource="{Binding GroupTypes}" SelectedItem="{Binding SelectedGroupType}"/>
+                <Label Grid.Column="0" Grid.Row="1" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right"
+                       Content="Group Name:"/>
+                <TextBox Grid.Column="1" Tag="InitialFocus" Grid.Row="1" Text="{Binding GroupName, UpdateSourceTrigger=PropertyChanged}"/>
 
-            <Label Grid.Column="0" Grid.Row="4" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right"
-                   Content="Room Type:"/>
-            <ComboBox Grid.Column="1" Grid.Row="4" ItemTemplate="{StaticResource RoomClassTemplate}"
-                      ItemsSource="{Binding RoomClasses}" SelectedItem="{Binding SelectedRoomClass}"/>
+                <Label Grid.Column="0" Grid.Row="3" Style="{StaticResource LabelStyle}" HorizontalAlignment="Right"
+                       Content="Room Type:"/>
+                <ComboBox Grid.Column="1" Grid.Row="3" ItemTemplate="{StaticResource RoomClassTemplate}"
+                          ItemsSource="{Binding RoomClasses}" SelectedItem="{Binding SelectedRoomClass}"/>
+
+                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Margin="5,0" VerticalAlignment="Center" Orientation="Vertical"
+                            Visibility="{Binding IsRoomGroup, Converter={StaticResource DisplayIfTrue}}">
+                    <Label Style="{StaticResource LabelStyle}" Padding="1" Content="-Lights may only be present in one room."/>
+                    <Label Style="{StaticResource LabelStyle}" Padding="1" Content="-Lights not shown are already assigned to a room."/>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Group Lighting:"/>
+                <ListView Grid.Row="1" Margin="5,0,0,0" ItemsSource="{Binding Lights}" 
+                          ItemTemplate="{StaticResource LightingTemplate}"/>
+            </Grid>
         </Grid>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Right">
             <Button Style="{StaticResource GeneralButtonStyle}" Width="70" Margin="10,0" Content="Ok" Command="{Binding Ok}" IsDefault="True"/>
             <Button Style="{StaticResource GeneralButtonStyle}" Width="70" Content="Cancel" Command="{Binding Cancel}" IsCancel="True"/>
         </StackPanel>
     </Grid>
+
+    <b:Interaction.Behaviors>
+        <behaviours:FocusOnLoad FocusElementTag="InitialFocus"/>
+    </b:Interaction.Behaviors>
 </UserControl>

@@ -9,15 +9,18 @@ namespace Mushrooms.Entities {
     }
 
     internal class LightSource {
+        public  string              Id { get; private set; }
         public  string              SourceName { get; protected set; }
         public  LightSourceType     SourceType { get; protected set; }
 
-        public LightSource( string name, LightSourceType type ) {
+        public LightSource( string id,  string name, LightSourceType type ) {
+            Id = id;
             SourceName = name;
             SourceType = type;
         }
 
-        public LightSource( string name, GroupType ? groupType ) {
+        public LightSource( string id, string name, GroupType ? groupType ) {
+            Id = id;
             SourceName = name;
 
             switch ( groupType ) {

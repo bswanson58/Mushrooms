@@ -5,77 +5,43 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModelLocator="clr-namespace:ReusableBits.Wpf.ViewModelLocator;assembly=ReusableBits.Wpf"
              xmlns:lighting="clr-namespace:Mushrooms.Lighting"
+             xmlns:valueConverters="clr-namespace:ReusableBits.Wpf.ValueConverters;assembly=ReusableBits.Wpf"
              viewModelLocator:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance lighting:LightingDisplayViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="EditableLightingTemplate" DataType="{x:Type lighting:LightingViewModel}">
-            <Grid x:Name="GroupContainer" Background="Transparent">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfTrue" IsHidden="True" TriggerValue="False"/>
+        <valueConverters:BooleanVisibilityConverter x:Key="DisplayIfFalse" IsHidden="True" TriggerValue="True"/>
 
-                <ContentPresenter Grid.Column="0" Height="26" Width="26" Margin="0,3,4,0" VerticalAlignment="Center"
-                                  Content="{StaticResource Path_Bulb_On}"/>
-                <TextBlock Grid.Column="1" Margin="0,0,0,3" VerticalAlignment="Center" Text="{Binding GroupName}"/>
-
-                <StackPanel x:Name="GroupControls" Grid.Column="3" Margin="3,0" Orientation="Horizontal" 
-                            Opacity="0" HorizontalAlignment="Right" ZIndex="10">
-                    <Button Padding="4" BorderThickness="0" Height="30" Width="30" Background="Transparent" Focusable="False"
-                            Content="{StaticResource Path_Edit}" ToolTip="Edit Lighting Group" CommandParameter="{Binding}"
-                            Command="{Binding DataContext.EditGroup, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
-                    <Button Padding="4" BorderThickness="0" Height="30" Width="30" Background="Transparent" Focusable="False"
-                            Content="{StaticResource Path_Delete}" ToolTip="Delete Lighting Group" CommandParameter="{Binding}"
-                            Command="{Binding DataContext.DeleteGroup, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
-                </StackPanel>
+        <DataTemplate x:Key="LightDataTemplate" DataType="{x:Type lighting:LightData}">
+            <Grid Margin="5" ToolTip="{Binding Light.Name}">
+                <Label Style="{StaticResource LabelStyle}" VerticalAlignment="Center" HorizontalAlignment="Center"
+                       Content="Off" Visibility="{Binding IsOn, Converter={StaticResource DisplayIfFalse}}"/>
+                <Ellipse Height="30" Width="30" Visibility="{Binding IsOn, Converter={StaticResource DisplayIfTrue}}">
+                    <Ellipse.Fill>
+                        <SolidColorBrush Color="{Binding Color}"/>
+                    </Ellipse.Fill>
+                </Ellipse>
             </Grid>
-
-            <DataTemplate.Triggers>
-                <Trigger SourceName="GroupContainer" Property="IsMouseOver" Value="True">
-                    <Setter TargetName="GroupControls" Property="Opacity" Value="0.7"/>
-                    <Setter TargetName="GroupContainer" Property="Background" Value="{DynamicResource MahApps.Brushes.Accent3}"/>
-                </Trigger>
-            </DataTemplate.Triggers>
         </DataTemplate>
     </UserControl.Resources>
 
     <Grid Margin="15">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="3*"/>
-        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Bulbs:"/>
-
-            <ListView Grid.Row="1" Margin="0,5,10,0" ItemsSource="{Binding Bulbs}" ItemTemplate="{StaticResource LightingTemplate}"/>
-        </Grid>
-
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <Label Grid.Row="0" Style="{StaticResource LabelStyle}" VerticalAlignment="Bottom" Content="Lighting Groups:"/>
-            <Button Grid.Row="0" HorizontalAlignment="Right" Height="25" Width="25" Margin="0,0,5,0" Padding="6" Opacity="0.7"
-                    Style="{DynamicResource MahApps.Styles.Button.Circle}" ToolTip="Create a new lighting group"
-                    Content="{StaticResource Path_Add}" Command="{Binding CreateGroup}"/>
-
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding Groups}" 
-                              ItemTemplate="{StaticResource EditableLightingTemplate}"/>
-            </ScrollViewer>
+        <Grid Grid.Row="1">
+            <ItemsControl Height="40" ItemsSource="{Binding LightData}" ItemTemplate="{StaticResource LightDataTemplate}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
         </Grid>
     </Grid>
 </UserControl>

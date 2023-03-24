@@ -30,6 +30,16 @@ namespace Mushrooms.Models {
             ToggleSelection = new DelegateCommand( OnToggleSelection );
         }
 
+        public LightSourceViewModel( Bulb bulb, Action<LightSourceViewModel> onSelect ) {
+            LightSource = new LightSource( bulb.Id, bulb.Name, LightSourceType.Bulb );
+            Bulbs = new List<Bulb>{ bulb };
+
+            mOnSelect = onSelect;
+            mSelected = false;
+
+            ToggleSelection = new DelegateCommand( OnToggleSelection );
+        }
+
         private void OnToggleSelection() => IsSelected = !IsSelected;
 
         public bool IsSelected {

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="ColorMinePortable" Version="2.0.1" />
+    <PackageReference Include="HueApi" Version="1.0.0" />
     <PackageReference Include="Q42.HueApi" Version="3.21.0" />
     <PackageReference Include="Q42.HueApi.ColorConverters" Version="3.20.1" />
   </ItemGroup>

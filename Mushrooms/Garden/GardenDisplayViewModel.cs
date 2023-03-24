@@ -264,7 +264,7 @@ namespace Mushrooms.Garden {
             var bulbs = await mHubManager.GetBulbs();
             var retValue = bulbs
                 .Select( bulb => new LightSourceViewModel( 
-                    new LightSource( bulb.Name, GroupType.Free ), new []{ bulb }, _ => { }));
+                    new LightSource( bulb.Id, bulb.Name, GroupType.Free ), new []{ bulb }, _ => { }));
 
             return retValue
                 .Concat( await LoadGroupLighting())
@@ -278,7 +278,7 @@ namespace Mushrooms.Garden {
                 .OrderBy( g => g.Name )
                 .Select( group =>
                     new LightSourceViewModel(
-                        new LightSource( group.Name, group.GroupType ), group.Bulbs, _ => { } ))
+                        new LightSource( group.Id, group.Name, group.GroupType ), group.Bulbs, _ => { } ))
                 .ToList();
         }
 

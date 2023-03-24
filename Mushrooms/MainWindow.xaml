@@ -58,7 +58,7 @@
                 <paletteBuilder:PaletteBuilder/>
             </TabItem>
             <TabItem Header="lighting">
-                <lighting:LightingDisplay/>
+                <lighting:LightingAreas/>
             </TabItem>
             <TabItem Header="garden">
                 <garden:GardenDisplay/>
