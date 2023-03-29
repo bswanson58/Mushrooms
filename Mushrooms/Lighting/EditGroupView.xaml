@@ -11,14 +11,18 @@
              xmlns:behaviours="clr-namespace:ReusableBits.Wpf.Behaviours;assembly=ReusableBits.Wpf"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:EditGroupViewModel, IsDesignTimeCreatable=False}"
-             Height="350" Width="500">
+             MinHeight="350" MinWidth="600">
 
     <dialogService:Dialog.WindowStyle>
         <Style TargetType="Window">
             <Setter Property="dialogService:Dialog.WindowStartupLocation" Value="CenterOwner" />
-            <Setter Property="ResizeMode" Value="NoResize"/>
+            <Setter Property="Width" Value="615"/>
+            <Setter Property="MinWidth" Value="615"/>
+            <Setter Property="Height" Value="365"/>
+            <Setter Property="MinHeight" Value="365"/>
+            <Setter Property="ResizeMode" Value="CanResizeWithGrip"/>
             <Setter Property="ShowInTaskbar" Value="False"/>
-            <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+            <Setter Property="SizeToContent" Value="Manual"/>
         </Style>
     </dialogService:Dialog.WindowStyle>
 
@@ -42,14 +46,14 @@
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="300"/>
                 <ColumnDefinition Width="25"/>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="90"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -83,8 +87,8 @@
                 </Grid.RowDefinitions>
 
                 <Label Grid.Row="0" Style="{StaticResource LabelStyle}" Content="Group Lighting:"/>
-                <ListView Grid.Row="1" Margin="5,0,0,0" ItemsSource="{Binding Lights}" 
-                          ItemTemplate="{StaticResource LightingTemplate}"/>
+                <ListBox Grid.Row="1" Margin="5,0,0,0" ItemsSource="{Binding Lights}"
+                         ItemTemplate="{StaticResource LightingTemplate}"/>
             </Grid>
         </Grid>
 
