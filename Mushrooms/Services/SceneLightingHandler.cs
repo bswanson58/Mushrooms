@@ -25,10 +25,12 @@ namespace Mushrooms.Services {
     internal class SceneLightingHandler : ISceneLightingHandler {
         private readonly IHubManager            mHubManager;
         private readonly LimitedRepeatingRandom mLimitedRandom;
+//        private readonly IBasicLog              mLog;
         private readonly Random                 mRandom;
 
-        public SceneLightingHandler( IHubManager hubManager ) {
+        public SceneLightingHandler( IHubManager hubManager ) {  //}, IBasicLog log ) {
             mHubManager = hubManager;
+//            mLog = log;
             mLimitedRandom = new LimitedRepeatingRandom();
             mRandom = Random.Shared;
         }
@@ -111,7 +113,15 @@ namespace Mushrooms.Services {
             }
 
             mHubManager.SetBulbState( bulbs.Select( b => b.Bulb ), color, brightness, transitionTime );
-
+/*
+            var firstBulb = bulbs.FirstOrDefault();
+            var updateTime = DateTime.MinValue;
+            if( firstBulb != null ) {
+                updateTime = firstBulb.NextUpdateTime;
+            }
+            mLog.LogMessage( 
+                $"Bulb updated: {String.Join( ',', bulbs.Select( b => b.Bulb.Name ))}, update time: {updateTime}, transition time: {transitionTime}, display time: {displayTime}, next update after: {nextUpdateTime}");
+*/
             return bulbs.Select( b => new ActiveBulb( b.Bulb, color, nextUpdateTime )).ToList();
         }
 
