@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using Mushrooms.Models;
 using ReusableBits.Wpf.Utility;
 
 namespace Mushrooms.Garden {

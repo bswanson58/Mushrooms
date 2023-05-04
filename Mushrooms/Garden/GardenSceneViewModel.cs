@@ -31,8 +31,7 @@ namespace Mushrooms.Garden {
         public  ICommand                    StartSceneAnimated { get; }
         public  ICommand                    StartSceneStationary { get; }
 
-        public  ICommand                    ActivateScene { get; }
-        public  ICommand                    DeactivateScene { get; }
+        public  ICommand                    ToggleScene { get; }
         public  ICommand                    SetPalette { get; }
         public  ICommand                    SetParameters { get; }
         public  ICommand                    SetLighting { get; }
@@ -51,8 +50,7 @@ namespace Mushrooms.Garden {
             StartSceneAnimated = new DelegateCommand( OnStartSceneAnimated );
             StartSceneStationary = new DelegateCommand( OnStartSceneStationary );
 
-            ActivateScene = new DelegateCommand( OnActivateScene );
-            DeactivateScene = new DelegateCommand( OnDeactivateScene );
+            ToggleScene = new DelegateCommand( OnToggleScene );
             SetLighting = new DelegateCommand( OnSetLighting );
             SetPalette = new DelegateCommand( OnSetPalette );
             SetParameters = new DelegateCommand( OnSetParameters );
@@ -122,14 +120,13 @@ namespace Mushrooms.Garden {
             RaisePropertyChanged( () => CanRecolorScene );
         }
 
-        private void OnActivateScene() {
-            mGarden.StartScene( Scene );
-
-            RaisePropertyChanged( () => CanRecolorScene );
-        }
-
-        private void OnDeactivateScene() {
-            mGarden.StopScene( Scene );
+        private void OnToggleScene() {
+            if( IsSceneActive || IsScheduleActive ) {
+                mGarden.StopScene( Scene );
+            }
+            else {
+                mGarden.StartScene( Scene );
+            }
 
             RaisePropertyChanged( () => CanRecolorScene );
         }
