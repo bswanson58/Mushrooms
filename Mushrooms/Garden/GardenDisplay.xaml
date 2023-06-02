@@ -162,11 +162,13 @@
                     <Setter TargetName="ScenePower" Property="Content" Value="{StaticResource Path_Clock}"/>
                     <Setter TargetName="ScenePower" Property="Opacity" Value="1.0"/>
                     <Setter TargetName="ScenePower" Property="Foreground" Value="LawnGreen"/>
+                    <Setter TargetName="SceneControls" Property="Visibility" Value="Visible"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsSceneActive}" Value="True">
                     <Setter TargetName="ScenePower" Property="Content" Value="{StaticResource Path_Power}"/>
                     <Setter TargetName="ScenePower" Property="Opacity" Value="1.0"/>
                     <Setter TargetName="ScenePower" Property="Foreground" Value="LawnGreen"/>
+                    <Setter TargetName="SceneControls" Property="Visibility" Value="Visible"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsScheduled}" Value="True">
                     <Setter TargetName="SceneSchedule" Property="Opacity" Value="0.3"/>
