@@ -70,12 +70,6 @@ namespace Mushrooms {
                 await store.InitializeAsync();
             }
 
-            var hassIntegration = serviceProvider.GetService<IHaLightingHandler>();
-
-            if( hassIntegration != null ) {
-                await hassIntegration.InitializeAsync();
-            }
-
             DispatcherUnhandledException += AppDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskSchedulerUnobservedTaskException;
@@ -108,7 +102,8 @@ namespace Mushrooms {
             services.AddSingleton<ILightsManager, LightsManager>();
             services.AddSingleton<ISensorsManager, SensorsManager>();
 
-            services.AddSingleton<IHaLightingHandler, HaLightingHandler>();
+            services.AddSingleton<HaLightingHandler>();
+            services.AddHostedService( p => p.GetRequiredService<HaLightingHandler>());
 
             services.AddScoped<IApplicationConstants, ApplicationConstants>();
             services.AddScoped<IEnvironment, OperatingEnvironment>();
