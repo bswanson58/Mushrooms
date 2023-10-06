@@ -2,6 +2,11 @@
 using Mushrooms.Models;
 using Mushrooms.Services;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using HassMqtt.Discovery;
+using HassMqtt.Models;
+using HassMqtt.Support;
 
 namespace Mushrooms.HassIntegration {
     internal class HaSceneLight : LightBase, IDisposable {
@@ -12,7 +17,7 @@ namespace Mushrooms.HassIntegration {
         private readonly IDisposable        mSceneSubscription;
 
         public HaSceneLight( ActiveScene scene, IMushroomGarden garden ) : 
-            base( string.IsNullOrWhiteSpace( scene.Scene.SceneName ) ? cDefaultName : scene.Scene.SceneName, 5, scene.Scene.Id ) {
+            base( string.IsNullOrWhiteSpace( scene.Scene.SceneName ) ? cDefaultName : scene.Scene.SceneName, 3, scene.Scene.Id ) {
             mScene = scene;
             mGarden = garden;
 
@@ -20,6 +25,43 @@ namespace Mushrooms.HassIntegration {
 
             mSceneSubscription = mScene.OnSceneChanged.Subscribe( OnSceneChanged );
         }
+
+        protected override BaseDiscoveryModel ? CreateDiscoveryModel() {
+            var discoveryModel = base.CreateDiscoveryModel() as LightDiscoveryModel;
+
+            if(( discoveryModel != null ) &&
+               ( HassContext != null )) {
+                discoveryModel.RgbStateTopic = $"{HassContext.DeviceBaseTopic( Domain )}/{ObjectId}/color/{Constants.Status}";
+            }
+
+            return discoveryModel;
+        }
+
+        public override IList<DeviceTopicState> GetStatesToPublish() {
+            var statesList = base.GetStatesToPublish();
+
+            if( GetDiscoveryModel() is LightDiscoveryModel discoveryModel ) {
+                if(!String.IsNullOrWhiteSpace( discoveryModel.RgbStateTopic )) {
+                    statesList.Add( new DeviceTopicState( discoveryModel.RgbStateTopic, GetRgbColor()));
+                }
+            }
+
+            return statesList;
+        }
+
+        private string GetRgbColor() {
+            var retValue = "200,200,200";
+            var bulb = mScene.GetActiveBulbs().FirstOrDefault();
+
+            if( bulb != null ) {
+                retValue = $"{bulb.ActiveColor.R},{bulb.ActiveColor.G},{bulb.ActiveColor.B}";
+            }
+
+            return retValue;
+        }
+
+        public override string GetCombinedState() =>
+            $"{base.GetCombinedState()}|{GetRgbColor()}";
 
         private void OnSceneChanged( ActiveScene scene ) {
             mState = scene.IsActive;

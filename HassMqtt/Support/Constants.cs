@@ -1,5 +1,5 @@
 ﻿namespace HassMqtt.Support {
-    internal static class Constants {
+    public static class Constants {
         // ReSharper disable once StringLiteralTypo
         public  static readonly string      DiscoveryPrefix = "homeassistant";
 
