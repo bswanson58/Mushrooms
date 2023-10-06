@@ -36,11 +36,12 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
+    <PackageReference Include="System.Reactive" Version="6.0.0" />
     <PackageReference Include="TrayIcon" Version="1.0.7.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HassMqtt\HassMqtt.csproj" />
     <ProjectReference Include="..\HueLighting\HueLighting.csproj" />
     <ProjectReference Include="..\ReusableBits.Platform\ReusableBits.Platform.csproj" />
     <ProjectReference Include="..\ReusableBits.Wpf\ReusableBits.Wpf.csproj" />

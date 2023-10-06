@@ -3,10 +3,18 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using Fluxor;
+using HassMqtt;
+using HassMqtt.Context;
+using HassMqtt.Lights;
+using HassMqtt.Mqtt;
+using HassMqtt.Platform;
+using HassMqtt.Sensors;
 using HueLighting.Hub;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MQTTnet;
 using Mushrooms.Database;
+using Mushrooms.HassIntegration;
 using Mushrooms.Platform;
 using Mushrooms.Services;
 using Mushrooms.Support;
@@ -62,6 +70,12 @@ namespace Mushrooms {
                 await store.InitializeAsync();
             }
 
+            var hassIntegration = serviceProvider.GetService<IHaLightingHandler>();
+
+            if( hassIntegration != null ) {
+                await hassIntegration.InitializeAsync();
+            }
+
             DispatcherUnhandledException += AppDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskSchedulerUnobservedTaskException;
@@ -83,6 +97,18 @@ namespace Mushrooms {
             services.AddSingleton<MushroomGarden>();
             services.AddSingleton<IMushroomGarden>( p => p.GetRequiredService<MushroomGarden>());
             services.AddHostedService( p => p.GetRequiredService<MushroomGarden>());
+
+            // HassMqtt
+            services.AddScoped<MqttFactory>();
+            services.AddScoped<IClientConfiguration, ClientConfiguration>();
+            services.AddSingleton<IMqttManager, MqttManager>();
+            services.AddSingleton<IHassContext, HassContext>();
+            services.AddSingleton<IHassMqttManager, HassMqttManager>();
+            services.AddSingleton<IHassManager, HassManager>();
+            services.AddSingleton<ILightsManager, LightsManager>();
+            services.AddSingleton<ISensorsManager, SensorsManager>();
+
+            services.AddSingleton<IHaLightingHandler, HaLightingHandler>();
 
             services.AddScoped<IApplicationConstants, ApplicationConstants>();
             services.AddScoped<IEnvironment, OperatingEnvironment>();
