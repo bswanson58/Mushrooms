@@ -27,6 +27,7 @@ namespace Mushrooms.StatusBar {
 		private readonly Queue<StatusMessage>	mHoldingQueue;
         private CelestialData ?                 mCelestialData;
 		private bool							mViewAttached;
+		private CancellationTokenSource			mTokenSource;
 
         public  bool                            IsDay {get; private set; }
         public  string                          CelestialInfo { get; private set; }
@@ -47,6 +48,7 @@ namespace Mushrooms.StatusBar {
             mVersionFormatter = versionFormatter;
 
 			mHoldingQueue = new Queue<StatusMessage>();
+			mTokenSource = new CancellationTokenSource();
 
 			OpenDataFolder = new DelegateCommand( OnOpenDataFolder );
 			ViewAttached = new DelegateCommand( OnViewAttached );
@@ -90,7 +92,7 @@ namespace Mushrooms.StatusBar {
             mVersionFormatter.StartFormatting();
 			mViewAttached = true;
 
-			Repeat.Interval( TimeSpan.FromMinutes( 5 ), UpdateCelestialData, CancellationToken.None );
+			Repeat.Interval( TimeSpan.FromMinutes( 5 ), UpdateCelestialData, mTokenSource.Token );
 		}
 
 		public void Handle( Events.StatusEvent status ) {
@@ -128,6 +130,9 @@ namespace Mushrooms.StatusBar {
 
         public void Dispose() {
             mEventAggregator.Unsubscribe( this );
+
+			mTokenSource.Cancel();
+			mTokenSource.Dispose();
 
             mVersionFormatter.Dispose();
         }
