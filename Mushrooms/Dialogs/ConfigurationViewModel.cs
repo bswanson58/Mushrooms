@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using HueLighting.Hub;
+using Mushrooms.HassIntegration;
 using Mushrooms.Models;
 using ReusableBits.Platform.Preferences;
 using ReusableBits.Wpf.Commands;
@@ -22,6 +23,7 @@ namespace Mushrooms.Dialogs {
         public  bool                                ScanningForHubs { get; private set; }
 
         public  DelegateCommand                     RegisterHubs { get; }
+        public  DelegateCommand                     HaIntegration { get; }
 
         public ConfigurationViewModel( IPreferences preferences, IHubManager hubManager, IDialogService dialogService ) {
             mPreferences = preferences;
@@ -31,6 +33,8 @@ namespace Mushrooms.Dialogs {
             Hubs = new ObservableCollection<HubViewModel>();
             RegisterHubs = new DelegateCommand( OnRegisterHubs );
             ScanningForHubs = false;
+
+            HaIntegration = new DelegateCommand( OnHaIntegration );
 
             var uiPreferences = mPreferences.Load<MushroomPreferences>();
 
@@ -74,6 +78,13 @@ namespace Mushrooms.Dialogs {
             mDialogService.ShowDialog<HubRegistrationView>( result => {
                 if( result.Result.Equals( ButtonResult.Ok )) {
                     LoadRegisteredHubs();
+                }
+            });
+        }
+
+        private void OnHaIntegration() {
+            mDialogService.ShowDialog<HassParametersView>( result => {
+                if( result.Result.Equals( ButtonResult.Ok )) {
                 }
             });
         }

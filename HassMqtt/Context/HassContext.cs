@@ -1,8 +1,8 @@
 ﻿using HassMqtt.Discovery;
-using HassMqtt.Models;
-using HassMqtt.Mqtt;
 using HassMqtt.Platform;
 using HassMqtt.Support;
+
+// ReSharper disable IdentifierTypo
 
 namespace HassMqtt.Context {
     public interface IHassContext {
@@ -17,26 +17,23 @@ namespace HassMqtt.Context {
     }
 
     public class HassContext : IHassContext {
-        private readonly HassParameters     mHassParameters;
-        private readonly MqttParameters     mMqttParameters;
+        private readonly IClientConfiguration   mClientConfiguration;
 
-        public  bool                        MqttEnabled => mMqttParameters.MqttEnabled;
-        public  bool                        UseMqttRetainFlag => mMqttParameters.UseRetainFlag;
-        public  DeviceConfigModel           DeviceConfiguration { get; }
+        public  bool                            MqttEnabled => mClientConfiguration.MqttConfiguration.MqttEnabled;
+        public  bool                            UseMqttRetainFlag => mClientConfiguration.MqttConfiguration.UseRetainFlag;
+        public  DeviceConfigModel               DeviceConfiguration => mClientConfiguration.DeviceConfiguration;
 
         public HassContext( IClientConfiguration clientConfiguration ) {
-            mHassParameters = clientConfiguration.HassConfiguration;
-            mMqttParameters = clientConfiguration.MqttConfiguration;
-            DeviceConfiguration = clientConfiguration.DeviceConfiguration;
+            mClientConfiguration = clientConfiguration;
         }
 
         public string  DeviceBaseTopic( string forDomain ) =>
-            $"{mHassParameters.DiscoveryPrefix}/{forDomain}/{DeviceConfiguration.Name}";
+            $"{mClientConfiguration.HassConfiguration.DiscoveryPrefix}/{forDomain}/{DeviceConfiguration.Name}";
 
         public string DeviceAvailabilityTopic() =>
-            $"{mHassParameters.DiscoveryPrefix}/{DeviceConfiguration.Name}/{DeviceConfiguration.Identifiers}/{Constants.Availability}";
+            $"{mClientConfiguration.HassConfiguration.DiscoveryPrefix}/{DeviceConfiguration.Name}/{DeviceConfiguration.Identifiers}/{Constants.Availability}";
 
         public string DeviceMessageSubscriptionTopic() =>
-            $"{mHassParameters.DiscoveryPrefix}/+/{DeviceConfiguration.Name}/#";
+            $"{mClientConfiguration.HassConfiguration.DiscoveryPrefix}/+/{DeviceConfiguration.Name}/#";
     }
 }

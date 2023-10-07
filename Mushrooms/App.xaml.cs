@@ -94,7 +94,7 @@ namespace Mushrooms {
 
             // HassMqtt
             services.AddScoped<MqttFactory>();
-            services.AddScoped<IClientConfiguration, ClientConfiguration>();
+            services.AddSingleton<IClientConfiguration, ClientConfiguration>();
             services.AddSingleton<IMqttManager, MqttManager>();
             services.AddSingleton<IHassContext, HassContext>();
             services.AddSingleton<IHassMqttManager, HassMqttManager>();
