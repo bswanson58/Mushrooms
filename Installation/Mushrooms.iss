@@ -44,6 +44,9 @@ Source: "..\Mushrooms\bin\Release\net7.0-windows\ControlzEx.dll"; DestDir: "{app
 Source: "..\Mushrooms\bin\Release\net7.0-windows\DynamicData.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Fluxor.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Gu.Wpf.Geometry.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Mushrooms\bin\Release\net7.0-windows\HassMqtt.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Mushrooms\bin\Release\net7.0-windows\HueApi.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Mushrooms\bin\Release\net7.0-windows\HueApi.ColorConverters.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\HueLighting.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\LiteDB.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\MahApps.Metro.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -74,14 +77,16 @@ Source: "..\Mushrooms\bin\Release\net7.0-windows\Microsoft.Extensions.Options.Co
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Microsoft.Extensions.Options.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Microsoft.Extensions.Primitives.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Microsoft.Xaml.Behaviors.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Mushrooms\bin\Release\net7.0-windows\MQTTnet.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Mushrooms\bin\Release\net7.0-windows\MQTTnet.Extensions.ManagedClient.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Mushrooms.deps.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Mushrooms.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Mushrooms.dll.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Mushrooms.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Mushrooms\bin\Release\net7.0-windows\Mushrooms.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Mushrooms.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\NCuid.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Mushrooms\bin\Release\net7.0-windows\OneOf.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Q42.HueApi.ColorConverters.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\Q42.HueApi.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\ReusableBits.Platform.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -95,9 +100,6 @@ Source: "..\Mushrooms\bin\Release\net7.0-windows\Serilog.Sinks.RollingFile.dll";
 Source: "..\Mushrooms\bin\Release\net7.0-windows\SixLabors.ImageSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\System.Reactive.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Mushrooms\bin\Release\net7.0-windows\TrayIcon.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Mushrooms\bin\Release\net7.0-windows\HueApi.ColorConverters.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Mushrooms\bin\Release\net7.0-windows\HueApi.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Mushrooms\bin\Release\net7.0-windows\Q42.HueApi.ColorConverters.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#ApplicationName}"; Filename: "{app}\{#ExecutableName}"
