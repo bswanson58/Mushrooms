@@ -1,12 +1,14 @@
 ﻿using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using HassMqtt.Platform;
+using HassMqtt.Context;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Packets;
 using OneOf;
 using OneOf.Types;
+
+// ReSharper disable IdentifierTypo
 
 namespace HassMqtt.Mqtt {
     public enum MqttStatus {
@@ -18,14 +20,12 @@ namespace HassMqtt.Mqtt {
     }
 
     public interface IMqttManager : IDisposable {
-        bool        IsEnabled { get; }
-        bool        IsConnected { get; }
-        MqttStatus  Status { get; }
+        bool                            IsEnabled { get; }
+        bool                            IsConnected { get; }
+        MqttStatus                      Status { get; }
 
         IObservable<MqttMessage>        OnMessageReceived { get; }
         IObservable<MqttMessage>        OnMessageProcessed {  get; }
-
-        Task<OneOf<None, Exception>>    InitializeAsync();
 
         Task<OneOf<None, Exception>>    PublishAsync( string topic, string payload );
         Task<OneOf<None, Exception>>    PublishAsync( MqttApplicationMessage message );
@@ -37,81 +37,101 @@ namespace HassMqtt.Mqtt {
 
     public class MqttManager : IMqttManager {
         private readonly MqttFactory            mClientFactory;
-        private readonly IClientConfiguration   mClientConfiguration;
-        private readonly IManagedMqttClient     mClient;
         private readonly Subject<MqttMessage>   mReceivedMessageSubject;
         private readonly Subject<MqttMessage>   mProcessedMessageSubject;
+        private readonly IDisposable            mContextSubscription;
+        private IManagedMqttClient ?            mClient;
 
         public  bool                            IsEnabled { get; private set; }
+        public  bool                            IsConnected => mClient?.IsConnected == true;
+
         public  MqttStatus                      Status { get; private set; }
 
         public  IObservable<MqttMessage>        OnMessageReceived => mReceivedMessageSubject.AsObservable();
         public  IObservable<MqttMessage>        OnMessageProcessed => mProcessedMessageSubject.AsObservable();
 
-        public MqttManager( MqttFactory clientFactory, IClientConfiguration clientConfiguration ) {
+        public MqttManager( MqttFactory clientFactory, IHassContextProvider contextProvider ) {
             mClientFactory = clientFactory;
-            mClientConfiguration = clientConfiguration;
 
             IsEnabled = false;
             Status = MqttStatus.Uninitialized;
 
-            mClient = mClientFactory.CreateManagedMqttClient();
-
             mReceivedMessageSubject = new Subject<MqttMessage>();
             mProcessedMessageSubject = new Subject<MqttMessage>();
+
+            Status = MqttStatus.Uninitialized;
+
+            mContextSubscription = contextProvider.OnContextChanged.Subscribe( OnContextChanged );
         }
 
-        public bool IsConnected => 
-            mClient is { IsConnected: true };
+        private void CreateClient() {
+            DisposeExistingClient();
 
-        public async Task<OneOf<None, Exception>> InitializeAsync() {
+            mClient = mClientFactory.CreateManagedMqttClient();
+
+            mClient.ApplicationMessageReceivedAsync += OnApplicationMessageReceivedAsync; 
+            mClient.ApplicationMessageProcessedAsync += OnApplicationMessageProcessedAsync;
+            mClient.ConnectedAsync += OnConnectedAsync;
+            mClient.ConnectingFailedAsync += OnConnectingFailedAsync;
+            mClient.DisconnectedAsync += OnDisconnectedAsync;
+        }
+
+        private async void OnContextChanged( IHassClientContext context ) {
+            await ConnectAsync( context );
+        }
+
+        private async Task ConnectAsync( IHassClientContext context ) {
             try {
-                if( mClientConfiguration.MqttConfiguration.MqttEnabled ) {
+                if( mClient?.IsConnected == true ) {
+                    await Disconnect();
+
+                    // wait while connecting
+                    while( mClient.IsConnected ) {
+                        await Task.Delay( 250 );
+                    } 
+                }
+
+                if( context.MqttEnabled ) {
                     Status = MqttStatus.Connecting;
 
                     var mqttClientOptions = new MqttClientOptionsBuilder()
-                        .WithClientId( mClientConfiguration.DeviceConfiguration.Identifiers )
-                        .WithTcpServer( mClientConfiguration.MqttConfiguration.ServerAddress )
+                        .WithClientId( context.DeviceConfiguration.Identifiers )
+                        .WithTcpServer( context.ServerAddress )
                         .WithCleanSession()
                         .WithKeepAlivePeriod( TimeSpan.FromSeconds( 15 ));
 
-                    if(!String.IsNullOrWhiteSpace( mClientConfiguration.MqttConfiguration.UserName )) {
+                    if(!String.IsNullOrWhiteSpace( context.UserName )) {
                         mqttClientOptions
-                            .WithCredentials( mClientConfiguration.MqttConfiguration.UserName, 
-                                              mClientConfiguration.MqttConfiguration.Password );
+                            .WithCredentials( context.UserName, context.Password );
                     }
 
-                    if(!String.IsNullOrWhiteSpace( mClientConfiguration.LastWillTopic )) {
+                    if(!String.IsNullOrWhiteSpace( context.LastWillTopic )) {
                         mqttClientOptions
-                            .WithWillTopic( mClientConfiguration.LastWillTopic )
-                            .WithWillPayload( mClientConfiguration.LastWillPayload )
-                            .WithWillRetain( mClientConfiguration.MqttConfiguration.UseRetainFlag );
+                            .WithWillTopic( context.LastWillTopic )
+                            .WithWillPayload( context.LastWillPayload )
+                            .WithWillRetain( context.UseMqttRetainFlag );
                     }
 
                     var managedMqttClientOptions = new ManagedMqttClientOptionsBuilder()
                         .WithClientOptions( mqttClientOptions.Build())
                         .Build();
 
-                    mClient.ApplicationMessageReceivedAsync += OnApplicationMessageReceivedAsync; 
-                    mClient.ApplicationMessageProcessedAsync += OnApplicationMessageProcessedAsync;
-                    mClient.ConnectedAsync += OnConnectedAsync;
-                    mClient.ConnectingFailedAsync += OnConnectingFailedAsync;
-                    mClient.DisconnectedAsync += OnDisconnectedAsync;
+                    CreateClient();
 
-                    await mClient.StartAsync( managedMqttClientOptions );
+                    if( mClient != null ) {
+                        await mClient.StartAsync( managedMqttClientOptions );
+                    }
 
                     IsEnabled = true;
                 }
                 else {
                     IsEnabled = false;
+
+                    Status = MqttStatus.Disconnected;
                 }
-
-                return new None();
             }
-            catch( Exception ex ) {
+            catch( Exception ) {
                 Status = MqttStatus.Error;
-
-                return ex;
             }
         }
 
@@ -146,19 +166,23 @@ namespace HassMqtt.Mqtt {
         }
 
         public async Task<OneOf<None, Exception>> PublishAsync( MqttApplicationMessage message ) {
-            await mClient.EnqueueAsync( message );
+            if( mClient != null ) {
+                await mClient.EnqueueAsync( message );
+            }
 
             return new None();
         }
 
         public async Task<OneOf<None, Exception>> PublishAsync( string topic, string payload ) {
-            var messageFactory = mClientFactory.CreateApplicationMessageBuilder();
-            var message = messageFactory
-                .WithTopic( topic )
-                .WithPayload( payload )
-                .Build();
+            if( mClient != null ) {
+                var messageFactory = mClientFactory.CreateApplicationMessageBuilder();
+                var message = messageFactory
+                    .WithTopic( topic )
+                    .WithPayload( payload )
+                    .Build();
 
-            await mClient.EnqueueAsync( message );
+                await mClient.EnqueueAsync( message );
+            }
 
             return new None();
         }
@@ -167,32 +191,49 @@ namespace HassMqtt.Mqtt {
             await SubscribeAsync( new List<string>{ topic });
 
         public async Task<OneOf<None, Exception>> SubscribeAsync( IList<string> topics ) {
-            var topicFilters = topics.Select( t => new MqttTopicFilter{ Topic = t }).ToList();
+            if( mClient != null ) {
+                var topicFilters = topics.Select( t => new MqttTopicFilter{ Topic = t }).ToList();
 
-            await mClient.SubscribeAsync( topicFilters );
+                await mClient.SubscribeAsync( topicFilters );
+            }
 
             return new None();
         }
 
         public async Task<OneOf<None, Exception>> UnsubscribeAsync( string topic ) {
-            await mClient.UnsubscribeAsync( topic );
+            if( mClient != null ) {
+                await mClient.UnsubscribeAsync( topic );
+            }
 
             return new None();
         }
 
-        private async void Disconnect() =>
-            await mClient.StopAsync();
+        private async Task Disconnect() {
+            if( mClient != null ) {
+                await mClient.StopAsync();
+            }
 
-        public void Dispose() {
-            Disconnect();
+            Status = MqttStatus.Disconnected;
+        }
 
-            mClient.ApplicationMessageReceivedAsync -= OnApplicationMessageReceivedAsync; 
-            mClient.ApplicationMessageProcessedAsync -= OnApplicationMessageProcessedAsync;
-            mClient.ConnectedAsync -= OnConnectedAsync;
-            mClient.ConnectingFailedAsync -= OnConnectingFailedAsync;
-            mClient.DisconnectedAsync -= OnDisconnectedAsync;
+        private void DisposeExistingClient() {
+            if( mClient != null ) {
+                mClient.ApplicationMessageReceivedAsync -= OnApplicationMessageReceivedAsync; 
+                mClient.ApplicationMessageProcessedAsync -= OnApplicationMessageProcessedAsync;
+                mClient.ConnectedAsync -= OnConnectedAsync;
+                mClient.ConnectingFailedAsync -= OnConnectingFailedAsync;
+                mClient.DisconnectedAsync -= OnDisconnectedAsync;
 
-            mClient.Dispose();
+                mClient.Dispose();
+            }
+        }
+
+        public async void Dispose() {
+            mContextSubscription.Dispose();
+
+            await Disconnect();
+
+            DisposeExistingClient();
         }
     }
 }

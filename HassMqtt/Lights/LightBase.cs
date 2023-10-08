@@ -16,20 +16,22 @@ namespace HassMqtt.Lights {
         }
 
         protected override BaseDiscoveryModel ? CreateDiscoveryModel() {
-            if( HassContext == null ) {
+            var context = ContextProvider?.Context;
+
+            if( context == null ) {
                 return null;
             }
 
             return new LightDiscoveryModel {
-                AvailabilityTopic = HassContext.DeviceAvailabilityTopic(),
+                AvailabilityTopic = context.DeviceAvailabilityTopic(),
                 Name = Name,
                 Icon = "mdi:lightbulb",
                 UniqueId = Id,
-                Device = HassContext.DeviceConfiguration,
-                StateTopic = $"{HassContext.DeviceBaseTopic( Domain )}/{ObjectId}/{Constants.State}/{Constants.Status}",
-                CommandTopic = $"{HassContext.DeviceBaseTopic( Domain )}/{ObjectId}/{Constants.State}/{Constants.Subscribe}",
-                BrightnessStateTopic = $"{HassContext.DeviceBaseTopic( Domain )}/{ObjectId}/{Constants.Brightness}/{Constants.Status}",
-                BrightnessCommandTopic = $"{HassContext.DeviceBaseTopic( Domain )}/{ObjectId}/{Constants.Brightness}/{Constants.Subscribe}",
+                Device = context.DeviceConfiguration,
+                StateTopic = $"{context.DeviceBaseTopic( Domain )}/{ObjectId}/{Constants.State}/{Constants.Status}",
+                CommandTopic = $"{context.DeviceBaseTopic( Domain )}/{ObjectId}/{Constants.State}/{Constants.Subscribe}",
+                BrightnessStateTopic = $"{context.DeviceBaseTopic( Domain )}/{ObjectId}/{Constants.Brightness}/{Constants.Status}",
+                BrightnessCommandTopic = $"{context.DeviceBaseTopic( Domain )}/{ObjectId}/{Constants.Brightness}/{Constants.Subscribe}",
                 BrightnessScale = 255
             };
         }

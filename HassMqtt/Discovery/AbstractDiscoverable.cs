@@ -7,21 +7,21 @@ namespace HassMqtt.Discovery {
     /// Abstract discoverable object from which all Home Assistant entities are derived
     /// </summary>
     public abstract class AbstractDiscoverable {
-        private string                  mObjectId;
-        private BaseDiscoveryModel ?    mDeviceDiscoveryModel;
+        private string                      mObjectId;
+        private BaseDiscoveryModel ?        mDeviceDiscoveryModel;
 
-        protected IHassContext ?        HassContext;
+        protected IHassContextProvider ?    ContextProvider;
 
-        public  string                  Name { get; }
-        public  string                  Id { get; }
-        public  string                  Domain { get; }
+        public  string                      Name { get; }
+        public  string                      Id { get; }
+        public  string                      Domain { get; }
 
-        public bool                     UseAttributes { get; }
+        public bool                         UseAttributes { get; }
 
-        public int                      UpdateIntervalSeconds { get; }
-        public DateTime                 LastUpdated { get; private set; }
-        public string                   PreviousPublishedState { get; private set; }
-        public string                   PreviousPublishedAttributes { get; private set; }
+        public int                          UpdateIntervalSeconds { get; }
+        public DateTime                     LastUpdated { get; private set; }
+        public string                       PreviousPublishedState { get; private set; }
+        public string                       PreviousPublishedAttributes { get; private set; }
 
         protected AbstractDiscoverable( string name, string domain,
                                         int updateIntervalSeconds = 10, string? id = default, bool useAttributes = false ) {
@@ -38,8 +38,8 @@ namespace HassMqtt.Discovery {
             PreviousPublishedAttributes = string.Empty;
         }
 
-        public void InitializeParameters( IHassContext context ) {
-            HassContext = context;
+        public void InitializeParameters( IHassContextProvider contextProvider ) {
+            ContextProvider = contextProvider;
         }
 
         public virtual string                   GetAttributes() => String.Empty;

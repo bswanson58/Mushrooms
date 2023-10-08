@@ -1,4 +1,5 @@
-﻿using HassMqtt.Lights;
+﻿using HassMqtt.Context;
+using HassMqtt.Lights;
 using HassMqtt.Mqtt;
 using HassMqtt.Platform;
 
@@ -16,24 +17,24 @@ namespace HassMqtt {
     }
 
     public class HassManager : IHassManager {
+        private readonly IHassContextProvider   mContextProvider;
         private readonly IMqttManager           mMqttManager;
         private readonly IHassMqttManager       mHassManager;
-        private readonly IClientConfiguration   mHassConfiguration;
 
-        public  ILightsManager              LightsManager { get; }
+        public  ILightsManager                  LightsManager { get; }
 
         public HassManager( ILightsManager lightsManager, IHassMqttManager hassManager, IMqttManager mqttManager,
-                            IClientConfiguration clientConfiguration ) {
-            mHassConfiguration = clientConfiguration;
+                            IHassContextProvider contextProvider ) {
             LightsManager = lightsManager;
             mHassManager = hassManager;
             mMqttManager = mqttManager;
+            mContextProvider = contextProvider;
         }
 
         public async Task InitializeAsync() {
-            if( mMqttManager.Status.Equals( MqttStatus.Uninitialized )) {
-                await mMqttManager.InitializeAsync();
-            }
+//            if( mMqttManager.Status.Equals( MqttStatus.Uninitialized )) {
+//                await mMqttManager.InitializeAsync();
+//            }
 
             // wait while connecting
             while( mMqttManager.Status == MqttStatus.Connecting ) {
@@ -57,9 +58,9 @@ namespace HassMqtt {
         }
 
         public HassMqttParameters GetHassMqttParameters() =>
-            mHassConfiguration.GetHassMqttParameters();
+            mContextProvider.GetHassMqttParameters();
 
         public void SetHassMqttParameters( HassMqttParameters parameters ) =>
-            mHassConfiguration.SetHassMqttParameters( parameters );
+            mContextProvider.SetHassMqttParameters( parameters );
     }
 }

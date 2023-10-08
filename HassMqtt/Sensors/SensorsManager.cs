@@ -21,19 +21,19 @@ namespace HassMqtt.Sensors {
     public class SensorsManager : ISensorsManager {
         private readonly List<AbstractSingleValueSensor>        mSingleValueSensors;
         private readonly List<AbstractMultiValueSensor>         mMultiValueSensors;
-        private readonly IMqttManager       mMqttManager;
-        private readonly IHassContext       mHassContext;
-        private readonly IHassMqttManager   mHassManager;
-        private readonly IStoredSensors     mStoredSensors;
-        private readonly IBasicLog          mLog;
-        private DateTime                    mLastAutoDiscoPublish;
-        private bool                        mActive;
-        private bool                        mPause;
+        private readonly IMqttManager           mMqttManager;
+        private readonly IHassContextProvider   mContextProvider;
+        private readonly IHassMqttManager       mHassManager;
+        private readonly IStoredSensors         mStoredSensors;
+        private readonly IBasicLog              mLog;
+        private DateTime                        mLastAutoDiscoPublish;
+        private bool                            mActive;
+        private bool                            mPause;
 
-        public SensorsManager( IMqttManager mqttManager, IBasicLog log, IStoredSensors storedSensors, IHassContext hassContext,
-                               IHassMqttManager hassManager ) {
+        public SensorsManager( IMqttManager mqttManager, IBasicLog log, IStoredSensors storedSensors,
+                               IHassContextProvider contextProvider, IHassMqttManager hassManager ) {
             mMqttManager = mqttManager;
-            mHassContext = hassContext;
+            mContextProvider = contextProvider;
             mLog = log;
             mStoredSensors = storedSensors;
             mHassManager = hassManager;
@@ -79,7 +79,7 @@ namespace HassMqtt.Sensors {
         }
 
         public void AddSensor( AbstractSingleValueSensor sensor ) {
-            sensor.InitializeParameters( mHassContext );
+            sensor.InitializeParameters( mContextProvider );
 
             mSingleValueSensors.Add( sensor );
         }

@@ -1,11 +1,13 @@
 ﻿using System.Text.Json;
-using HassMqtt.Context;
 using HassMqtt.Lights;
 using HassMqtt.Mqtt;
 using HassMqtt.Support;
 using ReusableBits.Platform.Interfaces;
 using MQTTnet;
 using HassMqtt.Discovery;
+using HassMqtt.Context;
+
+// ReSharper disable IdentifierTypo
 
 namespace HassMqtt {
     public interface IMqttMessageHandler {
@@ -27,7 +29,7 @@ namespace HassMqtt {
 
     public class HassMqttManager : IHassMqttManager {
         private readonly IMqttManager               mMqttManager;
-        private readonly IHassContext               mContext;
+        private readonly IHassContextProvider       mContextProvider;
         private readonly IBasicLog                  mLog;
         private readonly List<IMqttMessageHandler>  mMessageHandlers;
         private DateTime                            mLastAvailableAnnouncementFailedLogged;
@@ -35,9 +37,9 @@ namespace HassMqtt {
         private CancellationTokenSource ?           mTokenSource;
         private Task ?                              mProcessTask;
 
-        public HassMqttManager( IMqttManager mqttManager, IHassContext context, IBasicLog log ) {
+        public HassMqttManager( IMqttManager mqttManager, IHassContextProvider contextProvider, IBasicLog log ) {
             mMqttManager = mqttManager;
-            mContext = context;
+            mContextProvider = contextProvider;
             mLog = log;
 
             mMessageHandlers = new List<IMqttMessageHandler>();
@@ -102,7 +104,7 @@ namespace HassMqtt {
                     }
 
                     if(!subscriptionRequested ) {
-                        await mMqttManager.SubscribeAsync( mContext.DeviceMessageSubscriptionTopic());
+                        await mMqttManager.SubscribeAsync( mContextProvider.Context.DeviceMessageSubscriptionTopic());
 
                         subscriptionRequested = true;
                     }
@@ -117,22 +119,22 @@ namespace HassMqtt {
             }
 
             if( subscriptionRequested ) {
-                await mMqttManager.UnsubscribeAsync( mContext.DeviceMessageSubscriptionTopic());
+                await mMqttManager.UnsubscribeAsync( mContextProvider.Context.DeviceMessageSubscriptionTopic());
             }
         }
 
         private async Task AnnounceAvailabilityAsync( bool offline = false ) {
-            if(!mContext.MqttEnabled ) {
+            if(!mContextProvider.Context.MqttEnabled ) {
                 return;
             }
 
             try {
                 if( mMqttManager.IsConnected ) {
-                    var topic = mContext.DeviceAvailabilityTopic();
+                    var topic = mContextProvider.Context.DeviceAvailabilityTopic();
                     var messageBuilder = new MqttApplicationMessageBuilder()
                         .WithTopic( topic )
                         .WithPayload( offline ? Constants.Offline : Constants.Online )
-                        .WithRetainFlag( mContext.UseMqttRetainFlag );
+                        .WithRetainFlag( mContextProvider.Context.UseMqttRetainFlag );
 
                     await mMqttManager.PublishAsync( messageBuilder.Build());
                 }
@@ -162,18 +164,18 @@ namespace HassMqtt {
 
         private async Task AnnounceAutoDiscoveryConfigAsync( AbstractDiscoverable discoverable,
                                                              string domain, bool clearConfig = false ) {
-            if((!mContext.MqttEnabled ) ||
+            if((!mContextProvider.Context.MqttEnabled ) ||
                ( mMqttManager is not { IsConnected: true })) {
                 return;
             }
 
             try {
                 var topic =
-                    $"{mContext.DeviceBaseTopic( domain )}/{discoverable.ObjectId}/{Constants.Configuration}";
+                    $"{mContextProvider.Context.DeviceBaseTopic( domain )}/{discoverable.ObjectId}/{Constants.Configuration}";
 
                 var messageBuilder = new MqttApplicationMessageBuilder()
                     .WithTopic(topic)
-                    .WithRetainFlag( mContext.UseMqttRetainFlag );
+                    .WithRetainFlag( mContextProvider.Context.UseMqttRetainFlag );
 
                 if( clearConfig ) {
                     messageBuilder.WithPayload( Array.Empty<byte>() );

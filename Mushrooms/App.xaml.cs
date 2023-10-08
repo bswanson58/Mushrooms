@@ -94,11 +94,10 @@ namespace Mushrooms {
 
             // HassMqtt
             services.AddScoped<MqttFactory>();
-            services.AddSingleton<IClientConfiguration, ClientConfiguration>();
             services.AddSingleton<IMqttManager, MqttManager>();
-            services.AddSingleton<IHassContext, HassContext>();
             services.AddSingleton<IHassMqttManager, HassMqttManager>();
             services.AddSingleton<IHassManager, HassManager>();
+            services.AddSingleton<IHassContextProvider, HassContextProvider>();
             services.AddSingleton<ILightsManager, LightsManager>();
             services.AddSingleton<ISensorsManager, SensorsManager>();
 

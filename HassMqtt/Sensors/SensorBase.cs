@@ -12,16 +12,18 @@ namespace HassMqtt.Sensors {
         }
 
         protected override BaseDiscoveryModel ? CreateDiscoveryModel() {
-            if( HassContext == null ) {
+            var context = ContextProvider?.Context;
+
+            if( context == null ) {
                 return null;
             }
 
             return new SensorDiscoveryModel {
-                    AvailabilityTopic = HassContext.DeviceAvailabilityTopic(),
+                    AvailabilityTopic = context.DeviceAvailabilityTopic(),
                     Name = Name,
                     UniqueId = Id,
-                    Device = HassContext.DeviceConfiguration,
-                    StateTopic = $"{HassContext.DeviceBaseTopic( Domain )}/{ObjectId}/{Constants.State}/{Constants.Status}"
+                    Device = context.DeviceConfiguration,
+                    StateTopic = $"{context.DeviceBaseTopic( Domain )}/{ObjectId}/{Constants.State}/{Constants.Status}"
             };
         }
 

@@ -2,6 +2,8 @@
 using HassMqtt.Mqtt;
 using ReusableBits.Platform.Interfaces;
 
+// ReSharper disable IdentifierTypo
+
 namespace HassMqtt.Lights {
     public interface ILightsManager {
         Task    InitializeAsync();
@@ -17,7 +19,7 @@ namespace HassMqtt.Lights {
     public class LightsManager : ILightsManager, IMqttMessageHandler {
         private readonly List<LightBase>        mLights;
         private readonly IMqttManager           mMqttManager;
-        private readonly IHassContext           mHassContext;
+        private readonly IHassContextProvider   mContextProvider;
         private readonly IHassMqttManager       mHassManager;
         private readonly IBasicLog              mLog;
         private DateTime                        mLastAutoDiscoPublish;
@@ -25,10 +27,10 @@ namespace HassMqtt.Lights {
         private Task ?                          mProcessTask;
         private bool                            mPause;
 
-        public LightsManager( IMqttManager mqttManager, IBasicLog log, IHassContext hassContext, 
+        public LightsManager( IMqttManager mqttManager, IBasicLog log, IHassContextProvider contextProvider, 
                               IHassMqttManager hassManager ) {
             mMqttManager = mqttManager;
-            mHassContext = hassContext;
+            mContextProvider = contextProvider;
             mLog = log;
             mHassManager = hassManager;
 
@@ -83,7 +85,7 @@ namespace HassMqtt.Lights {
 
         public async Task AddLight( LightBase light ) {
             if( mMqttManager.IsConnected ) {
-                light.InitializeParameters( mHassContext );
+                light.InitializeParameters( mContextProvider );
             
                 // publish the initial discovery configuration
                 await mHassManager.PublishAutoDiscoveryConfigAsync( light );

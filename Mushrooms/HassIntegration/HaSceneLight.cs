@@ -28,10 +28,11 @@ namespace Mushrooms.HassIntegration {
 
         protected override BaseDiscoveryModel ? CreateDiscoveryModel() {
             var discoveryModel = base.CreateDiscoveryModel() as LightDiscoveryModel;
+            var context = ContextProvider?.Context;
 
             if(( discoveryModel != null ) &&
-               ( HassContext != null )) {
-                discoveryModel.RgbStateTopic = $"{HassContext.DeviceBaseTopic( Domain )}/{ObjectId}/color/{Constants.Status}";
+               ( context != null )) {
+                discoveryModel.RgbStateTopic = $"{context.DeviceBaseTopic( Domain )}/{ObjectId}/color/{Constants.Status}";
             }
 
             return discoveryModel;
