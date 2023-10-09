@@ -14,12 +14,9 @@ namespace HassMqtt {
         bool    ProcessMessage( MqttMessage message );
     }
 
-    public interface IHassMqttManager {
+    public interface IHassMqttManager : IDisposable {
         void    RegisterMessageHandler( IMqttMessageHandler handler );
         void    RevokeMessageHandler( IMqttMessageHandler handler );
-
-        Task    InitializeAsync();
-        Task    ShutdownAsync();
 
         Task    PublishAutoDiscoveryConfigAsync( AbstractDiscoverable discoverable );
         Task    RevokeAutoDiscoveryConfigAsync( AbstractDiscoverable discoverable );
@@ -34,6 +31,7 @@ namespace HassMqtt {
         private readonly List<IMqttMessageHandler>  mMessageHandlers;
         private DateTime                            mLastAvailableAnnouncementFailedLogged;
         private IDisposable ?                       mMessageSubscription;
+        private IDisposable ?                       mStatusSubscription;
         private CancellationTokenSource ?           mTokenSource;
         private Task ?                              mProcessTask;
 
@@ -44,16 +42,39 @@ namespace HassMqtt {
 
             mMessageHandlers = new List<IMqttMessageHandler>();
             mLastAvailableAnnouncementFailedLogged = DateTime.MinValue;
-        }
-
-        public Task InitializeAsync() {
-            mTokenSource = new CancellationTokenSource();
-
-            mProcessTask = Task.Run(() => Process( mTokenSource.Token ), mTokenSource.Token );
 
             mMessageSubscription = mMqttManager.OnMessageReceived.Subscribe( OnMessageReceived );
+            mStatusSubscription = mMqttManager.OnStatusChanged.Subscribe( OnMqttStatusChanged );
+        }
 
-            return Task.CompletedTask;
+        private async void OnMqttStatusChanged( MqttStatus status ) {
+            if( status.Equals( MqttStatus.Connected )) {
+                await StartProcessing();
+            }
+            else {
+                await StopProcessing();
+            }
+        }
+
+        private async Task StartProcessing() {
+            await StopProcessing();
+
+            mTokenSource = new CancellationTokenSource();
+            mProcessTask = Task.Run(() => Process( mTokenSource.Token ), mTokenSource.Token );
+        }
+
+        private async Task StopProcessing() {
+            mTokenSource?.Cancel();
+
+            if( mProcessTask != null ) {
+                await mProcessTask;
+
+                mProcessTask?.Dispose();
+                mProcessTask = null;
+            }
+
+            mTokenSource?.Dispose();
+            mTokenSource = null;
         }
 
         public void RegisterMessageHandler( IMqttMessageHandler handler ) {
@@ -260,6 +281,16 @@ namespace HassMqtt {
             catch( Exception ex ) {
                 mLog.LogException( $"Sensor '{device.Name}' - Error publishing state", ex );
             }
+        }
+
+        public async void Dispose() {
+            mMessageSubscription?.Dispose();
+            mMessageSubscription = null;
+
+            mStatusSubscription?.Dispose();
+            mStatusSubscription = null;
+
+            await StopProcessing();
         }
     }
 }

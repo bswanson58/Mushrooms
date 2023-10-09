@@ -36,7 +36,7 @@ namespace HassMqtt.Context {
             mContextSubject = new BehaviorSubject<IHassClientContext>( Context );
         }
 
-        public void UpdateContext() {
+        private void UpdateContext() {
             Context = CreateContext();
 
             mContextSubject.OnNext( Context );

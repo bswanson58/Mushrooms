@@ -20,15 +20,15 @@ namespace Mushrooms.HassIntegration {
             mGarden = garden;
         }
 
-        protected override async Task ExecuteAsync( CancellationToken stoppingToken ) {
-            await mHassManager.InitializeAsync();
-
+        protected override Task ExecuteAsync( CancellationToken stoppingToken ) {
             mSceneSubscription = mGarden.ActiveScenes
                 .AsObservableList()
                 .Connect()
                 .OnItemAdded( OnSceneAdded )
                 .OnItemRemoved( OnSceneRemoved )
                 .Subscribe();
+
+            return Task.CompletedTask;
         }
 
         private void OnSceneAdded( ActiveScene scene ) =>

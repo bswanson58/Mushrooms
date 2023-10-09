@@ -2,6 +2,8 @@
 using HassMqtt.Models;
 using HassMqtt.Support;
 
+// ReSharper disable IdentifierTypo
+
 namespace HassMqtt.Lights {
     public abstract class LightBase : AbstractDiscoverable {
         private const string    cDeviceName = "unknown light";

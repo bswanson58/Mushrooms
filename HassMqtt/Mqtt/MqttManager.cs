@@ -26,6 +26,7 @@ namespace HassMqtt.Mqtt {
 
         IObservable<MqttMessage>        OnMessageReceived { get; }
         IObservable<MqttMessage>        OnMessageProcessed {  get; }
+        IObservable<MqttStatus>         OnStatusChanged { get; }
 
         Task<OneOf<None, Exception>>    PublishAsync( string topic, string payload );
         Task<OneOf<None, Exception>>    PublishAsync( MqttApplicationMessage message );
@@ -36,30 +37,32 @@ namespace HassMqtt.Mqtt {
     }
 
     public class MqttManager : IMqttManager {
-        private readonly MqttFactory            mClientFactory;
-        private readonly Subject<MqttMessage>   mReceivedMessageSubject;
-        private readonly Subject<MqttMessage>   mProcessedMessageSubject;
-        private readonly IDisposable            mContextSubscription;
-        private IManagedMqttClient ?            mClient;
+        private readonly MqttFactory                    mClientFactory;
+        private readonly Subject<MqttMessage>           mReceivedMessageSubject;
+        private readonly Subject<MqttMessage>           mProcessedMessageSubject;
+        private readonly BehaviorSubject<MqttStatus>    mStatusSubject;
+        private readonly IDisposable                    mContextSubscription;
+        private IManagedMqttClient ?                    mClient;
 
-        public  bool                            IsEnabled { get; private set; }
-        public  bool                            IsConnected => mClient?.IsConnected == true;
+        public  bool                                    IsEnabled { get; private set; }
+        public  bool                                    IsConnected => mClient?.IsConnected == true;
 
-        public  MqttStatus                      Status { get; private set; }
+        public  MqttStatus                              Status { get; private set; }
 
-        public  IObservable<MqttMessage>        OnMessageReceived => mReceivedMessageSubject.AsObservable();
-        public  IObservable<MqttMessage>        OnMessageProcessed => mProcessedMessageSubject.AsObservable();
+        public  IObservable<MqttMessage>    OnMessageReceived => mReceivedMessageSubject.AsObservable();
+        public  IObservable<MqttMessage>    OnMessageProcessed => mProcessedMessageSubject.AsObservable();
+        public  IObservable<MqttStatus>     OnStatusChanged => mStatusSubject.AsObservable();
 
         public MqttManager( MqttFactory clientFactory, IHassContextProvider contextProvider ) {
             mClientFactory = clientFactory;
 
             IsEnabled = false;
-            Status = MqttStatus.Uninitialized;
 
             mReceivedMessageSubject = new Subject<MqttMessage>();
             mProcessedMessageSubject = new Subject<MqttMessage>();
 
             Status = MqttStatus.Uninitialized;
+            mStatusSubject = new BehaviorSubject<MqttStatus>( Status );
 
             mContextSubscription = contextProvider.OnContextChanged.Subscribe( OnContextChanged );
         }
@@ -74,6 +77,12 @@ namespace HassMqtt.Mqtt {
             mClient.ConnectedAsync += OnConnectedAsync;
             mClient.ConnectingFailedAsync += OnConnectingFailedAsync;
             mClient.DisconnectedAsync += OnDisconnectedAsync;
+        }
+
+        private void UpdateStatus( MqttStatus status ) {
+            Status = status;
+
+            mStatusSubject.OnNext( status );
         }
 
         private async void OnContextChanged( IHassClientContext context ) {
@@ -92,7 +101,7 @@ namespace HassMqtt.Mqtt {
                 }
 
                 if( context.MqttEnabled ) {
-                    Status = MqttStatus.Connecting;
+                    UpdateStatus( MqttStatus.Connecting );
 
                     var mqttClientOptions = new MqttClientOptionsBuilder()
                         .WithClientId( context.DeviceConfiguration.Identifiers )
@@ -127,28 +136,28 @@ namespace HassMqtt.Mqtt {
                 else {
                     IsEnabled = false;
 
-                    Status = MqttStatus.Disconnected;
+                    UpdateStatus( MqttStatus.Disconnected );
                 }
             }
             catch( Exception ) {
-                Status = MqttStatus.Error;
+                UpdateStatus( MqttStatus.Error );
             }
         }
 
         private Task OnConnectingFailedAsync( ConnectingFailedEventArgs arg ) {
-            Status = MqttStatus.Error;
+            UpdateStatus( MqttStatus.Error );
 
             return Task.CompletedTask;
         }
 
         private Task OnConnectedAsync( MqttClientConnectedEventArgs arg ) {
-            Status = MqttStatus.Connected;
+            UpdateStatus( MqttStatus.Connected );
 
             return Task.CompletedTask;
         }
 
         private Task OnDisconnectedAsync( MqttClientDisconnectedEventArgs arg ) {
-            Status = MqttStatus.Disconnected;
+            UpdateStatus( MqttStatus.Disconnected );
 
             return Task.CompletedTask;
         }
@@ -213,7 +222,7 @@ namespace HassMqtt.Mqtt {
                 await mClient.StopAsync();
             }
 
-            Status = MqttStatus.Disconnected;
+            UpdateStatus( MqttStatus.Disconnected );
         }
 
         private void DisposeExistingClient() {

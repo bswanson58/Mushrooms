@@ -1,5 +1,7 @@
 ﻿using HassMqtt.Support;
 
+// ReSharper disable IdentifierTypo
+
 namespace HassMqtt.Context {
     public class HassParameters {
         public string   DeviceName { get; set; }
