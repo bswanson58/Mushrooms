@@ -11,7 +11,7 @@
             ServerAddress = String.Empty;
             UserName = String.Empty;
             Password = String.Empty;
-            UseRetainFlag = false;
+            UseRetainFlag = true;
         }
     }
 }
