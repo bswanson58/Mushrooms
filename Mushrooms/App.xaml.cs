@@ -3,16 +3,10 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using Fluxor;
-using HassMqtt;
-using HassMqtt.Context;
-using HassMqtt.Hass;
-using HassMqtt.Lights;
-using HassMqtt.Mqtt;
-using HassMqtt.Sensors;
+using HassMqtt.Support;
 using HueLighting.Hub;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MQTTnet;
 using Mushrooms.Database;
 using Mushrooms.HassIntegration;
 using Mushrooms.Platform;
@@ -93,14 +87,7 @@ namespace Mushrooms {
             services.AddHostedService( p => p.GetRequiredService<MushroomGarden>());
 
             // HassMqtt
-            services.AddScoped<MqttFactory>();
-            services.AddSingleton<IMqttManager, MqttManager>();
-            services.AddSingleton<IHassMqttManager, HassMqttManager>();
-            services.AddSingleton<IHassManager, HassManager>();
-            services.AddSingleton<IHassContextProvider, HassContextProvider>();
-            services.AddSingleton<ILightsManager, LightsManager>();
-            services.AddSingleton<ISensorsManager, SensorsManager>();
-
+            services.AddHassIntegration();
             services.AddSingleton<HaLightingHandler>();
             services.AddHostedService( p => p.GetRequiredService<HaLightingHandler>());
 
