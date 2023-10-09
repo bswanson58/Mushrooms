@@ -9,7 +9,7 @@ using HassMqtt.Context;
 
 // ReSharper disable IdentifierTypo
 
-namespace HassMqtt {
+namespace HassMqtt.Hass {
     public interface IMqttMessageHandler {
         bool    ProcessMessage( MqttMessage message );
     }
@@ -33,7 +33,7 @@ namespace HassMqtt {
         private IDisposable ?                       mMessageSubscription;
         private IDisposable ?                       mStatusSubscription;
         private CancellationTokenSource ?           mTokenSource;
-        private Task ?                              mProcessTask;
+        private Task?                               mProcessTask;
 
         public HassMqttManager( IMqttManager mqttManager, IHassContextProvider contextProvider, IBasicLog log ) {
             mMqttManager = mqttManager;
@@ -181,20 +181,20 @@ namespace HassMqtt {
 
         private async Task AnnounceAutoDiscoveryConfigAsync( AbstractDiscoverable discoverable,
                                                              string domain, bool clearConfig = false ) {
-            if(!mMqttManager.IsConnected ) { 
+            if(!mMqttManager.IsConnected ) {
                 return;
             }
 
             try {
                 var topic =
-                    $"{mContextProvider.Context.DeviceBaseTopic( domain )}/{discoverable.ObjectId}/{Constants.Configuration}";
+                    $"{mContextProvider.Context.DeviceBaseTopic(domain)}/{discoverable.ObjectId}/{Constants.Configuration}";
 
                 var messageBuilder = new MqttApplicationMessageBuilder()
-                    .WithTopic(topic)
+                    .WithTopic( topic )
                     .WithRetainFlag( mContextProvider.Context.UseMqttRetainFlag );
 
                 if( clearConfig ) {
-                    messageBuilder.WithPayload( Array.Empty<byte>() );
+                    messageBuilder.WithPayload( Array.Empty<byte>());
                 }
                 else {
                     var discoveryConfig = discoverable.GetDiscoveryModel();

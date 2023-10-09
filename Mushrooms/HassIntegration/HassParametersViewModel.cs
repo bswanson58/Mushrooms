@@ -2,8 +2,8 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using HassMqtt;
+using HassMqtt.Hass;
 using HassMqtt.Mqtt;
-using HassMqtt.Platform;
 using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.DialogService;
 

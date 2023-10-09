@@ -1,6 +1,6 @@
 ﻿using HassMqtt.Context;
+using HassMqtt.Hass;
 using HassMqtt.Lights;
-using HassMqtt.Platform;
 
 // ReSharper disable IdentifierTypo
 

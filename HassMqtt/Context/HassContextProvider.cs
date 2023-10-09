@@ -5,7 +5,7 @@ using HassMqtt.Mqtt;
 using ReusableBits.Platform.Interfaces;
 using ReusableBits.Platform.Preferences;
 using System.Text.RegularExpressions;
-using HassMqtt.Platform;
+using HassMqtt.Hass;
 
 // ReSharper disable IdentifierTypo
 

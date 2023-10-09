@@ -1,4 +1,5 @@
 ﻿using HassMqtt.Context;
+using HassMqtt.Hass;
 using HassMqtt.Mqtt;
 using ReusableBits.Platform.Interfaces;
 
