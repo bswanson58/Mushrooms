@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using HassMqtt;
+using HassMqtt.Mqtt;
 using HassMqtt.Platform;
+using ReusableBits.Wpf.Commands;
 using ReusableBits.Wpf.DialogService;
 
 // ReSharper disable IdentifierTypo
@@ -8,19 +12,26 @@ using ReusableBits.Wpf.DialogService;
 namespace Mushrooms.HassIntegration {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class HassParametersViewModel : DialogAwareBase {
-        private readonly IHassManager           mHassManager;
-        private bool                            mEnableIntegration;
-        private bool                            mUseRetainFlag;
-        private string                          mServerAddress;
-        private string                          mUserName;
-        private string                          mPassword;
-        private string                          mDeviceName;
-        private string                          mClientIdentifier;
+        private readonly IHassManager   mHassManager;
+        private readonly IMqttManager   mMqttManager;
+        private bool                    mEnableIntegration;
+        private bool                    mUseRetainFlag;
+        private string                  mServerAddress;
+        private string                  mUserName;
+        private string                  mPassword;
+        private string                  mDeviceName;
+        private string                  mClientIdentifier;
+        private IDisposable ?           mStatusSubscription;
 
-        public  bool                            IsIntegrationEnabled => mEnableIntegration;
+        public  bool                    IsIntegrationEnabled => mEnableIntegration;
+        public  string                  MqttStatus { get; private set; }
+        public  string                  MqttMessage { get; private set; }
 
-        public HassParametersViewModel( IHassManager hassManager ) {
+        public  DelegateCommand         TestConnection { get; }
+
+        public HassParametersViewModel( IHassManager hassManager, IMqttManager mqttManager ) {
             mHassManager = hassManager;
+            mMqttManager = mqttManager;
 
             var parameters = mHassManager.GetHassMqttParameters();
 
@@ -32,7 +43,49 @@ namespace Mushrooms.HassIntegration {
             mDeviceName = parameters.DeviceName;
             mClientIdentifier = parameters.ClientIdentifier;
 
+            TestConnection = new DelegateCommand( OnTestConnection, CanAccept );
+
+            MqttStatus = String.Empty;
+            MqttMessage = String.Empty;
+
             Title = "Home Assistant Integration";
+        }
+
+        public override void OnDialogOpened( IDialogParameters parameters ) {
+            base.OnDialogOpened( parameters );
+
+            mStatusSubscription = mMqttManager.OnStatusChanged
+                .ObserveOn( CurrentThreadScheduler.Instance )
+                .Subscribe( OnMqttStatusChanged );
+        }
+
+        private void OnMqttStatusChanged( MqttStatus status ) {
+            switch ( status ) {
+                case HassMqtt.Mqtt.MqttStatus.Disconnected:
+                    MqttStatus = "Disconnected";
+                    break;
+
+                case HassMqtt.Mqtt.MqttStatus.Connected:
+                    MqttStatus = "Connected";
+                    break;
+
+                case HassMqtt.Mqtt.MqttStatus.Connecting:
+                    MqttStatus = "Connecting";
+                    break;
+
+                case HassMqtt.Mqtt.MqttStatus.Error:
+                    MqttStatus = "Error";
+                    break;
+
+                case HassMqtt.Mqtt.MqttStatus.Uninitialized:
+                    MqttStatus = "Uninitialized";
+                    break;
+            }
+
+            MqttMessage = mMqttManager.StatusMessage;
+
+            RaisePropertyChanged( () => MqttStatus );
+            RaisePropertyChanged( () => MqttMessage );
         }
 
         public bool EnableIntegration {
@@ -43,6 +96,7 @@ namespace Mushrooms.HassIntegration {
                 RaisePropertyChanged(() => EnableIntegration );
                 RaisePropertyChanged(() => IsIntegrationEnabled );
                 Ok.RaiseCanExecuteChanged();
+                TestConnection.RaiseCanExecuteChanged();
             }
         }
 
@@ -52,6 +106,7 @@ namespace Mushrooms.HassIntegration {
                 mServerAddress = value;
 
                 Ok.RaiseCanExecuteChanged();
+                TestConnection.RaiseCanExecuteChanged();
             }
         }
 
@@ -61,6 +116,7 @@ namespace Mushrooms.HassIntegration {
                 mUserName = value;
 
                 Ok.RaiseCanExecuteChanged();
+                TestConnection.RaiseCanExecuteChanged();
             }
         }
 
@@ -70,6 +126,7 @@ namespace Mushrooms.HassIntegration {
                 mPassword = value;
 
                 Ok.RaiseCanExecuteChanged();
+                TestConnection.RaiseCanExecuteChanged();
             }
         }
 
@@ -79,6 +136,7 @@ namespace Mushrooms.HassIntegration {
                 mDeviceName = value;
 
                 Ok.RaiseCanExecuteChanged();
+                TestConnection.RaiseCanExecuteChanged();
             }
         }
 
@@ -88,6 +146,7 @@ namespace Mushrooms.HassIntegration {
                 mClientIdentifier = value;
 
                 Ok.RaiseCanExecuteChanged();
+                TestConnection.RaiseCanExecuteChanged();
             }
         }
 
@@ -97,16 +156,11 @@ namespace Mushrooms.HassIntegration {
                 mUseRetainFlag = value;
 
                 Ok.RaiseCanExecuteChanged();
+                TestConnection.RaiseCanExecuteChanged();
             }
         }
 
-        protected override bool CanAccept() =>
-            !mEnableIntegration ||
-            !String.IsNullOrWhiteSpace( mServerAddress ) &&
-            !String.IsNullOrWhiteSpace( mDeviceName ) &&
-            !String.IsNullOrWhiteSpace( mClientIdentifier );
-
-        protected override void OnOk() {
+        private void UpdateParameters() {
             var parameters = new HassMqttParameters {
                 MqttEnabled = mEnableIntegration,
                 ServerAddress = mServerAddress,
@@ -118,8 +172,29 @@ namespace Mushrooms.HassIntegration {
             };
 
             mHassManager.SetHassMqttParameters( parameters );
+        }
+
+        protected override bool CanAccept() =>
+            !mEnableIntegration ||
+            !String.IsNullOrWhiteSpace( mServerAddress ) &&
+            !String.IsNullOrWhiteSpace( mDeviceName ) &&
+            !String.IsNullOrWhiteSpace( mClientIdentifier );
+
+        private void OnTestConnection() {
+            if( CanAccept()) {
+                UpdateParameters();
+            }
+        }
+
+        protected override void OnOk() {
+            UpdateParameters();
 
             base.OnOk();
+        }
+
+        public override void OnDialogClosed() {
+            mStatusSubscription?.Dispose();
+            mStatusSubscription = null;
         }
     }
 }

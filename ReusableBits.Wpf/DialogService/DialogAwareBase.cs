@@ -33,7 +33,7 @@ namespace ReusableBits.Wpf.DialogService {
         }
 
         public virtual bool CanCloseDialog() => true;
-        public void OnDialogClosed() { }
+        public virtual void OnDialogClosed() { }
 
         private void RaiseRequestClose( IDialogResult dialogResult ) {
             RequestClose?.Invoke( dialogResult );

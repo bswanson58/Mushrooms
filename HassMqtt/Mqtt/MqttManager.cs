@@ -20,12 +20,13 @@ namespace HassMqtt.Mqtt {
     }
 
     public interface IMqttManager : IDisposable {
-        bool                            IsConnected { get; }
         MqttStatus                      Status { get; }
+        string                          StatusMessage { get; }
+        bool                            IsConnected { get; }
+        IObservable<MqttStatus>         OnStatusChanged { get; }
 
         IObservable<MqttMessage>        OnMessageReceived { get; }
         IObservable<MqttMessage>        OnMessageProcessed {  get; }
-        IObservable<MqttStatus>         OnStatusChanged { get; }
 
         Task<OneOf<None, Exception>>    PublishAsync( string topic, string payload );
         Task<OneOf<None, Exception>>    PublishAsync( MqttApplicationMessage message );
@@ -46,6 +47,7 @@ namespace HassMqtt.Mqtt {
         public  bool                                    IsConnected => mClient?.IsConnected == true;
 
         public  MqttStatus                              Status { get; private set; }
+        public  string                                  StatusMessage { get; private set; }
 
         public  IObservable<MqttMessage>    OnMessageReceived => mReceivedMessageSubject.AsObservable();
         public  IObservable<MqttMessage>    OnMessageProcessed => mProcessedMessageSubject.AsObservable();
@@ -58,6 +60,7 @@ namespace HassMqtt.Mqtt {
             mProcessedMessageSubject = new Subject<MqttMessage>();
 
             Status = MqttStatus.Uninitialized;
+            StatusMessage = "Uninitialized";
             mStatusSubject = new BehaviorSubject<MqttStatus>( Status );
 
             mContextSubscription = contextProvider.OnContextChanged.Subscribe( OnContextChanged );
@@ -75,8 +78,9 @@ namespace HassMqtt.Mqtt {
             mClient.DisconnectedAsync += OnDisconnectedAsync;
         }
 
-        private void UpdateStatus( MqttStatus status ) {
+        private void UpdateStatus( MqttStatus status, string statusMessage = "" ) {
             Status = status;
+            StatusMessage = statusMessage;
 
             mStatusSubject.OnNext( status );
         }
@@ -131,25 +135,25 @@ namespace HassMqtt.Mqtt {
                     UpdateStatus( MqttStatus.Disconnected );
                 }
             }
-            catch( Exception ) {
-                UpdateStatus( MqttStatus.Error );
+            catch( Exception ex ) {
+                UpdateStatus( MqttStatus.Error, ex.Message );
             }
         }
 
         private Task OnConnectingFailedAsync( ConnectingFailedEventArgs arg ) {
-            UpdateStatus( MqttStatus.Error );
+            UpdateStatus( MqttStatus.Error, arg.Exception?.Message ?? String.Empty );
 
             return Task.CompletedTask;
         }
 
         private Task OnConnectedAsync( MqttClientConnectedEventArgs arg ) {
-            UpdateStatus( MqttStatus.Connected );
+            UpdateStatus( MqttStatus.Connected, arg.ConnectResult.ReasonString ?? String.Empty );
 
             return Task.CompletedTask;
         }
 
         private Task OnDisconnectedAsync( MqttClientDisconnectedEventArgs arg ) {
-            UpdateStatus( MqttStatus.Disconnected );
+            UpdateStatus( MqttStatus.Error, arg.Exception?.Message ?? String.Empty );
 
             return Task.CompletedTask;
         }
