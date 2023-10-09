@@ -47,10 +47,6 @@ namespace HassMqtt.Sensors {
         }
 
         public async Task InitializeAsync() {
-            if(!mMqttManager.IsEnabled ) {
-                return;
-            }
-
             // wait while connecting
             while( mMqttManager.Status == MqttStatus.Connecting ) {
                 await Task.Delay( 250 );

@@ -20,7 +20,6 @@ namespace HassMqtt.Mqtt {
     }
 
     public interface IMqttManager : IDisposable {
-        bool                            IsEnabled { get; }
         bool                            IsConnected { get; }
         MqttStatus                      Status { get; }
 
@@ -44,7 +43,6 @@ namespace HassMqtt.Mqtt {
         private readonly IDisposable                    mContextSubscription;
         private IManagedMqttClient ?                    mClient;
 
-        public  bool                                    IsEnabled { get; private set; }
         public  bool                                    IsConnected => mClient?.IsConnected == true;
 
         public  MqttStatus                              Status { get; private set; }
@@ -55,8 +53,6 @@ namespace HassMqtt.Mqtt {
 
         public MqttManager( MqttFactory clientFactory, IHassContextProvider contextProvider ) {
             mClientFactory = clientFactory;
-
-            IsEnabled = false;
 
             mReceivedMessageSubject = new Subject<MqttMessage>();
             mProcessedMessageSubject = new Subject<MqttMessage>();
@@ -130,12 +126,8 @@ namespace HassMqtt.Mqtt {
                     if( mClient != null ) {
                         await mClient.StartAsync( managedMqttClientOptions );
                     }
-
-                    IsEnabled = true;
                 }
                 else {
-                    IsEnabled = false;
-
                     UpdateStatus( MqttStatus.Disconnected );
                 }
             }

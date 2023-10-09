@@ -145,10 +145,6 @@ namespace HassMqtt {
         }
 
         private async Task AnnounceAvailabilityAsync( bool offline = false ) {
-            if(!mContextProvider.Context.MqttEnabled ) {
-                return;
-            }
-
             try {
                 if( mMqttManager.IsConnected ) {
                     var topic = mContextProvider.Context.DeviceAvailabilityTopic();
@@ -185,8 +181,7 @@ namespace HassMqtt {
 
         private async Task AnnounceAutoDiscoveryConfigAsync( AbstractDiscoverable discoverable,
                                                              string domain, bool clearConfig = false ) {
-            if((!mContextProvider.Context.MqttEnabled ) ||
-               ( mMqttManager is not { IsConnected: true })) {
+            if(!mMqttManager.IsConnected ) { 
                 return;
             }
 
